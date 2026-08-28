@@ -1,0 +1,74 @@
+{
+  "coreInterfaceStructure": {
+    "pageSpecificVisualDirection": {
+      "calculatorDirectory": {
+        "inspiration": "WattWise-inspired energy dashboard card system",
+        "visualCharacteristics": [
+          "Clean white cards on a cool light-gray background",
+          "3-4 column responsive card grid on desktop",
+          "Soft blue icon containers",
+          "Deep blue icons and key accents",
+          "Moderate 16-18px corner radius",
+          "Very subtle border and elevation",
+          "Strong visual hierarchy using icon → title → short description",
+          "Hover behavior limited to slight elevation, border emphasis, and shadow increase",
+          "Avoid dense dashboard charts on directory pages",
+          "Prioritize discoverability and fast tool selection"
+        ],
+        "calculatorCard": [
+          "Category-specific icon",
+          "Calculator title",
+          "One-line description",
+          "Optional small category badge",
+          "Clear forward-navigation indicator",
+          "Entire card should be clickable"
+        ],
+        "overall": "The calculator directory should visually resemble a modern energy-management dashboard tool grid rather than a traditional text-heavy utility directory."
+      },
+      "calculatorDetail": {
+        "inspiration": "Intentionally minimal, task-focused visual design",
+        "primaryPrinciple": "Users should immediately understand where to enter values and where the result appears. The calculation interface must be significantly simpler than the homepage and tool directory.",
+        "layout": [
+          "Minimal breadcrumb",
+          "Calculator title",
+          "One-sentence description",
+          "Single clean calculation panel",
+          "Inputs grouped vertically or in a simple responsive grid",
+          "Primary Calculate button",
+          "Clearly separated result panel",
+          "Formula / assumptions / examples placed below using progressive disclosure"
+        ],
+        "avoid": [
+          "Decorative dashboard widgets",
+          "Large illustrations",
+          "Charts unless essential to understanding the calculation",
+          "Multiple competing cards",
+          "Unnecessary gradients",
+          "Excessive icons",
+          "Marketing content inside the active calculation workflow"
+        ],
+        "desktop": {
+          "simpleCalculator": "centered panel with max-width 720-840px",
+          "complexCalculator": "input panel on left, result panel on right",
+          "technicalContent": "below the primary calculation area"
+        },
+        "mobile": [
+          "Single-column layout",
+          "Full-width inputs",
+          "Full-width primary CTA",
+          "Result immediately follows Calculate action"
+        ],
+        "overall": "The calculator screen must feel closer to a professional engineering instrument than a marketing dashboard."
+      }
+    }
+  },
+  "visualQualityBenchmarks": {
+    "pageHierarchyVisualRule": {
+      "homepage": "Smart Energy SaaS landing-page style.",
+      "calculatorDirectory": "WattWise-inspired card-based dashboard style.",
+      "calculatorDetail": "Minimal engineering utility interface.",
+      "referenceArticles": "Clean technical documentation style.",
+      "rule": "Do not apply dashboard complexity uniformly across all pages. The visual density must decrease as the user moves from discovery → tool selection → actual calculation."
+    }
+  }
+}
