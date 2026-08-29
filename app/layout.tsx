@@ -62,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${inter.variable} ${noto.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
+        <meta name="naver-site-verification" content="365dbd9fadf2c2c55603122bccfc9890040eb198" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-full flex-col bg-surface font-sans text-ink">
