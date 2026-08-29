@@ -42,6 +42,10 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
+  // Google Search Console 소유권 확인 — 확인 후에도 유지
+  verification: {
+    google: "McWQLec0319-LplEbAorWs8e6-sR7kLqasnHfsbdfzM",
+  },
 };
 
 const themeScript = `(function(){try{var p=JSON.parse(localStorage.getItem('voltdesk:preferences')||'{}');var t=p.theme||'system';var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
