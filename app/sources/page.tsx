@@ -4,7 +4,7 @@ import { formulas } from "@/lib/data/formulas";
 
 export const metadata: Metadata = {
   title: "참고 문헌·출처",
-  description: "VoltDesk 계산기와 문서가 인용하는 규격·공학 참고 자료 목록.",
+  description: "Ampory 계산기와 문서가 인용하는 규격·공학 참고 자료 목록.",
   alternates: { canonical: "/sources" },
 };
 

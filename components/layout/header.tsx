@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Heart, Menu, Moon, Search, Settings, Sun, X, Zap } from "lucide-react";
+import { Heart, Menu, Moon, Search, Settings, Sun, X } from "lucide-react";
 import { SearchOverlay } from "@/components/layout/search-overlay";
+import { AmporyMark, AmporyWordmark } from "@/components/brand/ampory-mark";
 import { usePreferences } from "@/components/providers/preferences-provider";
 
 const NAV = [
@@ -43,11 +44,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-card/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-ink">
-          <span className="flex size-8 items-center justify-center rounded-xl bg-primary text-white dark:text-ink">
-            <Zap className="size-4" aria-hidden />
-          </span>
-          <span>VoltDesk</span>
+        <Link href="/" className="flex items-center gap-2.5" aria-label="Ampory 홈">
+          <AmporyMark className="size-9 shrink-0" />
+          <AmporyWordmark className="text-base" />
         </Link>
         <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="주요">
           {NAV.map((item) => {

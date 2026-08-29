@@ -185,10 +185,10 @@ export const DEFAULT_PREFERENCES: UserPreference = {
 };
 
 export const SITE = {
-  name: "VoltDesk",
-  nameKo: "볼트데스크",
+  name: "Ampory",
+  nameKo: "앰포리",
   tagline: "전기·시설 엔지니어링 계산 도구",
   description:
     "부하전류, 전압강하, 변압기 부하율, 역률, UPS 백업시간 등 전기·시설관리 실무 계산기와 기술 참고자료를 제공하는 엔지니어링 유틸리티입니다.",
-  url: "https://voltdesk.app",
+  url: "https://ampory.app",
 } as const;

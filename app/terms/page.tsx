@@ -3,7 +3,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export const metadata: Metadata = {
   title: "이용약관",
-  description: "VoltDesk 계산 결과는 공학 보조 도구이며 설계·시공 승인을 대체하지 않습니다.",
+  description: "Ampory 계산 결과는 공학 보조 도구이며 설계·시공 승인을 대체하지 않습니다.",
   alternates: { canonical: "/terms" },
 };
 

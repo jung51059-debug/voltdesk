@@ -5,7 +5,7 @@ import { getPublishedTools } from "@/lib/data/tools";
 
 export const metadata: Metadata = {
   title: "전체 엔지니어링 도구",
-  description: "VoltDesk의 전기 계산기와 시설 관리 도구를 한곳에서 살펴봅니다.",
+  description: "Ampory의 전기 계산기와 시설 관리 도구를 한곳에서 살펴봅니다.",
   alternates: { canonical: "/tools" },
 };
 
