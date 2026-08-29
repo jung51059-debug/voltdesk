@@ -18,7 +18,7 @@ describe("RSS", () => {
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     expect(xml).toContain("<rss version=\"2.0\"");
     expect(xml).toContain("kW와 kVA의 차이");
-    expect(xml).toContain("https://ampory.app/feed.xml");
-    expect(xml).toContain("https://ampory.app/references/kw-vs-kva");
+    expect(xml).toContain("https://ampory.vercel.app/feed.xml");
+    expect(xml).toContain("https://ampory.vercel.app/references/kw-vs-kva");
   });
 });
