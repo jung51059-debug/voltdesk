@@ -47,9 +47,12 @@ export const metadata: Metadata = {
       "application/rss+xml": "/feed.xml",
     },
   },
-  // Google Search Console 소유권 확인 — 확인 후에도 유지
+  // Google·네이버 검색 소유권 확인 — 확인 후에도 유지
   verification: {
     google: "McWQLec0319-LplEbAorWs8e6-sR7kLqasnHfsbdfzM",
+    other: {
+      "naver-site-verification": "365dbd9fadf2c2c55603122bccfc9890040eb198",
+    },
   },
 };
 
