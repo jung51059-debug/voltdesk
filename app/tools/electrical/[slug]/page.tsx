@@ -4,21 +4,21 @@ import { CalculatorWorkspace } from "@/components/calculators/calculator-workspa
 import { JsonLd } from "@/components/seo/json-ld";
 import { getRelatedArticles } from "@/lib/data/articles";
 import { getFormulaById } from "@/lib/data/formulas";
-import { getPublishedTools, getRelatedTools, getToolBySlug } from "@/lib/data/tools";
+import { getPublishedTools, getRelatedTools, getToolBySlug, isElectricalWorkspaceTool } from "@/lib/data/tools";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
   return getPublishedTools()
-    .filter((tool) => tool.domain === "electrical")
+    .filter(isElectricalWorkspaceTool)
     .map((tool) => ({ slug: tool.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = getToolBySlug(slug);
-  if (!tool || tool.domain !== "electrical") return {};
+  if (!tool || !isElectricalWorkspaceTool(tool)) return {};
   return {
     title: tool.name,
     description: tool.longDescription,
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ElectricalToolPage({ params }: Props) {
   const { slug } = await params;
   const tool = getToolBySlug(slug);
-  if (!tool || tool.domain !== "electrical") notFound();
+  if (!tool || !isElectricalWorkspaceTool(tool)) notFound();
   const formula = getFormulaById(tool.formulaId);
   if (!formula) notFound();
   const related = getRelatedTools(tool);

@@ -7,7 +7,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentArticle } from "@/components/references/track-recent-article";
 import { articles, getArticleBySlug, getRelatedToolsForArticle } from "@/lib/data/articles";
 import { getCategoryById } from "@/lib/data/categories";
-import { breadcrumbJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -44,6 +44,7 @@ export default async function ArticlePage({ params }: Props) {
           { name: article.title, href: article.href },
         ])}
       />
+      {article.faqs && article.faqs.length > 0 ? <JsonLd data={faqJsonLd(article.faqs)} /> : null}
       <Breadcrumb
         items={[
           { href: "/", label: "홈" },
@@ -95,6 +96,19 @@ export default async function ArticlePage({ params }: Props) {
               ))}
             </ul>
           </section>
+          {article.faqs && article.faqs.length > 0 ? (
+            <section>
+              <h2 className="text-xl font-semibold">FAQ</h2>
+              <dl className="mt-3 space-y-4">
+                {article.faqs.map((faq) => (
+                  <div key={faq.question}>
+                    <dt className="font-medium">{faq.question}</dt>
+                    <dd className="mt-1 leading-7 text-muted">{faq.answer}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ) : null}
         </div>
         <div className="space-y-4">
           {tools[0] ? (

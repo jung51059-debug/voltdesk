@@ -1,4 +1,5 @@
 import { articles } from "@/lib/data/articles";
+import { getHubCategories } from "@/lib/data/categories";
 import { getPublishedTools } from "@/lib/data/tools";
 import { SITE } from "@/lib/types";
 
@@ -60,7 +61,8 @@ export function sitemapEntries() {
     "/contact",
     "/sources",
   ];
+  const categoryPaths = getHubCategories().map((category) => `/tools/categories/${category.slug}`);
   const toolPaths = getPublishedTools().map((tool) => tool.href);
   const articlePaths = articles.map((article) => article.href);
-  return [...staticPaths, ...toolPaths, ...articlePaths];
+  return [...staticPaths, ...categoryPaths, ...toolPaths, ...articlePaths];
 }

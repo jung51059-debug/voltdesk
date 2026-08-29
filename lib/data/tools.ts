@@ -1,11 +1,13 @@
 import type { CalculatorTool } from "@/lib/types";
+import { extraTools } from "@/lib/data/tools-extra";
+import { formSchemas } from "@/lib/calculations/schemas";
 
-export const tools: CalculatorTool[] = [
+export const baseTools: CalculatorTool[] = [
   {
     id: "tool-single-phase-current",
     slug: "single-phase-current",
     href: "/tools/electrical/single-phase-current",
-    categoryId: "cat-load-current",
+    categoryId: "cat-electrical-basics",
     domain: "electrical",
     name: "단상 부하전류 계산기",
     nameEn: "Single-phase load current calculator",
@@ -44,7 +46,7 @@ export const tools: CalculatorTool[] = [
     id: "tool-three-phase-current",
     slug: "three-phase-current",
     href: "/tools/electrical/three-phase-current",
-    categoryId: "cat-load-current",
+    categoryId: "cat-electrical-basics",
     domain: "electrical",
     name: "3상 부하전류 계산기",
     nameEn: "Three-phase load current calculator",
@@ -85,7 +87,7 @@ export const tools: CalculatorTool[] = [
     id: "tool-kw-kva-hp",
     slug: "kw-kva-hp",
     href: "/tools/electrical/kw-kva-hp",
-    categoryId: "cat-conversion",
+    categoryId: "cat-electrical-basics",
     domain: "electrical",
     name: "kW / kVA / HP 환산기",
     nameEn: "kW / kVA / HP converter",
@@ -114,7 +116,7 @@ export const tools: CalculatorTool[] = [
     id: "tool-power-factor",
     slug: "power-factor",
     href: "/tools/electrical/power-factor",
-    categoryId: "cat-power-factor",
+    categoryId: "cat-power-quality",
     domain: "electrical",
     name: "역률 계산기",
     nameEn: "Power factor calculator",
@@ -147,17 +149,18 @@ export const tools: CalculatorTool[] = [
     domain: "electrical",
     name: "변압기 용량·부하율 계산기",
     nameEn: "Transformer capacity and load ratio calculator",
-    description: "정격 kVA 대비 실제 부하율과 여유 용량을 산정합니다.",
+    description: "정격 kVA 대비 설계 부하 또는 현장 측정 전압·전류로 부하율과 여유 용량을 산정합니다.",
     longDescription:
-      "변압기 명판 용량과 실제 부하(kW 또는 kVA)로 부하율, 여유 kVA, 해석 문구를 제공합니다. 온도·고조파 derating은 포함하지 않습니다.",
+      "설계 계산(kW 또는 kVA)과 현장 측정(전압·전류) 모드를 제공합니다. R/S/T가 있으면 평균전류 기반 추정 부하와 최대상 전류를 보여 줍니다. 온도·고조파 derating은 포함하지 않습니다.",
     formulaId: "formula-transformer-load",
     tags: ["변압기", "부하율", "kVA", "TR"],
     synonyms: ["변압기 부하율", "transformer load", "변압기용량", "TR 부하", "부하율 계산"],
     relatedToolIds: [
       "tool-three-phase-current",
-      "tool-generator-load",
-      "tool-power-factor",
-      "tool-monthly-energy",
+      "tool-transformer-sizing",
+      "tool-field-compare",
+      "tool-phase-unbalance",
+      "tool-load-schedule",
     ],
     relatedArticleIds: ["art-transformer-load", "art-kw-vs-kva"],
     complexity: "intermediate",
@@ -169,7 +172,7 @@ export const tools: CalculatorTool[] = [
       {
         question: "적정 부하율은 얼마인가요?",
         answer:
-          "시설과 여유 정책에 따라 다릅니다. 상시 50~70%를 실무에서 자주 보며, 80%를 넘으면 증설과 온도를 검토하는 경우가 많습니다. 규정 확정값이 아닙니다.",
+          "프로젝트 운영기준과 제조사·냉각조건을 확인하세요. Ampory가 부하율 구간을 합격/경고로 나누지 않습니다.",
       },
     ],
   },
@@ -177,7 +180,7 @@ export const tools: CalculatorTool[] = [
     id: "tool-voltage-drop",
     slug: "voltage-drop",
     href: "/tools/electrical/voltage-drop",
-    categoryId: "cat-voltage-drop",
+    categoryId: "cat-cable",
     domain: "electrical",
     name: "전압강하 계산기",
     nameEn: "Voltage drop calculator",
@@ -326,7 +329,7 @@ export const tools: CalculatorTool[] = [
     id: "tool-generator-load",
     slug: "generator-load",
     href: "/tools/facility/generator-load",
-    categoryId: "cat-equipment",
+    categoryId: "cat-generator",
     domain: "facility",
     name: "발전기 부하율 계산기",
     nameEn: "Generator load ratio calculator",
@@ -336,7 +339,7 @@ export const tools: CalculatorTool[] = [
     formulaId: "formula-generator-load",
     tags: ["발전기", "부하율", "비상발전기", "kW"],
     synonyms: ["generator load", "비상발전기", "GEN 부하", "디젤발전기", "부하율"],
-    relatedToolIds: ["tool-transformer-load", "tool-ups-backup-time", "tool-three-phase-current"],
+    relatedToolIds: ["tool-transformer-load", "tool-generator-load-test", "tool-generator-sizing"],
     relatedArticleIds: ["art-ups-vs-generator", "art-transformer-load"],
     complexity: "basic",
     featured: true,
@@ -355,7 +358,7 @@ export const tools: CalculatorTool[] = [
     id: "tool-monthly-energy",
     slug: "monthly-energy",
     href: "/tools/facility/monthly-energy",
-    categoryId: "cat-facility-energy",
+    categoryId: "cat-facility-ops",
     domain: "facility",
     name: "월간 전력사용량 비교",
     nameEn: "Monthly electricity consumption comparison",
@@ -372,7 +375,7 @@ export const tools: CalculatorTool[] = [
       "에너지 비교",
       "검침",
     ],
-    relatedToolIds: ["tool-transformer-load", "tool-power-factor", "tool-kw-kva-hp"],
+    relatedToolIds: ["tool-energy-cost", "tool-retrofit-compare", "tool-trend-analysis"],
     relatedArticleIds: ["art-kw-vs-kva", "art-power-factor-poor"],
     complexity: "basic",
     featured: true,
@@ -388,6 +391,16 @@ export const tools: CalculatorTool[] = [
     ],
   },
 ];
+
+export const tools: CalculatorTool[] = [...baseTools, ...extraTools];
+
+export function isElectricalWorkspaceTool(tool: { href: string; slug: string; domain: string }): boolean {
+  return tool.domain === "electrical" && tool.href === `/tools/electrical/${tool.slug}` && Boolean(formSchemas[tool.slug]);
+}
+
+export function isFacilityWorkspaceTool(tool: { href: string; slug: string; domain: string }): boolean {
+  return tool.domain === "facility" && tool.href === `/tools/facility/${tool.slug}` && Boolean(formSchemas[tool.slug]);
+}
 
 export function getToolById(id: string): CalculatorTool | undefined {
   return tools.find((tool) => tool.id === id);

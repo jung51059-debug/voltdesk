@@ -1,7 +1,8 @@
 import type { ReferenceArticle } from "@/lib/types";
 import { getToolById } from "@/lib/data/tools";
+import { guideArticles } from "@/lib/data/articles-guides";
 
-export const articles: ReferenceArticle[] = [
+export const baseArticles: ReferenceArticle[] = [
   {
     id: "art-kw-vs-kva",
     slug: "kw-vs-kva",
@@ -266,7 +267,7 @@ export const articles: ReferenceArticle[] = [
     title: "전압강하 계산의 원리",
     summary:
       "전압강하는 도체 저항과 리액턴스에 전류가 흐르며 생기는 전압 손실입니다. 간단한 실무 근사는 저항만으로 ΔV를 구하고, 정확한 설계는 케이블 임피던스표를 씁니다.",
-    categoryId: "cat-voltage-drop",
+    categoryId: "cat-cable",
     relatedToolIds: ["tool-voltage-drop", "tool-cable-resistance", "tool-three-phase-current"],
     tags: ["전압강하", "케이블", "임피던스"],
     synonyms: ["voltage drop", "선로 전압강하", "VD"],
@@ -308,7 +309,7 @@ export const articles: ReferenceArticle[] = [
     title: "역률이 나빠지는 이유",
     summary:
       "유도성 부하의 자화 전류, 경부하 변압기·모터, 고조파를 만드는 전력전자 부하가 역률을 떨어뜨립니다. 결과는 전류 증가, 손실, 설비 용량 잠식입니다.",
-    categoryId: "cat-power-factor",
+    categoryId: "cat-power-quality",
     relatedToolIds: ["tool-power-factor", "tool-kw-kva-hp", "tool-transformer-load"],
     tags: ["역률", "무효전력", "고조파"],
     synonyms: ["역률 저하", "저역률", "power factor correction", "진상", "지상"],
@@ -351,7 +352,7 @@ export const articles: ReferenceArticle[] = [
     title: "단상 전류와 3상 전류",
     summary:
       "같은 전력이라도 단상과 3상은 전류 공식이 다릅니다. 3상은 선간전압과 √3이 들어가며, 동일 전력에서 선전류가 작아 배전에 유리합니다.",
-    categoryId: "cat-load-current",
+    categoryId: "cat-electrical-basics",
     relatedToolIds: ["tool-single-phase-current", "tool-three-phase-current", "tool-voltage-drop"],
     tags: ["단상", "3상", "전류"],
     synonyms: ["단상 vs 3상", "선전류", "상전류", "three phase vs single phase"],
@@ -381,6 +382,13 @@ export const articles: ReferenceArticle[] = [
         paragraphs: [
           "동일 전력 전송 시 도체 전류가 작고, 전동기가 스스로 회전 자계를 만들며, 전력이 맥동하지 않습니다.",
           "주거·소규모 부하 일부는 단상으로 충분하고, 동력·간선은 3상이 표준입니다.",
+        ],
+      },
+      {
+        heading: "3상 4선식 중성선과 고조파",
+        paragraphs: [
+          "3상 4선식에서는 불평형 단상부하 때문에 중성선 전류가 생깁니다. PC·SMPS·LED·UPS처럼 비선형 단상부하가 많으면 3고조파 및 triplen harmonic이 중성선에서 서로 상쇄되지 않고 합산될 수 있습니다.",
+          "현장에서는 R/S/T와 N을 각각 true-RMS로 재는 것이 유용합니다. Ampory Facility의 상전류 편차율은 영상분·중성선 계산을 포함하지 않으며, Neutral / Zero-sequence Analysis는 이후 Power Quality 영역에서 다룹니다.",
         ],
       },
     ],
@@ -426,6 +434,8 @@ export const articles: ReferenceArticle[] = [
     ],
   },
 ];
+
+export const articles: ReferenceArticle[] = [...baseArticles, ...guideArticles];
 
 export function getArticleBySlug(slug: string): ReferenceArticle | undefined {
   return articles.find((article) => article.slug === slug);

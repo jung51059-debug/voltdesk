@@ -17,7 +17,7 @@ function getServerSnapshot() {
 
 export function RecentToolsStrip() {
   const pathname = usePathname();
-  const onCalculator = /^\/tools\/(electrical|facility)\/[^/]+$/.test(pathname);
+  const onCalculator = /^\/tools\/(electrical|facility|schedules|advanced|categories)\/[^/]+$/.test(pathname);
   const raw = useSyncExternalStore(subscribeStorage, getSnapshot, getServerSnapshot);
   const ids = JSON.parse(raw) as string[];
   const tools = ids.map((id) => getToolById(id)).filter((tool) => Boolean(tool));

@@ -26,7 +26,7 @@ function emitStorage() {
   listeners.forEach((listener) => listener());
 }
 
-function readJson<T>(key: string, fallback: T): T {
+export function readJson<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = window.localStorage.getItem(key);
@@ -37,7 +37,7 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
-function writeJson(key: string, value: unknown) {
+export function writeJson(key: string, value: unknown) {
   window.localStorage.setItem(key, JSON.stringify(value));
   emitStorage();
 }

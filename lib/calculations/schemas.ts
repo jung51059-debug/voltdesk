@@ -1,10 +1,12 @@
+import { extraFormSchemas } from "@/lib/calculations/schemas-extra";
+
 export type SelectOption = { value: string; label: string };
 
 export type FieldDef = {
   id: string;
   label: string;
   hint?: string;
-  kind: "number" | "select";
+  kind: "number" | "select" | "textarea" | "text";
   required?: boolean;
   min?: number;
   max?: number;
@@ -37,7 +39,7 @@ const voltageUnits = [
   { value: "kV", label: "kV" },
 ];
 
-export const formSchemas: Record<string, FormSchema> = {
+export const baseFormSchemas: Record<string, FormSchema> = {
   "single-phase-current": {
     slug: "single-phase-current",
     layout: "simple",
@@ -128,7 +130,7 @@ export const formSchemas: Record<string, FormSchema> = {
   "transformer-load": {
     slug: "transformer-load",
     layout: "complex",
-    defaults: { ratedKva: "1000", loadMode: "kw", loadKw: "720", loadKva: "800", pf: "0.9" },
+    defaults: { ratedKva: "1000", loadMode: "kw", loadKw: "720", loadKva: "800", pf: "0.9", phase: "3", voltage: "380", current: "800", ir: "", is: "", it: "", ratedCurrent: "", designKva: "" },
     fields: [
       { id: "ratedKva", label: "정격 용량 kVA", kind: "number", required: true, min: 0, step: "any" },
       {
@@ -136,13 +138,31 @@ export const formSchemas: Record<string, FormSchema> = {
         label: "부하 입력",
         kind: "select",
         options: [
-          { value: "kw", label: "유효전력 kW + 역률" },
-          { value: "kva", label: "피상전력 kVA" },
+          { value: "kw", label: "설계 계산 · kW + 역률" },
+          { value: "kva", label: "설계 계산 · kVA" },
+          { value: "measured", label: "현장 측정 · 전압·전류" },
         ],
       },
       { id: "loadKw", label: "부하 유효전력 kW", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["kw"] } },
-      { id: "pf", label: "역률 PF", kind: "number", min: 0, max: 1, step: "0.01", visibleWhen: { field: "loadMode", values: ["kw"] } },
+      { id: "pf", label: "역률 PF", kind: "number", min: 0, max: 1, step: "0.01", visibleWhen: { field: "loadMode", values: ["kw", "measured"] }, hint: "측정 모드에서 비우면 kW는 추정하지 않습니다." },
       { id: "loadKva", label: "부하 kVA", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["kva"] } },
+      {
+        id: "phase",
+        label: "상",
+        kind: "select",
+        visibleWhen: { field: "loadMode", values: ["measured"] },
+        options: [
+          { value: "3", label: "3상" },
+          { value: "1", label: "단상" },
+        ],
+      },
+      { id: "voltage", label: "선간전압 V", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] }, hint: "3상은 선간전압. 상전압을 넣지 마세요." },
+      { id: "current", label: "선전류 A (균형 가정)", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] }, hint: "상이 다르면 아래 R/S/T를 넣으세요." },
+      { id: "ir", label: "R 상전류 A", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] } },
+      { id: "is", label: "S 상전류 A", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] } },
+      { id: "it", label: "T 상전류 A", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] } },
+      { id: "ratedCurrent", label: "명판 정격전류 A (선택)", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] }, hint: "넣으면 최대상 전류 / 정격전류만 보여 줍니다. 자동 한도 판정이 아닙니다." },
+      { id: "designKva", label: "부하표 예상 kVA (선택 비교)", kind: "number", min: 0, step: "any", visibleWhen: { field: "loadMode", values: ["measured"] }, hint: "Load Schedule 수요 kVA를 넣어 실측과 비교합니다." },
     ],
   },
   "voltage-drop": {
@@ -220,6 +240,7 @@ export const formSchemas: Record<string, FormSchema> = {
         visibleWhen: { field: "rMode", values: ["size"] },
       },
       { id: "area", label: "단면적 mm²", kind: "number", min: 0, step: "any", visibleWhen: { field: "rMode", values: ["size"] } },
+      { id: "allowPct", label: "사용자 허용 전압강하 % (선택)", kind: "number", min: 0, step: "any", hint: "비우면 상태 비교를 하지 않습니다." },
     ],
   },
   "cable-resistance": {
@@ -255,10 +276,23 @@ export const formSchemas: Record<string, FormSchema> = {
   "breaker-current": {
     slug: "breaker-current",
     layout: "simple",
-    defaults: { current: "87", margin: "1.25" },
+    defaults: { current: "87", margin: "1.25", loadType: "mixed", iscKa: "", icuKa: "" },
     fields: [
       { id: "current", label: "부하전류 A", kind: "number", required: true, min: 0, step: "any" },
       { id: "margin", label: "여유율", kind: "number", min: 1, max: 3, step: "0.05", hint: "연속 부하에 1.25를 쓰는 실무가 있으나 규정이 아닙니다." },
+      {
+        id: "loadType",
+        label: "부하 종류",
+        kind: "select",
+        options: [
+          { value: "mixed", label: "일반 혼합" },
+          { value: "motor", label: "모터" },
+          { value: "heater", label: "전열" },
+          { value: "it", label: "IT/비선형" },
+        ],
+      },
+      { id: "iscKa", label: "단락전류 kA (선택)", kind: "number", min: 0, step: "any", hint: "차단용량 비교용. 없으면 생략" },
+      { id: "icuKa", label: "차단기 Icu kA (선택)", kind: "number", min: 0, step: "any" },
     ],
   },
   "ups-backup-time": {
@@ -274,6 +308,7 @@ export const formSchemas: Record<string, FormSchema> = {
       loadUnit: "kW",
       efficiency: "0.92",
       dod: "0.8",
+      aging: "1",
     },
     fields: [
       {
@@ -315,17 +350,26 @@ export const formSchemas: Record<string, FormSchema> = {
       },
       { id: "efficiency", label: "변환 효율", kind: "number", min: 0, max: 1, step: "0.01" },
       { id: "dod", label: "방전심도 DOD", kind: "number", min: 0, max: 1, step: "0.01", hint: "연축전지 0.5~0.8 범위가 흔합니다." },
+      { id: "aging", label: "노화 보정 (선택)", kind: "number", min: 0, max: 1, step: "0.01", advanced: true },
     ],
   },
   "ups-capacity": {
     slug: "ups-capacity",
-    layout: "simple",
-    defaults: { loadKw: "40", pf: "0.9", growth: "0.2", outputPf: "0.9" },
+    layout: "complex",
+    defaults: { mode: "basic", loadKw: "40", pf: "0.9", growth: "0.2", outputPf: "0.9", efficiency: "0.92", dcV: "384", hours: "0.25", cellV: "12", moduleAh: "100", dod: "0.8", aging: "0.8" },
     fields: [
+      { id: "mode", label: "계산 모드", kind: "select", options: [{ value: "basic", label: "기본 계산" }, { value: "detailed", label: "상세 계산" }] },
       { id: "loadKw", label: "부하 유효전력 kW", kind: "number", required: true, min: 0, step: "any" },
       { id: "pf", label: "부하 역률", kind: "number", min: 0, max: 1, step: "0.01" },
       { id: "growth", label: "장래 여유 (소수)", kind: "number", min: 0, max: 2, step: "0.05", hint: "20%면 0.2" },
       { id: "outputPf", label: "UPS 정격 출력 역률", kind: "number", min: 0, max: 1, step: "0.01", advanced: true },
+      { id: "efficiency", label: "인버터 효율 (배터리 수지)", kind: "number", min: 0, max: 1, step: "0.01", advanced: true },
+      { id: "dcV", label: "DC 전압 V", kind: "number", min: 0, step: "any", advanced: true },
+      { id: "hours", label: "목표 백업 h", kind: "number", min: 0, step: "any", advanced: true, hint: "에너지 수지. 제조사 곡선이 아님" },
+      { id: "dod", label: "DOD", kind: "number", min: 0, max: 1, step: "0.01", advanced: true },
+      { id: "aging", label: "노화 보정", kind: "number", min: 0, max: 1, step: "0.01", advanced: true },
+      { id: "cellV", label: "셀(모듈) 전압 V", kind: "number", min: 0, step: "any", advanced: true },
+      { id: "moduleAh", label: "모듈 Ah", kind: "number", min: 0, step: "any", advanced: true },
     ],
   },
   "generator-load": {
@@ -389,4 +433,9 @@ export const formSchemas: Record<string, FormSchema> = {
       { id: "demand2", label: "비교 월 최대수요 kW", kind: "number", min: 0, step: "any", advanced: true },
     ],
   },
+};
+
+export const formSchemas: Record<string, FormSchema> = {
+  ...baseFormSchemas,
+  ...extraFormSchemas,
 };

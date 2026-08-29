@@ -3,8 +3,27 @@ import { fail, metric, warning } from "@/lib/calculations/helpers";
 import { SQRT_3, WATTS_PER_HP, conductorOhmPerKm, conductorResistanceOhm, resistivityOf, toMeters, toOhmPerKm, toVolts, toWattHours, toWatts } from "@/lib/math/units";
 import { parseNumber } from "@/lib/math/validate";
 import { roundTo } from "@/lib/math/round";
+import { review } from "@/lib/calculations/parse";
+import { followUp } from "@/lib/calculations/handoff";
+import { calculateMotorAcceleration, calculateMotorCurrent, calculateMotorStarting, calculateMotorStartVoltageDrop } from "@/lib/calculations/motor";
+import { calculateHarmonicFilterReview, calculatePowerFactorCorrection, calculatePowerTriangle, calculateThd } from "@/lib/calculations/power-quality";
+import { calculateBusbar, calculateCableAmpacityReview, calculateCableParallel, calculateCableSizing } from "@/lib/calculations/cable-tools";
+import { calculateTransformerCurrents, calculateTransformerLoss, calculateTransformerParallel, calculateTransformerSizing } from "@/lib/calculations/transformer-tools";
+import { calculateShortCircuit } from "@/lib/calculations/short-circuit";
+import { calculateBreakerExtended, calculateCtRatio, calculatePtRatio, calculateRelayIec, calculateSoftStarter, calculateVfdSizing } from "@/lib/calculations/protection";
+import { calculateEarthConductor, calculateGroundingRod, calculateLightingPowerDensity, calculateLux, calculateSoilResistivity, calculateSolarPv, calculateSpdHelper } from "@/lib/calculations/site-tools";
+import { calculateBatteryAh, calculateEnergyIntensity, calculateEquipmentUtilization, calculateEstimatedEnergyCost, calculateGeneratorFuel, calculateGeneratorSizing, calculateGenStartVoltageDrop, calculatePmInterval, calculateYoyEnergy } from "@/lib/calculations/facility-extra";
+import {
+  calculateDutyCycle,
+  calculateFieldCompare,
+  calculateGeneratorLoadTest,
+  calculatePhaseUnbalance,
+  calculateRetrofitCompare,
+  calculateSensorCalibration,
+} from "@/lib/calculations/field-verify";
 
-export type CalcInput = Record<string, string>;
+export type { CalcInput } from "@/lib/calculations/parse";
+import type { CalcInput } from "@/lib/calculations/parse";
 
 function num(input: CalcInput, id: string, label: string): number {
   return parseNumber(input[id], label);
@@ -90,6 +109,10 @@ export function calculateSinglePhaseCurrent(input: CalcInput, precision: number)
     interpretation: `단상 ${roundTo(V, 0)} V에서 ${roundTo(kW, precision)} kW 부하의 정상 전류는 ${roundTo(I, precision)} A입니다. 차단기·케이블 선정 시 기동전류, 온도, 규정을 추가로 적용하세요.`,
     warnings,
     formulaUsed: "I = P / (V × PF × η)",
+    steps: [
+      `P = ${roundTo(P, 1)} W`,
+      `I = ${roundTo(P, 1)} / (${roundTo(V, 2)} × ${roundTo(pf, 3)} × ${roundTo(eta, 3)}) = ${roundTo(I, precision)} A`,
+    ],
   });
 }
 
@@ -159,6 +182,10 @@ export function calculateThreePhaseCurrent(input: CalcInput, precision: number):
     interpretation: `3상 평형 ${roundTo(V, 0)} V 선간전압에서 ${roundTo(kW, precision)} kW의 선전류는 ${roundTo(I, precision)} A입니다.`,
     warnings,
     formulaUsed: "I = P / (√3 × V × PF × η)",
+    steps: [
+      `P = ${roundTo(P, 1)} W`,
+      `I = ${roundTo(P, 1)} / (√3 × ${roundTo(V, 2)} × ${roundTo(pf, 3)} × ${roundTo(eta, 3)}) = ${roundTo(I, precision)} A`,
+    ],
   });
 }
 
@@ -280,6 +307,12 @@ export function calculateTransformerLoad(input: CalcInput, precision: number): C
   const fieldErrors: Record<string, string> = {};
   let rated = 0;
   let loadKva = 0;
+  let measKw: number | null = null;
+  let ir = 0;
+  let isA = 0;
+  let it = 0;
+  let hasPhases = false;
+  let usedAmps = 0;
   try {
     rated = num(input, "ratedKva", "정격 용량 kVA");
     if (rated <= 0) fieldErrors.ratedKva = "정격 용량은 0보다 커야 합니다.";
@@ -292,6 +325,35 @@ export function calculateTransformerLoad(input: CalcInput, precision: number): C
     if (loadMode === "kva") {
       loadKva = num(input, "loadKva", "부하 kVA");
       if (loadKva < 0) fieldErrors.loadKva = "부하 kVA는 0 이상이어야 합니다.";
+    } else if (loadMode === "measured") {
+      const phase = input.phase ?? "3";
+      const volts = num(input, "voltage", "선간전압");
+      if (volts <= 0) fieldErrors.voltage = "선간전압은 0보다 커야 합니다.";
+      const irRaw = (input.ir ?? "").trim();
+      const isRaw = (input.is ?? "").trim();
+      const itRaw = (input.it ?? "").trim();
+      hasPhases = irRaw !== "" || isRaw !== "" || itRaw !== "";
+      if (hasPhases) {
+        if (!irRaw || !isRaw || !itRaw) {
+          fieldErrors.ir = "R/S/T 전류를 모두 넣거나 모두 비우세요.";
+        } else {
+          ir = optionalNum(input, "ir", 0);
+          isA = optionalNum(input, "is", 0);
+          it = optionalNum(input, "it", 0);
+          if (ir < 0 || isA < 0 || it < 0) fieldErrors.ir = "상전류는 0 이상이어야 합니다.";
+          usedAmps = (ir + isA + it) / 3;
+        }
+      } else {
+        usedAmps = num(input, "current", "선전류");
+        if (usedAmps < 0) fieldErrors.current = "선전류는 0 이상이어야 합니다.";
+      }
+      loadKva = phase === "1" ? (volts * usedAmps) / 1000 : (SQRT_3 * volts * usedAmps) / 1000;
+      const pfRaw = input.pf;
+      if (pfRaw && pfRaw.trim() !== "") {
+        const pf = optionalNum(input, "pf", 0);
+        if (pf <= 0 || pf > 1) fieldErrors.pf = "역률은 0 초과 1 이하여야 합니다.";
+        else measKw = loadKva * pf;
+      }
     } else {
       const kw = num(input, "loadKw", "부하 kW");
       const pf = optionalNum(input, "pf", 0.9);
@@ -307,36 +369,125 @@ export function calculateTransformerLoad(input: CalcInput, precision: number): C
 
   const ratio = (loadKva / rated) * 100;
   const spare = rated - loadKva;
-  const warnings = [];
-  if (ratio > 100) {
+  const warnings = [
+    warning("info", "추가 확인", "설비 정격·냉각조건·주위온도·부하 특성 및 운영기준을 확인하세요. 고조파·고도 derating은 포함하지 않습니다."),
+  ];
+  if (loadMode === "measured" && (input.phase ?? "3") === "3") {
     warnings.push(
-      warning("error", "과부하", "정격을 초과했습니다. 지속 과부하는 절연 수명을 단축합니다. 제조사 과부하 내량을 확인하세요."),
+      warning(
+        "info",
+        "균형계통 근사",
+        "총 부하는 평균전류를 이용한 균형계통 근사값입니다. √3 V Imax를 실제 총 kVA로 표시하지 않습니다.",
+      ),
     );
-  } else if (ratio >= 80) {
-    warnings.push(warning("warning", "높은 부하율", "상시 80% 이상이면 온도와 증설 여유를 검토하세요."));
-  } else if (ratio < 20) {
-    warnings.push(warning("info", "낮은 부하율", "경부하는 무효 대기 손실 비중이 커질 수 있습니다."));
+    warnings.push(
+      warning(
+        "info",
+        "불평형 총전력",
+        "정확한 불평형 총전력 계산에는 상별 전압/전류 phasor 또는 상별 전력계측값이 필요합니다.",
+      ),
+    );
+  }
+  if (hasPhases) {
+    const iMax = Math.max(ir, isA, it);
+    const iAvg = (ir + isA + it) / 3;
+    if (iMax > iAvg) {
+      warnings.push(
+        warning("info", "상전류", "한 상 전류가 평균보다 큽니다. 전체 추정 부하율이 낮아도 해당 상 전류를 별도로 확인하세요."),
+      );
+    }
   }
 
-  let band = "통상 운전";
-  if (ratio > 100) band = "과부하";
-  else if (ratio >= 80) band = "높은 부하";
-  else if (ratio < 30) band = "경부하";
+  let designKva = 0;
+  try {
+    designKva = optionalNum(input, "designKva", 0);
+    if (designKva < 0) fieldErrors.designKva = "부하표 예상 kVA는 0 이상이어야 합니다.";
+  } catch (error) {
+    fieldErrors.designKva = error instanceof Error ? error.message : "부하표 예상 kVA를 확인하세요.";
+  }
+  if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
+
+  let ratedCurrent = 0;
+  try {
+    ratedCurrent = optionalNum(input, "ratedCurrent", 0);
+    if (ratedCurrent < 0) fieldErrors.ratedCurrent = "명판 정격전류는 0 이상이어야 합니다.";
+  } catch (error) {
+    fieldErrors.ratedCurrent = error instanceof Error ? error.message : "명판 정격전류를 확인하세요.";
+  }
+  if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
+
+  const loadLabel = hasPhases ? "평균전류 기반 추정 부하" : loadMode === "measured" ? "선전류 기반 추정 부하" : "측정 kVA";
+  const metrics = [
+    metric("ratio", "변압기 부하율", ratio, "%", precision, { primary: true }),
+    metric("load", loadLabel, loadKva, "kVA", precision),
+    metric("spare", "잔여 kVA", spare, "kVA", precision),
+    metric("use", "정격 대비 사용률", ratio, "%", precision),
+    metric("rated", "정격", rated, "kVA", precision),
+  ];
+  if (measKw != null) metrics.splice(2, 0, metric("kw", "추정 kW", measKw, "kW", precision));
+  if (hasPhases) {
+    const iAvg = (ir + isA + it) / 3;
+    const iMax = Math.max(ir, isA, it);
+    const iMin = Math.min(ir, isA, it);
+    const iDev = iAvg > 0 ? (Math.max(Math.abs(ir - iAvg), Math.abs(isA - iAvg), Math.abs(it - iAvg)) / iAvg) * 100 : 0;
+    const maxPhase = ir >= isA && ir >= it ? "R" : isA >= it ? "S" : "T";
+    metrics.push(metric("iavg", "평균 상전류", iAvg, "A", precision));
+    metrics.push(metric("imax", "최대 상전류", iMax, "A", precision));
+    metrics.push(metric("imin", "최소 상전류", iMin, "A", precision));
+    metrics.push({ id: "imaxPhase", label: "최대 상", value: `${maxPhase}상` });
+    metrics.push(metric("idev", "상전류 편차율", iDev, "%", precision));
+    if (ratedCurrent > 0) {
+      metrics.push(metric("irated", "명판 정격전류", ratedCurrent, "A", precision));
+      metrics.push(metric("imaxpct", "최대상 정격 대비", (iMax / ratedCurrent) * 100, "%", precision));
+    }
+  } else if (loadMode === "measured" && usedAmps > 0) {
+    metrics.push(metric("iused", "사용 선전류", usedAmps, "A", precision));
+    if (ratedCurrent > 0) {
+      metrics.push(metric("irated", "명판 정격전류", ratedCurrent, "A", precision));
+      metrics.push(metric("imaxpct", "선전류 정격 대비", (usedAmps / ratedCurrent) * 100, "%", precision));
+    }
+  }
+  if (designKva > 0) {
+    metrics.push(metric("design", "부하표 예상 kVA", designKva, "kVA", precision));
+    metrics.push(metric("gap", "실측 − 예상", loadKva - designKva, "kVA", precision));
+  }
 
   return result({
-    metrics: [
-      metric("ratio", "부하율", ratio, "%", precision, { primary: true }),
-      metric("load", "부하 용량", loadKva, "kVA", precision),
-      metric("spare", "여유 용량", spare, "kVA", precision),
-      metric("rated", "정격", rated, "kVA", precision),
-    ],
+    metrics,
     inputSummary: [
+      { label: "모드", value: loadMode === "measured" ? "현장 측정" : "설계 계산" },
       { label: "정격", value: `${roundTo(rated, precision)} kVA` },
       { label: "부하", value: `${roundTo(loadKva, precision)} kVA` },
     ],
-    interpretation: `변압기 부하율은 ${roundTo(ratio, precision)}% (${band})입니다. 고조파·온도·고도 derating은 포함되지 않았습니다.`,
+    interpretation: hasPhases
+      ? `평균전류 기반 추정 부하 ${roundTo(loadKva, precision)} kVA, 부하율 ${roundTo(ratio, precision)}%. 총 부하는 평균전류를 이용한 균형계통 근사값입니다. 불평형 부하의 정확한 총 전력은 상별 전력 측정값을 사용하세요.`
+      : `현재 부하율 ${roundTo(ratio, precision)}%입니다. 설비 정격·냉각조건·주위온도·부하 특성 및 운영기준을 추가 확인하세요.`,
     warnings,
-    formulaUsed: "부하율(%) = (S_load / S_rated) × 100",
+    formulaUsed:
+      loadMode === "measured"
+        ? hasPhases
+          ? "S_est = √3 V_ll Iavg / 1000 (평균전류 기반 균형계통 근사),  부하율 = S_est / S_rated × 100"
+          : "S = √3 V_ll I / 1000 (3상, 선간·선전류, 균형 가정),  부하율 = S / S_rated × 100"
+        : "부하율(%) = (S_load / S_rated) × 100",
+    steps:
+      loadMode === "measured"
+        ? [
+            hasPhases ? `Iavg = (${ir}+${isA}+${it}) / 3 = ${roundTo(usedAmps, precision)} A` : `선전류 = ${roundTo(usedAmps, precision)} A`,
+            `S = ${roundTo(loadKva, precision)} kVA`,
+            `부하율 = ${roundTo(loadKva, precision)} / ${roundTo(rated, precision)} × 100 = ${roundTo(ratio, precision)} %`,
+            measKw != null ? `P ≈ S × PF = ${roundTo(measKw, precision)} kW` : "역률 미입력 — kW 생략",
+          ]
+        : [`부하율 = ${roundTo(loadKva, precision)} / ${roundTo(rated, precision)} × 100 = ${roundTo(ratio, precision)} %`],
+    reviewStatus: review("check", "부하율 산정입니다. 변압기 상태 합격 판정이 아닙니다."),
+    followUps: [
+      followUp("설계값과 실측 비교", "/tools/facility/field-compare", {
+        designValue: roundTo(rated, 4),
+        measuredValue: roundTo(loadKva, 4),
+        unit: "kVA",
+      }),
+      followUp("변압기 용량 산정", "/tools/electrical/transformer-sizing", { demandKw: roundTo(measKw ?? loadKva * 0.9, 4) }),
+      followUp("3상 불평형 실측", "/tools/facility/phase-unbalance", {}),
+    ],
   });
 }
 
@@ -387,6 +538,14 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
   const lengthKm = L / 1000;
   const dV = phase === "1" ? 2 * I * lengthKm * rOhmKm : SQRT_3 * I * lengthKm * rOhmKm;
   const pct = (dV / V) * 100;
+  const vend = V - dV;
+  let allow = 0;
+  try {
+    allow = optionalNum(input, "allowPct", 0);
+    if (allow < 0) allow = 0;
+  } catch {
+    allow = 0;
+  }
   const warnings = [];
   if (pct > 5) {
     warnings.push(
@@ -405,6 +564,7 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
     metrics: [
       metric("dv", "전압강하", dV, "V", precision, { primary: true }),
       metric("pct", "전압강하율", pct, "%", precision),
+      metric("vend", "말단 예상전압", vend, "V", precision),
       metric("r", "사용 저항", rOhmKm, "Ω/km", 4),
     ],
     inputSummary: [
@@ -413,12 +573,26 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
       { label: "편도 길이", value: `${roundTo(L, precision)} m` },
       { label: "기준 전압", value: `${roundTo(V, precision)} V` },
     ],
-    interpretation: `${phase === "1" ? "단상" : "3상"} 저항 근사 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%)입니다. 허용전류·단락내량과는 별개입니다.`,
+    interpretation: `${phase === "1" ? "단상" : "3상"} 저항 근사 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%), 말단 약 ${roundTo(vend, precision)} V입니다. 허용전류·단락내량과는 별개입니다.`,
     warnings,
     formulaUsed:
       phase === "1"
         ? "ΔV = 2 × I × L × r / 1000"
         : "ΔV = √3 × I × L × r / 1000",
+    steps: [
+      `L = ${roundTo(lengthKm, 5)} km, r = ${roundTo(rOhmKm, 4)} Ω/km`,
+      phase === "1"
+        ? `ΔV = 2 × ${roundTo(I, precision)} × ${roundTo(lengthKm, 5)} × ${roundTo(rOhmKm, 4)} = ${roundTo(dV, precision)} V`
+        : `ΔV = √3 × ${roundTo(I, precision)} × ${roundTo(lengthKm, 5)} × ${roundTo(rOhmKm, 4)} = ${roundTo(dV, precision)} V`,
+      `% = ${roundTo(dV, precision)} / ${roundTo(V, 2)} × 100 = ${roundTo(pct, precision)}%`,
+      `V_end = ${roundTo(V, 2)} − ${roundTo(dV, precision)} = ${roundTo(vend, precision)} V`,
+    ],
+    reviewStatus:
+      allow > 0
+        ? pct <= allow
+          ? review("in-range", `사용자 허용 ${allow}% 이하입니다. 규정 합격 판정이 아닙니다.`)
+          : review("caution", `사용자 허용 ${allow}%를 초과합니다.`)
+        : review("check", "허용 전압강하율은 프로젝트 기준을 확인하세요."),
   });
 }
 
@@ -522,6 +696,7 @@ export function calculateUpsBackup(input: CalcInput, precision: number): Calcula
   let P = 0;
   let eta = 0.92;
   let dod = 0.8;
+  let aging = 1;
 
   try {
     P = toWatts(num(input, "load", "부하전력"), input.loadUnit ?? "kW");
@@ -541,6 +716,12 @@ export function calculateUpsBackup(input: CalcInput, precision: number): Calcula
   } catch (error) {
     fieldErrors.dod = error instanceof Error ? error.message : "DOD를 확인하세요.";
   }
+  try {
+    aging = optionalNum(input, "aging", 1);
+    if (aging <= 0 || aging > 1) fieldErrors.aging = "노화 보정은 0 초과 1 이하여야 합니다.";
+  } catch (error) {
+    fieldErrors.aging = error instanceof Error ? error.message : "노화 보정을 확인하세요.";
+  }
 
   try {
     if (mode === "energy") {
@@ -559,7 +740,7 @@ export function calculateUpsBackup(input: CalcInput, precision: number): Calcula
   if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
   if (P === 0) return fail({}, "부하가 0이라 시간을 나눌 수 없습니다.");
 
-  const usable = energyWh * eta * dod;
+  const usable = energyWh * eta * dod * aging;
   const hours = usable / P;
   const minutes = hours * 60;
   const warnings = [];
@@ -586,7 +767,7 @@ export function calculateUpsBackup(input: CalcInput, precision: number): Calcula
       ...warnings,
       warning("info", "Peukert 미반영", "고율 방전 시 유효 Ah가 감소합니다."),
     ],
-    formulaUsed: "t = (V × C × η × DOD) / P",
+    formulaUsed: "t = (V × C × η × DOD × k_aging) / P",
   });
 }
 
@@ -625,23 +806,80 @@ export function calculateUpsCapacity(input: CalcInput, precision: number): Calcu
   const designKw = kw * (1 + growth);
   const loadKva = designKw / pf;
   const upsKva = Math.max(loadKva, designKw / outputPf);
+  const eta = optionalNum(input, "efficiency", 0.92);
+  const dcV = optionalNum(input, "dcV", 0);
+  const hours = optionalNum(input, "hours", 0);
+  const cellV = optionalNum(input, "cellV", 0);
+  const moduleAh = optionalNum(input, "moduleAh", 0);
+  const dod = optionalNum(input, "dod", 0.8);
+  const aging = optionalNum(input, "aging", 0.8);
+  const batteryDetail = (input.mode ?? "basic") === "detailed";
+
+  const metrics = [
+    metric("kva", "필요 UPS 용량", upsKva, "kVA", precision, { primary: true }),
+    metric("kw", "설계 유효전력", designKw, "kW", precision),
+    metric("loadkva", "부하 kVA", loadKva, "kVA", precision),
+    metric("ratio", "여유 반영 부하율 참고", (kw / designKw) * 100, "%", precision),
+  ];
+
+  const steps = [
+    `P_design = ${roundTo(kw, precision)} × (1+${growth}) = ${roundTo(designKw, precision)} kW`,
+    `S_load = P_design / PF_load = ${roundTo(loadKva, precision)} kVA`,
+    `S_ups = max(S_load, P_design / PF_ups) = ${roundTo(upsKva, precision)} kVA`,
+  ];
+
+  if (batteryDetail && dcV > 0 && hours > 0 && eta > 0 && eta <= 1) {
+    const pW = designKw * 1000;
+    const eWh = (pW * hours) / (eta * dod * aging);
+    const ah = eWh / dcV;
+    metrics.push(metric("dc", "DC 전압", dcV, "V", precision));
+    metrics.push(metric("ah", "필요 Ah (에너지 수지)", ah, "Ah", precision));
+    metrics.push(metric("e", "필요 배터리 에너지", eWh / 1000, "kWh", precision));
+    metrics.push(
+      metric("tgoal", "목표 백업시간 (에너지 수지)", hours, "h", precision, {
+        hint: "입력한 목표시간입니다. 제조사 방전곡선으로 구한 Backup Time이 아닙니다.",
+      }),
+    );
+    steps.push(`E = P t / (η DOD k_age) = ${roundTo(eWh / 1000, precision)} kWh`);
+    steps.push(`Ah = E / V_dc = ${roundTo(ah, precision)} Ah — 제조사 방전곡선이 아님`);
+    if (cellV > 0) {
+      const ns = Math.ceil(dcV / cellV - 1e-9);
+      metrics.push(metric("series", "직렬 개수 참고", ns, "셀", 0));
+      if (moduleAh > 0) {
+        const np = Math.ceil(ah / moduleAh - 1e-9);
+        metrics.push(metric("parallel", "병렬 String 참고", np, "회", 0));
+        metrics.push(metric("battn", "총 배터리 수 참고", ns * np, "개", 0));
+      }
+    }
+  }
 
   return result({
-    metrics: [
-      metric("kva", "필요 UPS 용량", upsKva, "kVA", precision, { primary: true }),
-      metric("kw", "설계 유효전력", designKw, "kW", precision),
-      metric("loadkva", "부하 kVA", loadKva, "kVA", precision),
-    ],
+    metrics,
     inputSummary: [
       { label: "현재 부하", value: `${roundTo(kw, precision)} kW` },
       { label: "성장·여유", value: `${roundTo(growth * 100, 0)}%` },
       { label: "부하 역률", value: String(roundTo(pf, 3)) },
     ],
-    interpretation: `여유를 반영한 필요 용량은 약 ${roundTo(upsKva, precision)} kVA입니다. 병렬 N+1, 고조파, 투입 돌입은 별도입니다.`,
+    interpretation: `여유를 반영한 필요 용량은 약 ${roundTo(upsKva, precision)} kVA입니다. 배터리 Ah는 에너지 수지이며 정밀 Backup Time이 아닙니다.`,
     warnings: [
       warning("info", "모듈 대수", "모듈형 UPS는 프레임 용량과 모듈 정격을 각각 확인하세요."),
+      warning("info", "배터리", "상세 조건의 Ah는 일정 전력 가정입니다. 제조사 런타임 표를 정밀 계산으로 쓰세요."),
     ],
-    formulaUsed: "S = max(P_design / PF_load, P_design / PF_ups)",
+    formulaUsed: "S = max(P_design / PF_load, P_design / PF_ups),  C = P t / (V η DOD k_age)",
+    steps,
+    reviewStatus: review("check", "UPS kVA는 부하·여유 산정입니다. 배터리 런타임은 명판 곡선이 우선입니다."),
+    nextChecks: ["고조파·투입 돌입", "N+1 모듈", "제조사 방전곡선"],
+    followUps: [
+      followUp("배터리 Ah 상세", "/tools/facility/battery-capacity", {
+        loadW: roundTo(designKw * 1000, 4),
+        dcV: dcV > 0 ? dcV : 384,
+        hours: hours > 0 ? hours : 0.25,
+      }),
+      followUp("백업시간 에너지 수지", "/tools/facility/ups-backup-time", {
+        load: roundTo(designKw, 4),
+        loadUnit: "kW",
+      }),
+    ],
   });
 }
 
@@ -705,6 +943,9 @@ export function calculateGeneratorLoad(input: CalcInput, precision: number): Cal
     interpretation: `발전기 부하율은 ${roundTo(ratio, precision)}%입니다. 통상 60~80% 근처를 실무에서 자주 목표로 하지만 제조사 권고가 우선입니다.`,
     warnings,
     formulaUsed: "부하율(%) = (P_load / P_rated) × 100",
+    followUps: [
+      followUp("발전기 로드테스트", "/tools/facility/generator-load-test", { ratedKw: roundTo(ratedKw, 4), loadKw: roundTo(loadKw, 4) }),
+    ],
   });
 }
 
@@ -814,9 +1055,53 @@ export const engines: Record<string, (input: CalcInput, precision: number) => Ca
   "transformer-load": calculateTransformerLoad,
   "voltage-drop": calculateVoltageDrop,
   "cable-resistance": calculateCableResistance,
-  "breaker-current": calculateBreakerReference,
+  "breaker-current": calculateBreakerExtended,
   "ups-backup-time": calculateUpsBackup,
   "ups-capacity": calculateUpsCapacity,
   "generator-load": calculateGeneratorLoad,
   "monthly-energy": calculateMonthlyEnergy,
+  "motor-current": calculateMotorCurrent,
+  "motor-starting": calculateMotorStarting,
+  "motor-start-vd": calculateMotorStartVoltageDrop,
+  "motor-acceleration": calculateMotorAcceleration,
+  "power-factor-correction": calculatePowerFactorCorrection,
+  "power-triangle": calculatePowerTriangle,
+  "thd": calculateThd,
+  "harmonic-filter": calculateHarmonicFilterReview,
+  "cable-sizing": calculateCableSizing,
+  "cable-parallel": calculateCableParallel,
+  "cable-ampacity": calculateCableAmpacityReview,
+  "busbar": calculateBusbar,
+  "transformer-sizing": calculateTransformerSizing,
+  "transformer-current": calculateTransformerCurrents,
+  "transformer-parallel": calculateTransformerParallel,
+  "transformer-loss": calculateTransformerLoss,
+  "short-circuit": calculateShortCircuit,
+  "ct-ratio": calculateCtRatio,
+  "pt-ratio": calculatePtRatio,
+  "vfd-sizing": calculateVfdSizing,
+  "soft-starter": calculateSoftStarter,
+  "protection-relay": calculateRelayIec,
+  "lux": calculateLux,
+  "lighting-density": calculateLightingPowerDensity,
+  "solar-pv": calculateSolarPv,
+  "grounding-rod": calculateGroundingRod,
+  "soil-resistivity": calculateSoilResistivity,
+  "earth-conductor": calculateEarthConductor,
+  "spd-helper": calculateSpdHelper,
+  "generator-sizing": calculateGeneratorSizing,
+  "generator-fuel": calculateGeneratorFuel,
+  "generator-start-vd": calculateGenStartVoltageDrop,
+  "battery-capacity": calculateBatteryAh,
+  "equipment-load": calculateEquipmentUtilization,
+  "energy-intensity": calculateEnergyIntensity,
+  "energy-cost": calculateEstimatedEnergyCost,
+  "pm-interval": calculatePmInterval,
+  "yoy-energy": calculateYoyEnergy,
+  "field-compare": calculateFieldCompare,
+  "phase-unbalance": calculatePhaseUnbalance,
+  "generator-load-test": calculateGeneratorLoadTest,
+  "duty-cycle": calculateDutyCycle,
+  "sensor-calibration": calculateSensorCalibration,
+  "retrofit-compare": calculateRetrofitCompare,
 };

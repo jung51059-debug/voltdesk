@@ -15,6 +15,8 @@ import {
 } from "@/lib/calculations/engines";
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 import { searchCatalog } from "@/lib/search";
+import { calculateMotorCurrent } from "@/lib/calculations/motor";
+import { calculatePowerFactorCorrection } from "@/lib/calculations/power-quality";
 
 function primaryNumber(outcome: ReturnType<typeof calculateSinglePhaseCurrent>): number {
   if (!outcome.ok) throw new Error(outcome.formError ?? "fail");
@@ -97,10 +99,11 @@ describe("변압기 부하율", () => {
     expect(primaryNumber(out)).toBeCloseTo(80, 2);
   });
 
-  it("과부하는 error 경고", () => {
+  it("정격 초과를 자동 과부하 판정하지 않는다", () => {
     const out = calculateTransformerLoad({ ratedKva: "100", loadMode: "kva", loadKva: "120" }, 2);
     expect(out.ok).toBe(true);
-    if (out.ok) expect(out.warnings.some((w) => w.level === "error")).toBe(true);
+    expect(primaryNumber(out)).toBeCloseTo(120, 2);
+    if (out.ok) expect(out.warnings.some((w) => w.level === "error" || w.title.includes("높은 부하율"))).toBe(false);
   });
 });
 
@@ -216,5 +219,12 @@ describe("검색", () => {
     expect(searchCatalog("변압기").length).toBeGreaterThan(0);
     expect(searchCatalog("kVA").length).toBeGreaterThan(0);
     expect(searchCatalog("역률").length).toBeGreaterThan(0);
+    expect(searchCatalog("전선").some((h) => h.href.includes("cable"))).toBe(true);
+    expect(searchCatalog("cable").some((h) => h.href.includes("cable"))).toBe(true);
+    expect(searchCatalog("CT").some((h) => h.href.includes("ct-ratio"))).toBe(true);
+    expect(searchCatalog("콘덴서").some((h) => h.href.includes("power-factor"))).toBe(true);
+    expect(searchCatalog("조명").some((h) => h.href.includes("lux"))).toBe(true);
+    expect(searchCatalog("태양광").some((h) => h.href.includes("solar"))).toBe(true);
+    expect(searchCatalog("모터").some((h) => h.href.includes("motor"))).toBe(true);
   });
 });

@@ -106,17 +106,19 @@ export function ShareDialog({
   onClose,
   title,
   summary,
+  shareUrl,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   summary: string;
+  shareUrl?: string;
 }) {
   const [copied, setCopied] = useState<"link" | "summary" | null>(null);
   if (!open) return null;
 
   async function copy(kind: "link" | "summary") {
-    const text = kind === "link" ? window.location.href : `${title}\n${summary}`;
+    const text = kind === "link" ? shareUrl || window.location.href : `${title}\n${summary}\n${shareUrl || window.location.href}`;
     await navigator.clipboard.writeText(text);
     setCopied(kind);
   }
@@ -126,7 +128,7 @@ export function ShareDialog({
       <button type="button" className="absolute inset-0 bg-ink/40" onClick={onClose} aria-label="닫기" />
       <div className="relative w-[min(420px,calc(100%-1.5rem))] rounded-2xl bg-card p-5 shadow-[var(--shadow)]">
         <h2 className="text-lg font-semibold">계산 공유</h2>
-        <p className="mt-2 text-sm text-muted">로그인 없이 현재 페이지 주소 또는 결과 요약을 복사합니다.</p>
+        <p className="mt-2 text-sm text-muted">입력 조건이 포함된 주소 또는 결과 요약을 복사합니다. 부하명·현장명은 넣지 않습니다.</p>
         <div className="mt-4 grid gap-2">
           <button type="button" className="rounded-xl border border-border px-4 py-2.5 text-sm hover:bg-info" onClick={() => copy("link")}>
             {copied === "link" ? "주소를 복사했습니다" : "계산기 링크 복사"}

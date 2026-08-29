@@ -11,6 +11,7 @@ import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { formSchemas, type FieldDef } from "@/lib/calculations/schemas";
 import { engines } from "@/lib/calculations/engines";
+import { buildHandoffHref, parseHandoff } from "@/lib/calculations/handoff";
 import { usePreferences } from "@/components/providers/preferences-provider";
 import { pushRecentTool } from "@/lib/storage/local";
 import type { CalculatorTool, CalculationOutcome, FormulaDefinition, ReferenceArticle } from "@/lib/types";
@@ -19,6 +20,109 @@ import { getCategoryById } from "@/lib/data/categories";
 function visible(field: FieldDef, values: Record<string, string>) {
   if (!field.visibleWhen) return true;
   return field.visibleWhen.values.includes(values[field.visibleWhen.field] ?? "");
+}
+
+function isBasicDetailedToggle(field: FieldDef) {
+  return (
+    field.id === "mode" &&
+    Boolean(field.options?.some((option) => option.value === "basic")) &&
+    Boolean(field.options?.some((option) => option.value === "detailed"))
+  );
+}
+
+function renderField(
+  field: FieldDef,
+  values: Record<string, string>,
+  setField: (id: string, value: string) => void,
+  formId: string,
+  error?: string,
+) {
+  const inputId = `${formId}-${field.id}`;
+  const errorId = `${inputId}-error`;
+  return (
+    <div key={field.id}>
+      <label htmlFor={inputId} className="text-sm font-medium">
+        {field.label}
+        {field.required ? <span className="text-danger-ink"> *</span> : null}
+      </label>
+      {field.hint ? <p className="mt-1 text-xs text-muted">{field.hint}</p> : null}
+      {field.kind === "select" ? (
+        <select
+          id={inputId}
+          className="mt-1.5 h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+          value={values[field.id] ?? ""}
+          onChange={(event) => setField(field.id, event.target.value)}
+        >
+          {field.options?.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      ) : field.kind === "textarea" ? (
+        <textarea
+          id={inputId}
+          rows={4}
+          placeholder={field.placeholder}
+          value={values[field.id] ?? ""}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+          className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-base"
+          onChange={(event) => setField(field.id, event.target.value)}
+        />
+      ) : field.kind === "text" ? (
+        <input
+          id={inputId}
+          type="text"
+          enterKeyHint="done"
+          placeholder={field.placeholder}
+          value={values[field.id] ?? ""}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+          className="mt-1.5 h-11 w-full rounded-lg border border-border bg-surface px-3 text-base"
+          onChange={(event) => setField(field.id, event.target.value)}
+        />
+      ) : (
+        <div className="mt-1.5 flex gap-2">
+          <input
+            id={inputId}
+            inputMode="decimal"
+            enterKeyHint="done"
+            type="text"
+            min={field.min}
+            max={field.max}
+            step={field.step}
+            placeholder={field.placeholder}
+            value={values[field.id] ?? ""}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
+            className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 text-base"
+            onChange={(event) => setField(field.id, event.target.value)}
+          />
+          {field.unitField && field.units ? (
+            <select
+              aria-label={`${field.label} 단위`}
+              className="h-11 w-[88px] rounded-lg border border-border bg-surface px-2 text-sm"
+              value={values[field.unitField] ?? field.units[0]?.value}
+              onChange={(event) => setField(field.unitField!, event.target.value)}
+            >
+              {field.units.map((unit) => (
+                <option key={unit.value} value={unit.value}>
+                  {unit.label}
+                </option>
+              ))}
+            </select>
+          ) : null}
+        </div>
+      )}
+      {error ? (
+        <p id={errorId} className="mt-1 flex items-center gap-1 text-sm text-danger-ink">
+          <AlertTriangle className="size-3.5" aria-hidden />
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 export function CalculatorWorkspace({
@@ -54,11 +158,27 @@ export function CalculatorWorkspace({
     pushRecentTool(tool.id);
   }, [tool.id]);
 
+  useEffect(() => {
+    const incoming = parseHandoff(new URLSearchParams(window.location.search));
+    if (Object.keys(incoming).length === 0) return;
+    setValues((current) => {
+      const next = { ...current, ...incoming };
+      if (incoming.mode === "detailed") setShowAdvanced(true);
+      const engine = engines[tool.slug];
+      if (engine) setOutcome(engine(next, prefs.precision));
+      return next;
+    });
+  }, [tool.slug, prefs.precision]);
+
   const fields = useMemo(() => schema?.fields ?? [], [schema]);
+  const modeField = fields.find(isBasicDetailedToggle);
+  const basicFields = fields.filter((field) => !field.advanced && !isBasicDetailedToggle(field));
+  const advancedFields = fields.filter((field) => field.advanced);
 
   function setField(id: string, value: string) {
     setDirty(true);
     setValues((current) => ({ ...current, [id]: value }));
+    if (id === "mode") setShowAdvanced(value === "detailed");
   }
 
   function calculate() {
@@ -71,6 +191,7 @@ export function CalculatorWorkspace({
     if (schema) setValues(schema.defaults);
     setOutcome(null);
     setDirty(false);
+    setShowAdvanced(false);
     setConfirmReset(false);
   }
 
@@ -80,9 +201,11 @@ export function CalculatorWorkspace({
       href: tool.domain === "facility" ? "/tools/facility" : "/tools/electrical",
       label: tool.domain === "facility" ? "시설" : "전기",
     },
+    ...(category ? [{ href: `/tools/categories/${category.slug}`, label: category.name }] : []),
     { label: tool.name },
   ];
 
+  const shareHref = buildHandoffHref(tool.href, values);
   const shareSummary =
     outcome && outcome.ok
       ? outcome.metrics.map((metric) => `${metric.label}: ${metric.value}${metric.unit ? ` ${metric.unit}` : ""}`).join("\n")
@@ -92,85 +215,18 @@ export function CalculatorWorkspace({
     return <p>이 계산기의 입력 정의가 없습니다.</p>;
   }
 
-  const fieldList = fields.map((field) => {
+  function fieldNode(field: FieldDef) {
     if (!visible(field, values)) return null;
-    if (field.advanced && !showAdvanced) return null;
     const error = outcome && !outcome.ok ? outcome.fieldErrors[field.id] : undefined;
-    const inputId = `${formId}-${field.id}`;
-    const errorId = `${inputId}-error`;
-    return (
-      <div key={field.id}>
-        <label htmlFor={inputId} className="text-sm font-medium">
-          {field.label}
-          {field.required ? <span className="text-danger-ink"> *</span> : null}
-        </label>
-        {field.hint ? <p className="mt-1 text-xs text-muted">{field.hint}</p> : null}
-        {field.kind === "select" ? (
-          <select
-            id={inputId}
-            className="mt-1.5 h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm"
-            value={values[field.id] ?? ""}
-            onChange={(event) => setField(field.id, event.target.value)}
-          >
-            {field.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <div className="mt-1.5 flex gap-2">
-            <input
-              id={inputId}
-              inputMode="decimal"
-              type="text"
-              min={field.min}
-              max={field.max}
-              step={field.step}
-              placeholder={field.placeholder}
-              value={values[field.id] ?? ""}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? errorId : undefined}
-              className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 text-base"
-              onChange={(event) => setField(field.id, event.target.value)}
-            />
-            {field.unitField && field.units ? (
-              <select
-                aria-label={`${field.label} 단위`}
-                className="h-11 w-[88px] rounded-lg border border-border bg-surface px-2 text-sm"
-                value={values[field.unitField] ?? field.units[0]?.value}
-                onChange={(event) => setField(field.unitField!, event.target.value)}
-              >
-                {field.units.map((unit) => (
-                  <option key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        )}
-        {error ? (
-          <p id={errorId} className="mt-1 flex items-center gap-1 text-sm text-danger-ink">
-            <AlertTriangle className="size-3.5" aria-hidden />
-            {error}
-          </p>
-        ) : null}
-      </div>
-    );
-  });
+    return renderField(field, values, setField, formId, error);
+  }
 
   const actions = (
     <div className="mt-6 space-y-2">
-      {fields.some((field) => field.advanced) ? (
-        <button type="button" className="text-sm text-primary" onClick={() => setShowAdvanced((v) => !v)}>
-          {showAdvanced ? "고급 옵션 숨기기" : "고급 옵션"}
-        </button>
-      ) : null}
       {outcome && !outcome.ok && outcome.formError ? (
         <WarningPanel warnings={[{ level: "error", title: "계산 불가", message: outcome.formError }]} />
       ) : null}
-      <button type="submit" className="h-12 w-full rounded-lg bg-primary text-sm font-semibold text-white dark:text-ink">
+      <button type="submit" className="h-12 w-full rounded-lg bg-primary text-base font-semibold text-white shadow-sm dark:text-ink">
         계산하기
       </button>
       <button
@@ -211,22 +267,69 @@ export function CalculatorWorkspace({
       </header>
 
       <form
-        className={`rounded-[16px] border border-border bg-card p-5 sm:p-6 ${
-          complex ? "lg:grid lg:grid-cols-2 lg:gap-10" : ""
-        }`}
+        className={`rounded-[16px] border border-border bg-card p-5 sm:p-6 ${complex ? "lg:grid lg:grid-cols-2 lg:gap-10" : ""}`}
         onSubmit={(event) => {
           event.preventDefault();
           calculate();
         }}
       >
         <div>
-          <div className="space-y-3.5">{fieldList}</div>
+          {modeField ? (
+            <div className="mb-4 grid grid-cols-2 gap-2" role="group" aria-label="계산 모드">
+              {modeField.options?.map((option) => {
+                const active = (values.mode ?? "basic") === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`h-11 rounded-xl text-sm font-medium ${
+                      active ? "bg-primary text-white dark:text-ink" : "border border-border bg-surface"
+                    }`}
+                    onClick={() => setField("mode", option.value)}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+          <div className="space-y-3.5">{basicFields.map(fieldNode)}</div>
+          {advancedFields.length > 0 ? (
+            <details
+              className="mt-4 rounded-xl border border-border bg-surface px-3 py-2"
+              open={modeField ? values.mode === "detailed" : showAdvanced}
+              onToggle={(event) => {
+                const open = (event.target as HTMLDetailsElement).open;
+                setShowAdvanced(open);
+                if (!modeField) return;
+                const next = open ? "detailed" : "basic";
+                if ((values.mode ?? "basic") !== next) setField("mode", next);
+              }}
+            >
+              <summary className="cursor-pointer py-2 text-sm font-medium text-primary">상세 조건 펼치기</summary>
+              <div className="space-y-3.5 pb-2 pt-1">{advancedFields.map(fieldNode)}</div>
+            </details>
+          ) : null}
           {actions}
         </div>
-        <div className={complex ? "" : "mt-0"}>{resultBlock}</div>
+        <div>{resultBlock}</div>
       </form>
 
       <TechnicalDisclosure formula={formula} />
+
+      {tool.faqs.length > 0 ? (
+        <section className="mt-8 border-t border-border pt-6">
+          <h2 className="text-lg font-semibold">FAQ</h2>
+          <dl className="mt-3 space-y-4">
+            {tool.faqs.map((faq) => (
+              <div key={faq.question}>
+                <dt className="text-sm font-medium">{faq.question}</dt>
+                <dd className="mt-1 text-sm leading-6 text-muted">{faq.answer}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
 
       <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-6 text-sm">
         <button type="button" className="text-muted hover:text-primary" onClick={() => setShareOpen(true)}>
@@ -244,7 +347,13 @@ export function CalculatorWorkspace({
         ))}
       </nav>
 
-      <ShareDialog open={shareOpen} onClose={() => setShareOpen(false)} title={tool.name} summary={shareSummary} />
+      <ShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={tool.name}
+        summary={shareSummary}
+        shareUrl={typeof window === "undefined" ? shareHref : `${window.location.origin}${shareHref}`}
+      />
 
       {confirmReset ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="초기화 확인">

@@ -1,6 +1,7 @@
 import type { FormulaDefinition } from "@/lib/types";
+import { extraFormulas } from "@/lib/calculations/formulas-extra";
 
-export const formulas: FormulaDefinition[] = [
+export const baseFormulas: FormulaDefinition[] = [
   {
     id: "formula-single-phase-current",
     title: "단상 부하전류",
@@ -181,7 +182,7 @@ export const formulas: FormulaDefinition[] = [
     ],
     units: ["kVA", "kW", "%"],
     assumptions: [
-      "3상 평형 부하를 가정합니다.",
+      "3상 평형 부하를 가정합니다. 현장 R/S/T 전류가 있으면 S_est = √3 V_ll Iavg / 1000 균형계통 근사입니다.",
       "온도, 고도, 고조파 감소용량(derating)은 포함하지 않습니다.",
       "수요율·부등률은 사용자가 이미 반영한 부하값을 입력한다고 가정합니다.",
     ],
@@ -442,6 +443,8 @@ export const formulas: FormulaDefinition[] = [
     referenceSources: [{ id: "src-iec-62040", title: "IEC 62040 — UPS", publisher: "IEC", note: "용량은 부하 특성과 제조 데이터를 따름" }],
   },
 ];
+
+export const formulas: FormulaDefinition[] = [...baseFormulas, ...extraFormulas];
 
 export function getFormulaById(id: string): FormulaDefinition | undefined {
   return formulas.find((formula) => formula.id === id);

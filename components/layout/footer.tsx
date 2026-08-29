@@ -5,6 +5,8 @@ import { getElectricalCategories, getFacilityCategories } from "@/lib/data/categ
 export function Footer() {
   const electrical = getElectricalCategories();
   const facility = getFacilityCategories();
+  const electricalMid = Math.ceil(electrical.length / 2);
+  const electricalCols = [electrical.slice(0, electricalMid), electrical.slice(electricalMid)];
 
   return (
     <footer className="mt-auto border-t border-border bg-card">
@@ -14,26 +16,30 @@ export function Footer() {
             <AmporyMark className="size-9 shrink-0" />
             <AmporyWordmark className="text-base" />
           </Link>
-          <p className="mt-3 text-sm leading-6 text-muted">전기·시설 실무를 위한 빠른 계산과 기술 참고자료.</p>
+          <p className="mt-3 text-sm leading-6 text-muted">전기·시설 실무를 위한 계산과 참고자료.</p>
         </div>
         <div>
           <p className="text-sm font-semibold">전기 계산</p>
-          <ul className="mt-3 space-y-2 text-sm text-muted">
-            {electrical.slice(0, 6).map((category) => (
-              <li key={category.id}>
-                <Link href={`/tools/electrical#${category.slug}`} className="hover:text-primary">
-                  {category.name}
-                </Link>
-              </li>
+          <div className="mt-3 grid grid-cols-2 gap-x-6">
+            {electricalCols.map((col, index) => (
+              <ul key={index} className="space-y-2 text-sm text-muted">
+                {col.map((category) => (
+                  <li key={category.id}>
+                    <Link href={`/tools/categories/${category.slug}`} className="hover:text-primary">
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             ))}
-          </ul>
+          </div>
         </div>
         <div>
           <p className="text-sm font-semibold">시설 관리</p>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             {facility.map((category) => (
               <li key={category.id}>
-                <Link href={`/tools/facility#${category.slug}`} className="hover:text-primary">
+                <Link href={`/tools/categories/${category.slug}`} className="hover:text-primary">
                   {category.name}
                 </Link>
               </li>
