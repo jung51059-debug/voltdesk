@@ -47,7 +47,19 @@ export function softwareJsonLd() {
 }
 
 export function sitemapEntries() {
-  const staticPaths = ["/", "/tools", "/tools/electrical", "/tools/facility", "/references", "/search", "/favorites", "/settings", "/privacy", "/terms", "/contact", "/sources"];
+  // 즐겨찾기·설정은 robots에서 차단하므로 사이트맵에 넣지 않습니다.
+  const staticPaths = [
+    "/",
+    "/tools",
+    "/tools/electrical",
+    "/tools/facility",
+    "/references",
+    "/search",
+    "/privacy",
+    "/terms",
+    "/contact",
+    "/sources",
+  ];
   const toolPaths = getPublishedTools().map((tool) => tool.href);
   const articlePaths = articles.map((article) => article.href);
   return [...staticPaths, ...toolPaths, ...articlePaths];

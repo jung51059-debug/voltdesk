@@ -41,7 +41,12 @@ export const metadata: Metadata = {
     description: SITE.description,
   },
   robots: { index: true, follow: true },
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
   // Google Search Console 소유권 확인 — 확인 후에도 유지
   verification: {
     google: "McWQLec0319-LplEbAorWs8e6-sR7kLqasnHfsbdfzM",

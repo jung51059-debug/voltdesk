@@ -68,6 +68,16 @@ export function Footer() {
                 사이트맵
               </Link>
             </li>
+            <li>
+              <a href="/feed.xml" className="hover:text-primary">
+                RSS
+              </a>
+            </li>
+            <li>
+              <a href="/robots.txt" className="hover:text-primary">
+                robots.txt
+              </a>
+            </li>
           </ul>
         </div>
       </div>
