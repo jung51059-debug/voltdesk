@@ -35,8 +35,8 @@ export const extraFormulas: FormulaDefinition[] = [
     steps: ["P = 30000 W", "분모 = √3 × 380 × 0.85 × 0.92", "I ≈ 58.1 A"],
     result: "약 58.1 A",
   }, {
-    criteriaNotes: [{ standard: "IEC 60034 (참고)", appliesTo: "모터 명판 출력·효율·역률의 정의. 본 도구는 전류 관계식만 계산" }],
-    referenceSources: [{ id: "src-iec-60034", title: "IEC 60034 계열 — 회전기 명판 수량", publisher: "IEC", note: "전류 공식 자체는 3상 전력 관계식" }],
+    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "명판 P, PF, η로 전류 환산. IEC 60034 명판 절차는 수행하지 않음" }],
+    referenceSources: [{ id: "src-eng-motor", title: "일반 전기공학 전력·전류 관계식", publisher: "공학 교과서", note: "3상 I = P/(√3 V PF η)" }],
   }),
   f("formula-motor-starting", "모터 기동전류 참고", "I_start = k × I_FLC", [
     { symbol: "k", name: "기동배수", unit: "—", description: "명판 또는 기동장치 설정" },
@@ -82,8 +82,9 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "A_VD", name: "전압강하 최소 단면적", unit: "mm²", description: "허용전류 선정 아님" },
   ], { title: "3상 45 kW, 380 V, 80 m, 허용 3%", given: "Cu, PF 0.85", steps: ["Ib 계산", "ΔV_allow", "A_VD"], result: "설계전류와 전압강하 최소 단면적" }, {
     criteriaNotes: [
-      { standard: "저항 전압강하 공식", appliesTo: "ΔV 및 A_VD" },
-      { standard: "KEC / IEC 60364-5-52", appliesTo: "허용전류·보정표는 내장하지 않음. 사용자가 Iz와 k를 넣을 때만 비교" },
+      { standard: "일반 공학식", appliesTo: "Ib, ΔV, A_VD" },
+      { standard: "KEC 232.5.2", appliesTo: "국내 적용 관련. 표 수치는 사용자가 입력" },
+      { standard: "KS C IEC 60364-5-52", appliesTo: "공사방법·허용전류·보정 체계. 표 미내장" },
     ],
     limitations: ["허용전류표를 하드코딩하지 않습니다."],
   }),
@@ -93,7 +94,11 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-cable-ampacity", "허용전류 검토", "Iz' = Iz k1 k2 k3, Ib ≤ Iz'", [
     { symbol: "Iz", name: "표 허용전류", unit: "A", description: "사용자 입력" },
   ], { title: "Ib=87, Iz=110, k=0.94×0.8", given: "사용자 표", steps: ["Iz'=82.7", "Ib>Iz'"], result: "추가 확인 필요" }, {
-    criteriaNotes: [{ standard: "KEC / IEC 60364-5-52 (사용자 표)", appliesTo: "Iz와 보정계수 값은 사용자가 표에서 확인 후 입력" }],
+    criteriaNotes: [
+      { standard: "KEC 232.5.2", appliesTo: "국내 적용 관련" },
+      { standard: "KS C IEC 60364-5-52", appliesTo: "공사방법 → 허용전류 → 보정계수. 표 미내장" },
+      { standard: "일반 공학식", appliesTo: "Iz' = Iz × k (사용자 값)" },
+    ],
   }),
   f("formula-busbar", "부스바 단면·밀도", "A = w t n, J = I/A, I²t = Isc² t", [
     { symbol: "J", name: "전류밀도", unit: "A/mm²", description: "경험값 비교는 사용자 한도" },
@@ -103,7 +108,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-transformer-sizing", "변압기 필요 kVA", "S = [P(1+손실)/PF](1+설계)(1+증설)", [
     { symbol: "P", name: "최대수요", unit: "kW", description: "" },
   ], { title: "720 kW, PF 0.9, 여유 10%+15%, 손실 3%", given: "수요 720 kW", steps: ["P'=741.6", "S_load=824", "S_need≈1042"], result: "상용 후보 1500 kVA 등" }, {
-    criteriaNotes: [{ standard: "IEC 60076 (참고)", appliesTo: "용량·손실 정의. 냉각 보정은 미구현" }],
+    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "수요를 kVA로 환산. 냉각 보정은 하지 않음" }],
   }),
   f("formula-transformer-current", "변압기 정격전류", "I = S / (√3 V)", [
     { symbol: "S", name: "용량", unit: "kVA", description: "명판" },
@@ -129,13 +134,13 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "Ip", name: "1차 정격", unit: "A", description: "100/5A의 100" },
     { symbol: "Is", name: "2차 정격", unit: "A", description: "보통 5 또는 1" },
   ], { title: "부하 80 A, CT 100/5A", given: "Is=5 A", steps: ["n=20", "I2=4 A"], result: "2차 4 A" }, {
-    criteriaNotes: [{ standard: "IEC 61869-2 (참고)", appliesTo: "CT 비·부담 개념. 오차 계급 계산은 미구현" }],
+    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "n = Ip/Is. IEC 61869 계급 계산은 하지 않음" }],
   }),
   f("formula-pt-ratio", "PT 변성비", "n = V1 / V2", [
     { symbol: "V1", name: "1차", unit: "V", description: "" },
     { symbol: "V2", name: "2차", unit: "V", description: "흔히 110 V" },
   ], { title: "22900 / 110 V", given: "PT", steps: ["n=208.18"], result: "약 208.2" }, {
-    criteriaNotes: [{ standard: "IEC 61869-3 (참고)", appliesTo: "변성비 정의" }],
+    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "n = V1/V2" }],
   }),
   f("formula-vfd", "VFD 용량 검토", "S = max(P(1+m)/k, √3 V I (1+m)/1000/k)", [
     { symbol: "k", name: "감소계수", unit: "—", description: "제조사 표 사용자 입력" },
@@ -177,7 +182,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-earth-conductor", "접지도체 단열식", "S = (I/k) √t", [
     { symbol: "k", name: "재질 계수", unit: "A√s/mm²", description: "표준 표를 사용자가 입력" },
   ], { title: "5 kA, 0.5 s, k=143", given: "사용자 k", steps: ["S=(5000/143)√0.5"], result: "mm²" }, {
-    criteriaNotes: [{ standard: "단열 공식 (IEC 60364-5-54 형태)", appliesTo: "수식만 사용. k 수치표는 내장하지 않음" }],
+    criteriaNotes: [{ standard: "KEC 142.3.2 계산식 / KS C IEC 60364-5-54", appliesTo: "단열식만 사용. t ≤ 5 s에만 결과 표시. t > 5 s는 적용범위 밖(선정 불가가 아님). 표 142.3-1·k 수치는 내장하지 않음" }],
   }),
   f("formula-spd", "SPD 간이 체크", "공식 선정 없음 — 위치·Uc·In 확인", [
     { symbol: "Uc", name: "최대 연속 전압", unit: "V", description: "명판" },

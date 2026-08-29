@@ -16,6 +16,8 @@ import { usePreferences } from "@/components/providers/preferences-provider";
 import { pushRecentTool } from "@/lib/storage/local";
 import type { CalculatorTool, CalculationOutcome, FormulaDefinition, ReferenceArticle } from "@/lib/types";
 import { getCategoryById } from "@/lib/data/categories";
+import { getStandardBasisBySlug } from "@/lib/data/standard-basis";
+import { StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
 
 function visible(field: FieldDef, values: Record<string, string>) {
   if (!field.visibleWhen) return true;
@@ -152,6 +154,7 @@ export function CalculatorWorkspace({
   const [confirmReset, setConfirmReset] = useState(false);
   const formId = useId();
   const category = getCategoryById(tool.categoryId);
+  const basis = getStandardBasisBySlug(tool.slug);
   const complex = schema?.layout === "complex";
 
   useEffect(() => {
@@ -261,6 +264,17 @@ export function CalculatorWorkspace({
         <div>
           {category ? <p className="text-xs font-medium text-muted">{category.name}</p> : null}
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">{tool.name}</h1>
+          {basis ? (
+            <div className="mt-2 space-y-1.5">
+              <StandardStatusBadge status={basis.standardStatus} />
+              {basis.standardStatus === "manufacturer-data-required" ||
+              basis.standardStatus === "verification-required" ||
+              basis.standardStatus === "verified-kec" ||
+              basis.standardStatus === "kec-related" ? (
+                <StandardStatusNote status={basis.standardStatus} />
+              ) : null}
+            </div>
+          ) : null}
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{tool.description}</p>
         </div>
         <FavoriteButton toolId={tool.id} toolName={tool.name} />

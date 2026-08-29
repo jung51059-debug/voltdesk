@@ -38,10 +38,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-ieee-141",
-        title: "IEEE Std 141 (Red Book) — 산업용 배전 일반 관계식",
-        publisher: "IEEE",
-        note: "단상 전력-전류 관계의 일반 공학 공식",
+        id: "src-eng-1p",
+        title: "일반 전기공학 전력·전류 관계식",
+        publisher: "공학 교과서",
+        note: "단상 I = P/(V PF). 표준 표를 사용하지 않습니다.",
       },
     ],
   },
@@ -80,10 +80,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-ieee-141-3p",
-        title: "3상 유효전력 P = √3 × V × I × PF",
-        publisher: "IEEE / 일반 전기공학",
-        note: "선간전압 기준 3상 전력 관계식의 역산",
+        id: "src-eng-3p",
+        title: "일반 전기공학 3상 전력·전류 관계식",
+        publisher: "공학 교과서",
+        note: "P = √3 V I PF 역산. 표준 표를 사용하지 않습니다.",
       },
     ],
   },
@@ -163,10 +163,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-ieee-1459",
-        title: "IEEE Std 1459 — 전력의 정의",
-        publisher: "IEEE",
-        note: "유효·무효·피상전력 관계",
+        id: "src-eng-pf",
+        title: "일반 전기공학 전력 삼각형",
+        publisher: "공학 교과서",
+        note: "PF = P/S. IEEE 1459 측정 정의는 사용하지 않습니다.",
       },
     ],
   },
@@ -205,10 +205,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-iec-60076",
-        title: "IEC 60076 — Power transformers",
-        publisher: "IEC",
-        note: "정격과 부하 운전의 일반 개념. 본 계산은 단순 비율입니다.",
+        id: "src-eng-tr-load",
+        title: "일반 전기공학 용량 비율",
+        publisher: "공학 교과서",
+        note: "부하율 = S/S_rated. IEC 60076 냉각 보정은 수행하지 않습니다.",
       },
     ],
   },
@@ -232,11 +232,12 @@ export const baseFormulas: FormulaDefinition[] = [
     ],
     warnings: [
       "저압 간선에서 리액턴스가 커지면 이 근사보다 전압강하가 클 수 있습니다.",
-      "일반적으로 분기회로 3%, 간선 5% 등 지침이 있으나 프로젝트 기준을 따르세요.",
+      "허용 전압강하 %는 기본 계산에서 강제하지 않습니다. 사용자가 넣은 값과만 비교합니다.",
+      "KEC 232.3.9 표 비교는 검토를 켠 수전 수용가에만 적용합니다. 독립 자가발전기에는 해당하지 않습니다.",
       "허용전류(ampacity)와 차단기 선정은 별도입니다.",
     ],
     limitations: [
-      "KS C IEC 60364, NEC, 내선규정 등의 공식 전압강하 계산표를 대체하지 않습니다.",
+      "표 232.3-1 숫자·거리 가산은 대한전기협회 공개 Q&A를 근거로 하며 현재 시행본을 확인해야 합니다.",
     ],
     example: {
       title: "3상 380 V, 80 A, 80 m, r = 0.727 Ω/km",
@@ -250,10 +251,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-iec-60364",
-        title: "IEC 60364-5-52 — 배선 설비",
-        publisher: "IEC",
-        note: "전압강하 검토의 일반 원칙. 본 도구는 저항 근사 계산입니다.",
+        id: "src-eng-vd",
+        title: "일반 전기공학 선로 전압강하 근사식",
+        publisher: "공학 교과서",
+        note: "저항 성분만. KEC 허용치는 내장하지 않습니다.",
       },
     ],
   },
@@ -294,10 +295,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-ieee-1184",
-        title: "IEEE Std 1184 — UPS용 배터리 선정 가이드",
-        publisher: "IEEE",
-        note: "상세 런타임은 제조사 곡선과 온도 보정이 필요합니다.",
+        id: "src-eng-ups-t",
+        title: "일반 전기공학 에너지 수지",
+        publisher: "공학 교과서",
+        note: "t = 가용Wh / P. IEEE 1184 선정 절차는 사용하지 않습니다.",
       },
     ],
   },
@@ -330,10 +331,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-iso-8528",
-        title: "ISO 8528 — 왕복동 내연기관 구동 교류 발전기 세트",
-        publisher: "ISO",
-        note: "정격 종류(연속, 프라임, 스탠바이) 구분",
+        id: "src-eng-gen-load",
+        title: "일반 전기공학 부하율",
+        publisher: "공학 교과서",
+        note: "P_load/P_rated. ISO 8528 정격 분류 전체를 구현하지 않습니다.",
       },
     ],
   },
@@ -371,10 +372,10 @@ export const baseFormulas: FormulaDefinition[] = [
     },
     referenceSources: [
       {
-        id: "src-energy-mgmt",
-        title: "ISO 50001 에너지 성과 비교의 일반 원칙",
-        publisher: "ISO",
-        note: "단순 월 비교는 생산량·외기온 정규화가 없을 수 있습니다.",
+        id: "src-eng-month",
+        title: "일반 시설관리 사용량 비교",
+        publisher: "공학 교과서",
+        note: "검침값 차. ISO 50001 정규화는 사용하지 않습니다.",
       },
     ],
   },
@@ -398,7 +399,7 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: ["R = 0.0175 × 100 / 35 ≈ 0.050 Ω", "r = 0.0175 × 1000 / 35 ≈ 0.50 Ω/km"],
       result: "약 0.050 Ω (0.50 Ω/km)",
     },
-    referenceSources: [{ id: "src-iec-60228", title: "IEC 60228 — Conductors of insulated cables", publisher: "IEC", note: "공칭 단면적과 저항" }],
+    referenceSources: [{ id: "src-eng-r", title: "일반 전기공학 도체 저항", publisher: "공학 교과서", note: "R = ρL/A. IEC 60228 표는 사용하지 않습니다." }],
   },
   {
     id: "formula-breaker-ref",
@@ -419,7 +420,7 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: ["I_ref = 108.75 A", "상용 스케일 참고 125 A"],
       result: "참고 108.8 A",
     },
-    referenceSources: [{ id: "src-iec-60947", title: "IEC 60947-2", publisher: "IEC", note: "저압 차단기. 본 도구는 배율 참고만 수행" }],
+    referenceSources: [{ id: "src-eng-brk", title: "임의 여유율 참고", publisher: "공학 교과서", note: "I×k. IEC 60947 선정·KEC 적합 판정이 아닙니다." }],
   },
   {
     id: "formula-ups-capacity",
@@ -440,7 +441,7 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: ["P_design = 48 kW", "S = 48 / 0.9 = 53.3 kVA"],
       result: "약 53.3 kVA",
     },
-    referenceSources: [{ id: "src-iec-62040", title: "IEC 62040 — UPS", publisher: "IEC", note: "용량은 부하 특성과 제조 데이터를 따름" }],
+    referenceSources: [{ id: "src-eng-ups-s", title: "일반 전기공학 kVA 환산", publisher: "공학 교과서", note: "IEC 62040 선정 절차는 사용하지 않습니다." }],
   },
 ];
 

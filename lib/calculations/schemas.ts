@@ -180,6 +180,12 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       resistanceUnit: "ohm/km",
       material: "cu",
       area: "35",
+      kecReview: "off",
+      kecScope: "utility",
+      kecSupply: "lv",
+      kecLoad: "other",
+      kecPathSame: "yes",
+      kecPathLength: "",
     },
     fields: [
       {
@@ -194,7 +200,7 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       { id: "current", label: "부하전류 A", kind: "number", required: true, min: 0, step: "any" },
       {
         id: "length",
-        label: "편도 길이",
+        label: "계산 구간 편도 길이",
         kind: "number",
         required: true,
         min: 0,
@@ -205,6 +211,7 @@ export const baseFormSchemas: Record<string, FormSchema> = {
           { value: "km", label: "km" },
           { value: "ft", label: "ft" },
         ],
+        hint: "이 케이블 구간의 편도 길이. ΔV 계산에만 씁니다.",
       },
       { id: "voltage", label: "기준 전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits },
       {
@@ -240,7 +247,71 @@ export const baseFormSchemas: Record<string, FormSchema> = {
         visibleWhen: { field: "rMode", values: ["size"] },
       },
       { id: "area", label: "단면적 mm²", kind: "number", min: 0, step: "any", visibleWhen: { field: "rMode", values: ["size"] } },
-      { id: "allowPct", label: "사용자 허용 전압강하 % (선택)", kind: "number", min: 0, step: "any", hint: "비우면 상태 비교를 하지 않습니다." },
+      { id: "allowPct", label: "사용자 허용 전압강하 % (선택)", kind: "number", min: 0, step: "any", hint: "비우면 사용자 허용과 비교하지 않습니다. KEC 표와는 별개입니다." },
+      {
+        id: "kecReview",
+        label: "KEC 232.3.9 기준 검토",
+        kind: "select",
+        options: [
+          { value: "off", label: "하지 않음 (전압강하만 계산)" },
+          { value: "on", label: "검토 (수전 수용가 · 표 232.3-1)" },
+        ],
+        hint: "기본은 계산만 합니다. 3%·5%를 자동으로 붙이지 않습니다.",
+      },
+      {
+        id: "kecScope",
+        label: "적용 대상",
+        kind: "select",
+        options: [
+          { value: "utility", label: "전력공급자로부터 수전하는 수용가" },
+          { value: "island", label: "독립 자가발전기" },
+        ],
+        visibleWhen: { field: "kecReview", values: ["on"] },
+        hint: "독립 자가발전기에는 KEC 232.3.9가 해당하지 않습니다.",
+      },
+      {
+        id: "kecSupply",
+        label: "수전방식",
+        kind: "select",
+        options: [
+          { value: "lv", label: "저압 수전" },
+          { value: "hv-plus", label: "고압 이상 수전" },
+        ],
+        visibleWhen: { field: "kecReview", values: ["on"] },
+        hint: "고압 이상: 가능한 한 최종회로 내 전압강하는 저압 수전 유형의 값을 넘지 않도록 하는 것이 바람직합니다.",
+      },
+      {
+        id: "kecLoad",
+        label: "부하종류",
+        kind: "select",
+        options: [
+          { value: "lighting", label: "조명" },
+          { value: "other", label: "기타" },
+          { value: "mixed", label: "혼합 / 별도 검토" },
+        ],
+        visibleWhen: { field: "kecReview", values: ["on"] },
+        hint: "혼합은 조명·기타 중 하나를 자동으로 고르지 않습니다.",
+      },
+      {
+        id: "kecPathSame",
+        label: "KEC 검토 경로 길이",
+        kind: "select",
+        options: [
+          { value: "yes", label: "계산 구간 길이와 동일 (단일 구간)" },
+          { value: "no", label: "인입구→기기 전체 경로를 따로 입력" },
+        ],
+        visibleWhen: { field: "kecReview", values: ["on"] },
+        hint: "구간이 인입구→기기 전체와 같을 때만 구간 ΔV%와 허용 참고값을 비교합니다. 다르면 허용 %는 참고만 하고 비교하지 않습니다.",
+      },
+      {
+        id: "kecPathLength",
+        label: "KEC 검토 경로 길이 (인입구→기기)",
+        kind: "number",
+        min: 0,
+        step: "any",
+        visibleWhen: { field: "kecPathSame", values: ["no"] },
+        hint: "수용가 설비 인입구부터 해당 기기까지. ΔV용 구간 길이와 다를 수 있습니다. 단위는 m.",
+      },
     ],
   },
   "cable-resistance": {
@@ -276,10 +347,20 @@ export const baseFormSchemas: Record<string, FormSchema> = {
   "breaker-current": {
     slug: "breaker-current",
     layout: "simple",
-    defaults: { current: "87", margin: "1.25", loadType: "mixed", iscKa: "", icuKa: "" },
+    defaults: { current: "87", margin: "1.25", loadType: "mixed", inRated: "", izCorrected: "", i2Conv: "", iscKa: "", icuKa: "" },
     fields: [
-      { id: "current", label: "부하전류 A", kind: "number", required: true, min: 0, step: "any" },
-      { id: "margin", label: "여유율", kind: "number", min: 1, max: 3, step: "0.05", hint: "연속 부하에 1.25를 쓰는 실무가 있으나 규정이 아닙니다." },
+      { id: "current", label: "설계전류 Ib A", kind: "number", required: true, min: 0, step: "any", hint: "회로 설계전류. 아래 In·Iz와 비교할 때 씁니다." },
+      { id: "margin", label: "임의 여유율 (참고)", kind: "number", min: 1, max: 3, step: "0.05", hint: "I×k 참고값입니다. KEC Ib≤In≤Iz와 같은 조건이 아닙니다." },
+      { id: "inRated", label: "차단기 정격/설정전류 In A (선택)", kind: "number", min: 0, step: "any", hint: "넣으면 Ib/In/Iz 관계만 표시합니다. 적합 판정이 아닙니다." },
+      { id: "izCorrected", label: "보정 후 도체 허용전류 Iz A (선택)", kind: "number", min: 0, step: "any", hint: "적용 표에서 확인한 값. 내장 표 없음." },
+      {
+        id: "i2Conv",
+        label: "규약동작전류 I₂ A (선택)",
+        kind: "number",
+        min: 0,
+        step: "any",
+        hint: "보호장치가 규약시간 이내에 유효하게 동작하는 것을 보장하는 전류. 제조사 기술사양 또는 적용 제품표준에서 확인. 트립곡선으로 추정하지 마세요.",
+      },
       {
         id: "loadType",
         label: "부하 종류",

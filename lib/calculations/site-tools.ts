@@ -1,3 +1,4 @@
+import { KEC_EARTH_CONDUCTOR } from "@/lib/calculations/kec-review";
 import { FieldBag, metric, ok, review, roundTo, warning, type CalcInput } from "@/lib/calculations/parse";
 import type { CalculationOutcome } from "@/lib/types";
 
@@ -214,12 +215,52 @@ export function calculateEarthConductor(input: CalcInput, precision: number): Ca
   const fields = new FieldBag(input);
   const I = fields.num("faultA", "지락·단락전류 A");
   const t = fields.num("time", "차단시간 s");
-  const k = fields.num("kFactor", "재질 계수 k");
   fields.requirePositive("faultA", "전류", I);
   fields.requirePositive("time", "시간", t);
+  if (fields.failed()) return fields.fail();
+
+  const timeOk = t <= KEC_EARTH_CONDUCTOR.adiabaticTimeLimitS + 1e-9;
+  const outOfRange = KEC_EARTH_CONDUCTOR.adiabaticOutOfRangeLines.join(" ");
+
+  if (!timeOk) {
+    return ok({
+      metrics: [{ id: "scope", label: "단열식 계산", value: "적용범위 밖", primary: true }],
+      inputSummary: [
+        { label: "I", value: `${I} A` },
+        { label: "t", value: `${t} s` },
+        { label: "t ≤ 5 s", value: "이 계산식의 적용범위 밖" },
+      ],
+      interpretation: outOfRange,
+      warnings: [
+        warning("error", "k·표 미내장", "KEC 142.3.2는 표 142.3-1 또는 계산식으로 선정합니다. Ampory는 단열식만 제공하며 k 수치표는 내장하지 않습니다."),
+        warning("warning", "차단시간 적용범위", outOfRange),
+      ],
+      formulaUsed: "S = (I / k) × √t  (t ≤ 5 s)",
+      steps: [
+        `t = ${t} s > 5 s — Ampory가 제공하는 단열식 계산방법의 적용범위 밖입니다.`,
+        "단면적 결과는 표시하지 않습니다. 표 142.3-1 등 다른 선정방법을 별도로 검토하세요.",
+      ],
+      reviewStatus: review("caution", "현재 Ampory 단열식 계산방법의 적용범위 밖입니다. 표 142.3-1 등 다른 선정방법을 검토하세요."),
+    });
+  }
+
+  const k = fields.num("kFactor", "재질 계수 k");
   fields.requirePositive("kFactor", "k", k);
   if (fields.failed()) return fields.fail();
   const s = (I / k) * Math.sqrt(t);
+
+  const warnings = [
+    warning(
+      "error",
+      "k·표 미내장",
+      "KEC 142.3.2는 표 142.3-1 또는 계산식으로 선정합니다. Ampory는 단열식만 제공하며 k 수치표는 내장하지 않습니다.",
+    ),
+    warning(
+      "info",
+      "차단시간 적용범위",
+      "단열식은 차단시간 5초 이하에 적용하는 계산 경로입니다. 표 142.3-1 선정과 병행 확인하세요.",
+    ),
+  ];
 
   return ok({
     metrics: [metric("s", "최소 단면적(단열 공식)", s, "mm²", precision, { primary: true })],
@@ -227,16 +268,11 @@ export function calculateEarthConductor(input: CalcInput, precision: number): Ca
       { label: "I", value: `${I} A` },
       { label: "t", value: `${t} s` },
       { label: "k", value: String(k) },
+      { label: "t ≤ 5 s", value: "적용범위 내" },
     ],
-    interpretation: `S = (I/k)√t = ${roundTo(s, precision)} mm². k는 절연·초기/최종 온도에 따라 달라지므로 적용 표준 표를 사용자가 넣어야 합니다.`,
-    warnings: [
-      warning(
-        "error",
-        "k 미내장",
-        "IEC 60364-5-54 등의 k 수치표를 확인하지 않은 채 내장하지 않았습니다. 잘못된 k는 단면적을 왜곡합니다.",
-      ),
-    ],
-    formulaUsed: "S = (I / k) × √t",
+    interpretation: `S = (I/k)√t = ${roundTo(s, precision)} mm². KEC 142.3.2 보호도체 최소 단면적의 계산식 경로입니다. 차단시간 5초 이하 적용범위. k와 표 142.3-1은 사용자가 원문에서 확인해야 합니다.`,
+    warnings,
+    formulaUsed: "S = (I / k) × √t  (t ≤ 5 s)",
     steps: [`S = (${I} / ${k}) × √${t} = ${roundTo(s, precision)} mm²`],
     reviewStatus: review("check", "단열 공식 결과입니다. 기계적 강도·시공 최소 굵기를 추가 확인하세요."),
   });

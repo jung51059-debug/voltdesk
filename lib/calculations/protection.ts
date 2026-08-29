@@ -1,5 +1,6 @@
 import { SQRT_3, toVolts } from "@/lib/math/units";
 import { FieldBag, metric, ok, review, roundTo, warning, type CalcInput } from "@/lib/calculations/parse";
+import { kecCoordCond1, kecCoordCond2 } from "@/lib/calculations/kec-review";
 import type { CalculationOutcome } from "@/lib/types";
 
 export function calculateCtRatio(input: CalcInput, precision: number): CalculationOutcome {
@@ -171,14 +172,21 @@ export function calculateBreakerExtended(input: CalcInput, precision: number): C
   const margin = fields.optional("margin", 1.25, "여유율");
   const isc = fields.optional("iscKa", 0, "단락전류 kA");
   const icu = fields.optional("icuKa", 0, "차단기 Icu kA");
+  const inRated = fields.optional("inRated", 0, "In");
+  const izCorrected = fields.optional("izCorrected", 0, "Iz");
+  const i2Conv = fields.optional("i2Conv", 0, "I2");
   const loadType = input.loadType ?? "mixed";
   fields.requirePositive("current", "부하전류", I);
   fields.requirePositive("margin", "여유율", margin);
+  if (inRated < 0) fields.errors.inRated = "In은 0 이상이어야 합니다.";
+  if (izCorrected < 0) fields.errors.izCorrected = "Iz는 0 이상이어야 합니다.";
+  if (i2Conv < 0) fields.errors.i2Conv = "I₂는 0 이상이어야 합니다.";
   if (fields.failed()) return fields.fail();
 
   const minRating = I * margin;
   const stepsList = [16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000];
   const near = stepsList.find((s) => s >= minRating - 1e-9) ?? Math.ceil(minRating);
+  const hasCoord = inRated > 0 && izCorrected > 0;
 
   const warnings = [
     warning(
@@ -186,16 +194,49 @@ export function calculateBreakerExtended(input: CalcInput, precision: number): C
       "정격 검토 참고",
       "차단기를 자동 선정하지 않습니다. 트립 곡선, 선택차단, 케이블 보호, 모터 기동은 제조사 데이터와 보호협조가 필요합니다.",
     ),
+    warning("info", "여유율과 구분", "임의 여유율 I×k는 KEC 212.4.1 협조 조건(Ib·In·Iz)과 다른 참고값입니다."),
   ];
   if (loadType === "motor") {
     warnings.push(warning("warning", "모터 부하", "기동전류로 순시 트립이 오동작하지 않는지 명판과 곡선을 보세요."));
   }
+  if (hasCoord) {
+    warnings.push(
+      warning(
+        "info",
+        "관계 표시",
+        "수치관계 확인 결과이며 설비의 KEC 적합성을 자동 판정하지 않습니다.",
+      ),
+    );
+  }
+
+  const cond1 = hasCoord ? kecCoordCond1(I, inRated, izCorrected) : null;
+  const cond2 = i2Conv > 0 && izCorrected > 0 ? kecCoordCond2(i2Conv, izCorrected) : null;
 
   const metrics = [
-    metric("min", "참고 최소 정격전류", minRating, "A", precision, { primary: true }),
+    metric("min", "임의 여유율 참고값", minRating, "A", precision, { primary: true }),
     metric("near", "가까운 상용 눈금", near, "A", 0),
+    metric("ib", "설계전류 Ib", I, "A", precision),
   ];
-  let status = review("check", "부하전류 여유만 반영한 참고값입니다.");
+  if (inRated > 0) metrics.push(metric("in", "차단기 정격/설정 In", inRated, "A", precision));
+  if (izCorrected > 0) metrics.push(metric("iz", "보정 후 도체 허용전류 Iz", izCorrected, "A", precision));
+  metrics.push({
+    id: "cond1",
+    label: "조건 1  Ib ≤ In ≤ Iz",
+    value: cond1 ? `수치관계 ${cond1}` : "미검토",
+  });
+  if (i2Conv > 0) {
+    metrics.push(metric("i2", "입력 규약동작전류 I₂", i2Conv, "A", precision));
+    if (izCorrected > 0) {
+      metrics.push(metric("i2Limit", "1.45 × Iz", 1.45 * izCorrected, "A", precision));
+    }
+  }
+  metrics.push({
+    id: "i2Review",
+    label: "조건 2  I₂ ≤ 1.45 Iz",
+    value: cond2 ? `수치관계 ${cond2}` : "미검토",
+  });
+
+  let status = review("check", "부하전류 여유만 반영한 참고값입니다. KEC 적합 판정이 아닙니다.");
   if (isc > 0 && icu > 0) {
     metrics.push(metric("isc", "입력 단락전류", isc, "kA", precision));
     metrics.push(metric("icu", "입력 Icu", icu, "kA", precision));
@@ -207,18 +248,32 @@ export function calculateBreakerExtended(input: CalcInput, precision: number): C
     }
   }
 
+  const i2Note = cond2
+    ? `조건 2 수치관계 ${cond2}. I₂는 제조사 기술사양 또는 적용 제품표준에서 확인합니다.`
+    : "조건 2 미검토. I₂는 제조사 기술사양 또는 적용 제품표준에서 확인하세요.";
+  const cond1Note = cond1 ? `조건 1 수치관계 ${cond1}.` : "조건 1 미검토 (In·Iz 필요).";
+
   return ok({
     metrics,
     inputSummary: [
       { label: "부하 종류", value: loadType },
       { label: "여유율", value: String(margin) },
+      { label: "In", value: inRated > 0 ? `${roundTo(inRated, precision)} A` : "미입력" },
+      { label: "Iz", value: izCorrected > 0 ? `${roundTo(izCorrected, precision)} A` : "미입력" },
+      { label: "I₂", value: i2Conv > 0 ? `${roundTo(i2Conv, precision)} A` : "미검토" },
     ],
-    interpretation: `참고 최소 정격 ${roundTo(minRating, precision)} A, 상용 눈금 ${near} A. MCCB/ACB 적용은 전류대·선택차단·시설 기준을 따릅니다.`,
+    interpretation: hasCoord
+      ? `Ib ${roundTo(I, precision)} A, In ${roundTo(inRated, precision)} A, Iz ${roundTo(izCorrected, precision)} A입니다. ${cond1Note} ${i2Note} 수치관계 확인이며 적합 판정이 아닙니다. 임의 여유율 참고값은 ${roundTo(minRating, precision)} A입니다.`
+      : `설계전류에 임의 여유율 ${roundTo(margin, 2)}를 곱한 참고값은 ${roundTo(minRating, precision)} A입니다. 가까운 상용 정격 ${near} A는 제안이 아니라 스케일 참고입니다. ${cond1Note} ${i2Note}`,
     warnings,
-    formulaUsed: "I_ref = I_load × 여유율.  차단용량은 사용자 Icu ≥ Isc 비교만 수행",
+    formulaUsed: hasCoord
+      ? "참고 I×k. 조건 1 Ib≤In≤Iz, 조건 2 I₂≤1.45 Iz (입력 시에만 수치관계)"
+      : "I_ref = Ib × 임의 여유율. 협조 조건은 In·Iz·I₂ 입력 시",
     steps: [
       `I_ref = ${roundTo(I, precision)} × ${margin} = ${roundTo(minRating, precision)} A`,
       isc > 0 ? `Isc = ${isc} kA, Icu = ${icu || "미입력"} kA` : "단락전류 미입력 — 차단용량 비교 생략",
+      cond1 ? `조건 1 Ib≤In≤Iz : 수치관계 ${cond1}` : "조건 1 미검토",
+      cond2 ? `조건 2 I₂≤1.45 Iz : 수치관계 ${cond2}` : "조건 2 미검토",
     ],
     reviewStatus: status,
   });

@@ -75,6 +75,15 @@ export const HANDOFF_KEYS = new Set([
   "vcMag",
   "vcAng",
   "ratedCurrent",
+  "inRated",
+  "izCorrected",
+  "i2Conv",
+  "kecReview",
+  "kecScope",
+  "kecSupply",
+  "kecLoad",
+  "kecPathSame",
+  "kecPathLength",
 ]);
 
 const VALUE = /^[0-9A-Za-z._+\-]+$/;

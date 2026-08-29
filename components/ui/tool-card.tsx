@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { getCategoryById } from "@/lib/data/categories";
+import { getStandardBasisBySlug } from "@/lib/data/standard-basis";
+import { StandardStatusBadge } from "@/components/calculators/standard-badge";
 import type { CalculatorTool } from "@/lib/types";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 
@@ -20,6 +22,7 @@ export function ToolCard({
 }) {
   const category = getCategoryById(tool.categoryId);
   const landing = variant === "landing";
+  const basis = getStandardBasisBySlug(tool.slug);
 
   return (
     <article
@@ -33,11 +36,14 @@ export function ToolCard({
         </div>
         <FavoriteButton toolId={tool.id} toolName={tool.name} />
       </div>
-      {category ? (
-        <p className="mb-1.5 inline-flex w-fit rounded-full bg-info px-2 py-0.5 text-[11px] font-medium text-primary">
-          {category.name}
-        </p>
-      ) : null}
+      <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+        {category ? (
+          <p className="inline-flex w-fit rounded-full bg-info px-2 py-0.5 text-[11px] font-medium text-primary">
+            {category.name}
+          </p>
+        ) : null}
+        {basis ? <StandardStatusBadge status={basis.standardStatus} /> : null}
+      </div>
       <h3 className={`font-semibold tracking-tight text-ink ${landing ? "text-lg" : "text-[15px] leading-snug"}`}>
         <Link href={tool.href} className="after:absolute after:inset-0">
           {tool.name}

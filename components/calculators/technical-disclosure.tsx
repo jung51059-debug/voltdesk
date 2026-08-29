@@ -1,7 +1,11 @@
 import type { FormulaDefinition } from "@/lib/types";
 import { EngineeringDisclaimer } from "@/components/calculators/engineering-disclaimer";
+import { StandardBadgeRow, StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
+import { METHOD_LABEL, getStandardBasisByFormulaId } from "@/lib/data/standard-basis";
 
 export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition }) {
+  const basis = getStandardBasisByFormulaId(formula.id);
+
   return (
     <div className="mt-8 space-y-2 border-t border-border pt-6">
       <details className="group" open>
@@ -27,24 +31,55 @@ export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition })
           ))}
         </ul>
       </details>
-      <details>
+      <details open>
         <summary className="cursor-pointer text-sm font-medium text-ink">계산 기준 및 참고자료</summary>
-        {formula.criteriaNotes && formula.criteriaNotes.length > 0 ? (
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
-            {formula.criteriaNotes.map((note) => (
-              <li key={`${note.standard}-${note.appliesTo}`}>
-                <span className="font-medium text-ink">{note.standard}</span> — {note.appliesTo}
+        <div className="mt-3 space-y-3 text-sm leading-6 text-muted">
+          {basis ? (
+            <>
+              <div className="space-y-1.5">
+                <StandardStatusBadge status={basis.standardStatus} />
+                <StandardStatusNote status={basis.standardStatus} />
+                <StandardBadgeRow kinds={basis.kinds} />
+              </div>
+              {basis.domesticReview ? (
+                <p>
+                  <span className="font-medium text-ink">국내 적용 검토</span> — {basis.domesticReview}
+                </p>
+              ) : null}
+              {basis.relatedStandards && basis.relatedStandards.length > 0 ? (
+                <p>
+                  <span className="font-medium text-ink">관련 표준</span> — {basis.relatedStandards.join(" · ")}
+                </p>
+              ) : null}
+              <p>
+                <span className="font-medium text-ink">계산 방식</span> — {METHOD_LABEL[basis.method]} · {basis.usedInCalculation}
+              </p>
+              {basis.referenceOnly && basis.referenceOnly.length > 0 ? (
+                <p>
+                  <span className="font-medium text-ink">참고만 (계산 미사용)</span> — {basis.referenceOnly.join(" · ")}
+                </p>
+              ) : null}
+              <p>
+                <span className="font-medium text-ink">Ampory 사용 범위</span> — {basis.amporyScope}
+              </p>
+              <div>
+                <p className="font-medium text-ink">적용 한계</p>
+                <ul className="mt-1 list-disc space-y-1 pl-5">
+                  {basis.limits.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          ) : null}
+          <ul className="list-disc space-y-1 pl-5">
+            {formula.referenceSources.map((source) => (
+              <li key={source.id}>
+                {source.title} ({source.publisher}) — {source.note}
               </li>
             ))}
           </ul>
-        ) : null}
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
-          {formula.referenceSources.map((source) => (
-            <li key={source.id}>
-              {source.title} ({source.publisher}) — {source.note}
-            </li>
-          ))}
-        </ul>
+        </div>
       </details>
       <details>
         <summary className="cursor-pointer text-sm font-medium text-ink">실무 예제</summary>

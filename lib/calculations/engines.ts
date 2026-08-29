@@ -24,6 +24,13 @@ import {
 
 export type { CalcInput } from "@/lib/calculations/parse";
 import type { CalcInput } from "@/lib/calculations/parse";
+import {
+  kecVoltageDropCanCompare,
+  kecVoltageDropJudgmentLabel,
+  kecVoltageDropLimitPct,
+  type KecVoltageDropLoad,
+  type KecVoltageDropSupply,
+} from "@/lib/calculations/kec-review";
 
 function num(input: CalcInput, id: string, label: string): number {
   return parseNumber(input[id], label);
@@ -546,34 +553,133 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
   } catch {
     allow = 0;
   }
-  const warnings = [];
-  if (pct > 5) {
-    warnings.push(
-      warning("warning", "전압강하 5% 초과", "많은 저압 간선 지침에서 5%를 넘기면 단면적 또는 경로를 재검토합니다. 프로젝트 기준을 확인하세요."),
-    );
-  } else if (pct > 3) {
-    warnings.push(
-      warning("info", "전압강하 3% 초과", "분기회로 지침에서 3%를 쓰는 경우 여유가 부족할 수 있습니다."),
-    );
+  const kecReview = input.kecReview === "on";
+  const kecScope = input.kecScope ?? "utility";
+  const supply = (input.kecSupply ?? "") as KecVoltageDropSupply | "";
+  const load = (input.kecLoad ?? "") as KecVoltageDropLoad | "";
+  const supplyOk = supply === "lv" || supply === "hv-plus";
+  const loadOk = load === "lighting" || load === "other";
+  const pathSame = (input.kecPathSame ?? "yes") !== "no";
+  let pathM = L;
+  if (kecReview && !pathSame) {
+    try {
+      pathM = optionalNum(input, "kecPathLength", 0);
+      if (pathM <= 0) fieldErrors.kecPathLength = "인입구→기기 경로 길이는 0보다 커야 합니다.";
+    } catch (error) {
+      fieldErrors.kecPathLength = error instanceof Error ? error.message : "KEC 경로 길이를 확인하세요.";
+    }
   }
-  warnings.push(
+  if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
+
+  const pathMatchesSegment = kecVoltageDropCanCompare(L, pathM);
+  let kecMode: "off" | "out-of-scope" | "mixed" | "review" = "off";
+  let kecLimit = 0;
+  let kecBase = 0;
+  let kecExtra = 0;
+  if (kecReview && kecScope === "island") {
+    kecMode = "out-of-scope";
+  } else if (kecReview && kecScope === "utility" && load === "mixed") {
+    kecMode = "mixed";
+  } else if (kecReview && kecScope === "utility" && supplyOk && loadOk) {
+    kecMode = "review";
+    const limit = kecVoltageDropLimitPct({ supply, load, lengthM: pathM });
+    kecBase = limit.basePct;
+    kecExtra = limit.extraPct;
+    kecLimit = limit.limitPct;
+  } else if (kecReview) {
+    kecMode = "off";
+  }
+
+  const warnings = [
     warning("info", "저항 근사", "리액턴스와 온도 보정은 포함하지 않았습니다. 정확한 설계는 케이블 임피던스표를 사용하세요."),
-  );
+  ];
+  if (!kecReview) {
+    warnings.push(
+      warning(
+        "info",
+        "KEC 검토 꺼짐",
+        "표 232.3-1과 비교하지 않습니다. 3%·5%를 자동 한도로 쓰지 않습니다. 수전 수용가 검토가 필요하면 KEC 232.3.9 검토를 켜세요.",
+      ),
+    );
+  } else if (kecMode === "out-of-scope") {
+    warnings.push(
+      warning(
+        "warning",
+        "적용 대상 아님",
+        "KEC 232.3.9는 전력공급자로부터 수전하는 수용가설비 기준입니다. 독립 자가발전기에는 해당하지 않습니다.",
+      ),
+    );
+  } else if (kecMode === "mixed") {
+    warnings.push(
+      warning(
+        "warning",
+        "혼합부하 · 별도 검토",
+        "조명 및 기타 부하가 함께 포함된 회로입니다. 적용 허용 전압강하는 설계 범위와 각 부하의 공급경로를 확인하여 결정하세요. 3/5 또는 6/8을 자동으로 고르지 않습니다.",
+      ),
+    );
+  } else if (kecMode === "review") {
+    warnings.push(
+      warning(
+        "info",
+        "표 232.3-1 선택 검토",
+        pathMatchesSegment
+          ? "단일 구간이 인입구→기기 경로와 같을 때만 구간 전압강하율과 허용 참고값을 비교합니다. 모터 기동 등 별도 경우는 표보다 큰 값이 허용될 수 있습니다. 규정 합격·인증이 아닙니다."
+          : "현재 결과는 선택한 케이블 구간의 전압강하입니다. KEC 기준 검토는 인입구부터 해당 기기까지 전체 공급경로의 전압강하를 합산하여 확인하세요.",
+      ),
+    );
+    if (supply === "hv-plus") {
+      warnings.push(
+        warning(
+          "info",
+          "고압 이상 수전 주의",
+          "가능한 한 최종회로 내 전압강하는 저압 수전 유형의 값을 넘지 않도록 하는 것이 바람직합니다.",
+        ),
+      );
+    }
+  } else {
+    warnings.push(warning("warning", "검토 입력 부족", "수전방식과 부하종류를 넣어야 표 232.3-1과 비교합니다."));
+  }
+
+  const metrics = [
+    metric("dv", "전압강하", dV, "V", precision, { primary: true }),
+    metric("pct", "전압강하율", pct, "%", precision),
+    { id: "kecJudge", label: "KEC 232.3.9 검토", value: kecVoltageDropJudgmentLabel(kecMode) },
+    metric("vend", "말단 예상전압", vend, "V", precision),
+    metric("r", "사용 저항", rOhmKm, "Ω/km", 4),
+  ];
+  if (kecMode === "review") {
+    metrics.push(metric("kecLimit", "전체 경로 허용 참고값", kecLimit, "%", 2));
+    if (pathMatchesSegment) {
+      metrics.push({
+        id: "kecCompare",
+        label: "계산값 대비 표",
+        value: pct <= kecLimit + 1e-9 ? "기준 이하 (참고)" : "기준 초과 (참고)",
+      });
+    }
+  }
+
+  const kecNote =
+    kecMode === "off"
+      ? "KEC 기준 자동 판정은 미적용입니다. KEC 232.3.9 관련 기준은 수전방식·부하종류·배선조건에 따라 확인이 필요합니다."
+      : kecMode === "out-of-scope"
+        ? "독립 자가발전기에는 KEC 232.3.9가 적용되지 않습니다."
+        : kecMode === "mixed"
+          ? "조명 및 기타 부하가 함께 포함된 회로입니다. 적용 허용 전압강하는 설계 범위와 각 부하의 공급경로를 확인하여 결정하세요."
+        : pathMatchesSegment
+          ? `전체 경로 허용 참고값 ${roundTo(kecLimit, 2)}% (기본 ${roundTo(kecBase, 2)}% + 거리 가산 ${roundTo(kecExtra, 3)}%). 적합 판정이 아닙니다. 사용자 입력 전압으로 %를 만들었으며 표 232.3-1의 공식 분모라고 단정하지 않습니다.`
+          : `현재 결과는 선택한 케이블 구간의 전압강하입니다. KEC 기준 검토는 인입구부터 해당 기기까지 전체 공급경로의 전압강하를 합산하여 확인하세요. 전체 경로 허용 참고값: ${roundTo(kecLimit, 2)}%.`;
 
   return result({
-    metrics: [
-      metric("dv", "전압강하", dV, "V", precision, { primary: true }),
-      metric("pct", "전압강하율", pct, "%", precision),
-      metric("vend", "말단 예상전압", vend, "V", precision),
-      metric("r", "사용 저항", rOhmKm, "Ω/km", 4),
-    ],
+    metrics,
     inputSummary: [
       { label: "방식", value: phase === "1" ? "단상" : "3상" },
       { label: "전류", value: `${roundTo(I, precision)} A` },
-      { label: "편도 길이", value: `${roundTo(L, precision)} m` },
+      { label: "계산 구간", value: `${roundTo(L, precision)} m` },
+      { label: "KEC 경로", value: kecReview ? `${roundTo(pathM, precision)} m` : "미적용" },
       { label: "기준 전압", value: `${roundTo(V, precision)} V` },
+      { label: "KEC 검토", value: kecReview ? "켬" : "끔" },
     ],
-    interpretation: `${phase === "1" ? "단상" : "3상"} 저항 근사 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%), 말단 약 ${roundTo(vend, precision)} V입니다. 허용전류·단락내량과는 별개입니다.`,
+    interpretation: `${phase === "1" ? "단상" : "3상"} 저항 근사 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%)입니다. ${kecNote}`,
     warnings,
     formulaUsed:
       phase === "1"
@@ -586,13 +692,30 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
         : `ΔV = √3 × ${roundTo(I, precision)} × ${roundTo(lengthKm, 5)} × ${roundTo(rOhmKm, 4)} = ${roundTo(dV, precision)} V`,
       `% = ${roundTo(dV, precision)} / ${roundTo(V, 2)} × 100 = ${roundTo(pct, precision)}%`,
       `V_end = ${roundTo(V, 2)} − ${roundTo(dV, precision)} = ${roundTo(vend, precision)} V`,
+      kecMode === "review"
+        ? pathMatchesSegment
+          ? `경로=구간 ${roundTo(pathM, 1)} m, 전체 경로 허용 참고 = ${roundTo(kecBase, 2)} + ${roundTo(kecExtra, 3)} = ${roundTo(kecLimit, 2)}%`
+          : `구간 ${roundTo(L, 1)} m ≠ 경로 ${roundTo(pathM, 1)} m — 허용 참고 ${roundTo(kecLimit, 2)}%만 표시, 비교 안 함`
+        : kecMode === "mixed"
+          ? "혼합부하 — 표 숫자 자동 선택 없음"
+          : "KEC 표 비교 생략",
     ],
     reviewStatus:
-      allow > 0
-        ? pct <= allow
-          ? review("in-range", `사용자 허용 ${allow}% 이하입니다. 규정 합격 판정이 아닙니다.`)
-          : review("caution", `사용자 허용 ${allow}%를 초과합니다.`)
-        : review("check", "허용 전압강하율은 프로젝트 기준을 확인하세요."),
+      kecMode === "review"
+        ? pathMatchesSegment
+          ? pct <= kecLimit + 1e-9
+            ? review("in-range", `전체 경로 허용 참고 ${roundTo(kecLimit, 2)}% 이하입니다. 적합 판정이 아닙니다.`)
+            : review("caution", `전체 경로 허용 참고 ${roundTo(kecLimit, 2)}%를 넘습니다. 부적합 판정이 아닙니다.`)
+          : review("check", "구간 전압강하와 전체 경로 허용 참고값은 비교하지 않습니다. 경로 합산 후 확인하세요.")
+        : kecMode === "mixed"
+          ? review("check", "혼합부하는 표 허용값을 자동으로 고르지 않습니다. 설계 범위와 공급경로를 확인하세요.")
+        : kecMode === "out-of-scope"
+          ? review("check", "KEC 232.3.9 적용 대상이 아닙니다.")
+        : allow > 0
+          ? pct <= allow
+            ? review("in-range", `사용자 허용 ${allow}% 이하입니다. 규정 합격 판정이 아닙니다.`)
+            : review("caution", `사용자 허용 ${allow}%를 초과합니다.`)
+          : review("check", "허용 전압강하율은 프로젝트 기준을 확인하세요."),
   });
 }
 
@@ -640,53 +763,7 @@ export function calculateCableResistance(input: CalcInput, precision: number): C
 }
 
 export function calculateBreakerReference(input: CalcInput, precision: number): CalculationOutcome {
-  const fieldErrors: Record<string, string> = {};
-  let I = 0;
-  let margin = 1.25;
-  try {
-    I = num(input, "current", "부하전류 A");
-    if (I <= 0) fieldErrors.current = "부하전류는 0보다 커야 합니다.";
-  } catch (error) {
-    fieldErrors.current = error instanceof Error ? error.message : "전류를 확인하세요.";
-  }
-  try {
-    margin = optionalNum(input, "margin", 1.25);
-    if (margin < 1 || margin > 3) fieldErrors.margin = "여유율은 1.0~3.0 사이로 입력하세요.";
-  } catch (error) {
-    fieldErrors.margin = error instanceof Error ? error.message : "여유율을 확인하세요.";
-  }
-  if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
-
-  const minRating = I * margin;
-  const standard = nearestBreaker(minRating);
-
-  return result({
-    metrics: [
-      metric("min", "참고 최소 정격", minRating, "A", precision, { primary: true }),
-      metric("std", "가까운 상용 정격", standard, "A", 0),
-      metric("load", "부하전류", I, "A", precision),
-    ],
-    inputSummary: [
-      { label: "부하전류", value: `${roundTo(I, precision)} A` },
-      { label: "여유율", value: String(roundTo(margin, 2)) },
-    ],
-    interpretation: `부하전류에 여유율 ${roundTo(margin, 2)}를 곱한 참고값은 ${roundTo(minRating, precision)} A입니다. 가까운 상용 정격 ${standard} A는 제안이 아니라 스케일 참고입니다.`,
-    warnings: [
-      warning(
-        "error",
-        "선정 승인 아님",
-        "단락용량, 보호협조, 모터 기동, 케이블 허용전류, 제조사 특성곡선을 확인하기 전까지 차단기를 선정하지 마세요.",
-      ),
-    ],
-    formulaUsed: "I_ref = I_load × 여유율",
-  });
-}
-
-const BREAKER_STEPS = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000];
-
-function nearestBreaker(minA: number): number {
-  const found = BREAKER_STEPS.find((step) => step >= minA - 1e-9);
-  return found ?? Math.ceil(minA);
+  return calculateBreakerExtended(input, precision);
 }
 
 export function calculateUpsBackup(input: CalcInput, precision: number): CalculationOutcome {

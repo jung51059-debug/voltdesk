@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { calculateMotorCurrent } from "@/lib/calculations/motor";
 import { calculatePowerFactorCorrection, calculateThd } from "@/lib/calculations/power-quality";
-import { calculateVoltageDrop, calculateTransformerLoad, engines } from "@/lib/calculations/engines";
-import { calculateLux } from "@/lib/calculations/site-tools";
+import { calculateVoltageDrop, calculateTransformerLoad, calculateBreakerReference, engines } from "@/lib/calculations/engines";
+import { kecVoltageDropCanCompare, kecVoltageDropLimitPct } from "@/lib/calculations/kec-review";
+import { calculateEarthConductor, calculateLux } from "@/lib/calculations/site-tools";
 import {
   exportLoadScheduleCsv,
   loadRowsFromCsv,
@@ -42,6 +43,16 @@ import {
   isFacilityWorkspaceTool,
 } from "@/lib/data/tools";
 import { searchCatalog } from "@/lib/search";
+import {
+  STANDARD_KIND_LABEL,
+  STANDARD_STATUS_LABEL,
+  STANDARD_STATUS_NOTE,
+  STANDARD_STATUSES,
+  assertNoComplianceWording,
+  getStandardBasisBySlug,
+  missingStandardBasis,
+  toolsByStandardStatus,
+} from "@/lib/data/standard-basis";
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 
 function primaryNumber(outcome: { ok: boolean; metrics?: { primary?: boolean; value: number | string }[] }): number {
@@ -204,6 +215,322 @@ describe("카탈로그 정합", () => {
         expect(formSchemas[tool.slug], tool.slug).toBeTruthy();
         expect(engines[tool.slug], tool.slug).toBeTruthy();
       }
+    }
+  });
+
+  it("모든 published 도구에 계산 기준 메타데이터가 있다", () => {
+    expect(missingStandardBasis()).toEqual([]);
+    for (const tool of getPublishedTools()) {
+      const basis = getStandardBasisBySlug(tool.slug);
+      expect(basis, tool.slug).toBeTruthy();
+      if (!basis) continue;
+      for (const kind of basis.kinds) {
+        expect(assertNoComplianceWording(STANDARD_KIND_LABEL[kind])).toBe(true);
+      }
+      expect(STANDARD_STATUSES.includes(basis.standardStatus), tool.slug).toBe(true);
+      expect(assertNoComplianceWording(STANDARD_STATUS_LABEL[basis.standardStatus])).toBe(true);
+      expect(assertNoComplianceWording(STANDARD_STATUS_NOTE[basis.standardStatus])).toBe(true);
+      expect(assertNoComplianceWording(basis.methodNote)).toBe(true);
+      expect(assertNoComplianceWording(basis.amporyScope)).toBe(true);
+      for (const limit of basis.limits) expect(assertNoComplianceWording(limit)).toBe(true);
+    }
+  });
+});
+
+describe("차단기 Ib/In/Iz", () => {
+  it("In·Iz가 있어도 적합 판정을 하지 않는다", () => {
+    const out = calculateBreakerReference(
+      { current: "80", margin: "1.25", inRated: "100", izCorrected: "114" },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.interpretation).toContain("적합 판정이 아닙니다");
+      expect(out.warnings.some((w) => w.title === "관계 표시")).toBe(true);
+      expect(out.warnings.some((w) => /합격|인증|법적 적합/.test(`${w.title}${w.message}`))).toBe(false);
+      expect(out.metrics.find((m) => m.id === "i2Review")?.value).toBe("미검토");
+      expect(out.metrics.find((m) => m.id === "cond1")?.value).toBe("수치관계 충족");
+    }
+  });
+
+  it("I₂를 넣으면 조건 2 수치관계만 표시하고 합격 문구를 쓰지 않는다", () => {
+    const out = engines["breaker-current"](
+      { current: "80", margin: "1.25", inRated: "100", izCorrected: "114", i2Conv: "200" },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.find((m) => m.id === "i2")?.value).toBeTruthy();
+      expect(out.metrics.find((m) => m.id === "i2Review")?.value).toBe("수치관계 미충족");
+      expect(out.metrics.find((m) => m.id === "i2Limit")?.value).toBeTruthy();
+      expect(out.warnings.some((w) => /합격|인증|법적 적합/.test(`${w.title}${w.message}`))).toBe(false);
+    }
+  });
+});
+
+describe("전압강하 허용치", () => {
+  it("3%·5%를 자동 한도로 쓰지 않는다", () => {
+    const out = calculateVoltageDrop(
+      {
+        phase: "3",
+        current: "80",
+        length: "80",
+        lengthUnit: "m",
+        voltage: "380",
+        voltageUnit: "V",
+        rMode: "ohm",
+        resistance: "0.727",
+        resistanceUnit: "ohm/km",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.warnings.some((w) => w.title.includes("3%") || w.title.includes("5%"))).toBe(false);
+      expect(out.metrics.find((m) => m.id === "kecJudge")?.value).toBe("미적용");
+      expect(out.interpretation).toContain("자동 판정은 미적용");
+    }
+  });
+
+  it("검토를 켠 저압 조명 150 m는 3.25%를 허용 참고로 쓴다", () => {
+    const limit = kecVoltageDropLimitPct({ supply: "lv", load: "lighting", lengthM: 150 });
+    expect(limit.limitPct).toBeCloseTo(3.25, 5);
+    const out = calculateVoltageDrop(
+      {
+        phase: "3",
+        current: "80",
+        length: "150",
+        lengthUnit: "m",
+        voltage: "380",
+        voltageUnit: "V",
+        rMode: "ohm",
+        resistance: "0.727",
+        resistanceUnit: "ohm/km",
+        kecReview: "on",
+        kecScope: "utility",
+        kecSupply: "lv",
+        kecLoad: "lighting",
+        kecPathSame: "yes",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.find((m) => m.id === "kecJudge")?.value).toBe("선택 검토");
+      expect(Number(out.metrics.find((m) => m.id === "kecLimit")?.value)).toBeCloseTo(3.25, 2);
+      expect(out.metrics.find((m) => m.id === "kecCompare")?.value).toMatch(/기준/);
+      expect(out.interpretation).toContain("적합 판정이 아닙니다");
+    }
+  });
+
+  it("ΔV 구간과 KEC 경로 길이를 분리한다", () => {
+    const out = calculateVoltageDrop(
+      {
+        phase: "3",
+        current: "80",
+        length: "40",
+        lengthUnit: "m",
+        voltage: "380",
+        voltageUnit: "V",
+        rMode: "ohm",
+        resistance: "0.727",
+        resistanceUnit: "ohm/km",
+        kecReview: "on",
+        kecScope: "utility",
+        kecSupply: "lv",
+        kecLoad: "other",
+        kecPathSame: "no",
+        kecPathLength: "160",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(Number(out.metrics.find((m) => m.id === "kecLimit")?.value)).toBeCloseTo(5.3, 2);
+      expect(out.metrics.some((m) => m.id === "kecCompare")).toBe(false);
+      expect(String(out.interpretation)).not.toMatch(/기준 이하|기준 초과/);
+      expect(out.interpretation).toContain("선택한 케이블 구간의 전압강하");
+      expect(out.interpretation).toContain("전체 공급경로");
+      expect(out.inputSummary.some((row) => row.label === "계산 구간" && row.value.includes("40"))).toBe(true);
+      expect(out.inputSummary.some((row) => row.label === "KEC 경로" && row.value.includes("160"))).toBe(true);
+    }
+  });
+
+  it("구간과 경로가 같으면 비교하고 다르면 비교하지 않는다", () => {
+    expect(kecVoltageDropCanCompare(40, 40)).toBe(true);
+    expect(kecVoltageDropCanCompare(40, 160)).toBe(false);
+  });
+
+  it("320 m 경로는 가산 상한 0.5%를 적용한다", () => {
+    expect(kecVoltageDropLimitPct({ supply: "lv", load: "other", lengthM: 320 }).limitPct).toBeCloseTo(5.5, 5);
+  });
+
+  it("혼합부하는 표 숫자를 고르지 않는다", () => {
+    const out = calculateVoltageDrop(
+      {
+        phase: "3",
+        current: "80",
+        length: "80",
+        lengthUnit: "m",
+        voltage: "380",
+        voltageUnit: "V",
+        rMode: "ohm",
+        resistance: "0.727",
+        resistanceUnit: "ohm/km",
+        kecReview: "on",
+        kecScope: "utility",
+        kecSupply: "lv",
+        kecLoad: "mixed",
+        kecPathSame: "yes",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.find((m) => m.id === "kecJudge")?.value).toBe("혼합부하 · 별도 검토");
+      expect(out.metrics.some((m) => m.id === "kecLimit")).toBe(false);
+      expect(out.interpretation).toContain("공급경로를 확인하여 결정하세요");
+    }
+  });
+
+  it("고압 이상 수전에 최종회로 주의사항을 표시한다", () => {
+    const out = calculateVoltageDrop(
+      {
+        phase: "3",
+        current: "80",
+        length: "80",
+        lengthUnit: "m",
+        voltage: "380",
+        voltageUnit: "V",
+        rMode: "ohm",
+        resistance: "0.727",
+        resistanceUnit: "ohm/km",
+        kecReview: "on",
+        kecScope: "utility",
+        kecSupply: "hv-plus",
+        kecLoad: "other",
+        kecPathSame: "yes",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(Number(out.metrics.find((m) => m.id === "kecLimit")?.value)).toBe(8);
+      expect(out.warnings.some((w) => w.title === "고압 이상 수전 주의")).toBe(true);
+    }
+  });
+
+  it("표 232.3-1 기본값과 거리 가산 상한을 지킨다", () => {
+    expect(kecVoltageDropLimitPct({ supply: "lv", load: "other", lengthM: 80 }).limitPct).toBe(5);
+    expect(kecVoltageDropLimitPct({ supply: "hv-plus", load: "lighting", lengthM: 80 }).limitPct).toBe(6);
+    expect(kecVoltageDropLimitPct({ supply: "hv-plus", load: "other", lengthM: 80 }).limitPct).toBe(8);
+    expect(kecVoltageDropLimitPct({ supply: "lv", load: "lighting", lengthM: 220 }).limitPct).toBeCloseTo(3.5, 5);
+  });
+
+  it("독립 자가발전기는 표와 비교하지 않는다", () => {
+    const out = calculateVoltageDrop(
+      {
+        phase: "3",
+        current: "80",
+        length: "80",
+        lengthUnit: "m",
+        voltage: "380",
+        voltageUnit: "V",
+        rMode: "ohm",
+        resistance: "0.727",
+        resistanceUnit: "ohm/km",
+        kecReview: "on",
+        kecScope: "island",
+        kecSupply: "lv",
+        kecLoad: "other",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.find((m) => m.id === "kecJudge")?.value).toBe("적용 대상 아님");
+      expect(out.metrics.some((m) => m.id === "kecLimit")).toBe(false);
+    }
+  });
+});
+
+describe("KEC 표기 범위", () => {
+  it("60287을 사용 표준으로 붙이지 않는다", () => {
+    for (const tool of getPublishedTools()) {
+      const basis = getStandardBasisBySlug(tool.slug);
+      expect(basis?.relatedStandards?.some((item) => item.includes("60287")) ?? false).toBe(false);
+    }
+  });
+
+  it("케이블 허용전류는 232.5.2와 60364-5-52만 연결한다", () => {
+    const basis = getStandardBasisBySlug("cable-ampacity");
+    expect(basis?.domesticReview).toBe("KEC 232.5.2");
+    expect(basis?.relatedStandards).toEqual(["KS C IEC 60364-5-52"]);
+    expect(basis?.usedInCalculation).toContain("사용자");
+    expect(basis?.standardStatus).toBe("kec-related");
+  });
+
+  it("확인된 분류를 metadata에 고정한다", () => {
+    expect(getStandardBasisBySlug("cable-sizing")?.standardStatus).toBe("kec-related");
+    expect(getStandardBasisBySlug("breaker-current")?.standardStatus).toBe("kec-related");
+    expect(getStandardBasisBySlug("voltage-drop")?.standardStatus).toBe("kec-related");
+    expect(getStandardBasisBySlug("voltage-drop")?.usedInCalculation).toContain("구간=경로");
+    expect(getStandardBasisBySlug("earth-conductor")?.standardStatus).toBe("kec-related");
+    expect(getStandardBasisBySlug("earth-conductor")?.usedInCalculation).toContain("결과 숨김");
+    expect(getStandardBasisBySlug("earth-conductor")?.domesticReview).toBe("KEC 142.3.2 보호도체 최소 단면적");
+    expect(getStandardBasisBySlug("earth-conductor")?.relatedStandards).toEqual(["KS C IEC 60364-5-54"]);
+    expect(getStandardBasisBySlug("ups-backup-time")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("ups-capacity")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("battery-capacity")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("vfd-sizing")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("soft-starter")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("motor-starting")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("generator-fuel")?.standardStatus).toBe("manufacturer-data-required");
+    expect(getStandardBasisBySlug("short-circuit")?.standardStatus).toBe("international-reference");
+    expect(getStandardBasisBySlug("transformer-load")?.standardStatus).toBe("general-engineering");
+    expect(toolsByStandardStatus("verified-kec")).toEqual([]);
+    expect(toolsByStandardStatus("kec-related").map((item) => item.slug).sort()).toEqual([
+      "breaker-current",
+      "cable-ampacity",
+      "cable-sizing",
+      "earth-conductor",
+      "voltage-drop",
+    ]);
+    expect(STANDARD_STATUS_NOTE["manufacturer-data-required"]).toContain("제조사");
+    expect(STANDARD_STATUS_NOTE["verification-required"]).toContain("자동 적합 판정");
+  });
+});
+
+describe("접지도체 단열식", () => {
+  it("k 기본값 없이 계산하고 t≤5 s를 표시한다", () => {
+    const out = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143" }, 2);
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.interpretation).toContain("5초 이하");
+      expect(out.inputSummary.some((row) => row.label === "t ≤ 5 s" && row.value === "적용범위 내")).toBe(true);
+    }
+  });
+
+  it("t가 5초를 넘으면 k 없이 적용범위만 안내한다", () => {
+    const out = calculateEarthConductor({ faultA: "5000", time: "8" }, 2);
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.some((m) => m.id === "s")).toBe(false);
+      expect(out.interpretation).not.toContain("선정 불가능");
+    }
+  });
+
+  it("t가 5초를 넘으면 단면적을 숨기고 적용범위만 안내한다", () => {
+    const out = calculateEarthConductor({ faultA: "5000", time: "6", kFactor: "143" }, 2);
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.some((m) => m.id === "s")).toBe(false);
+      expect(out.metrics.find((m) => m.id === "scope")?.value).toBe("적용범위 밖");
+      expect(out.interpretation).toContain("이 계산식의 적용범위를 벗어났습니다");
+      expect(out.interpretation).toContain("차단시간 5초 이하");
+      expect(out.interpretation).toContain("표 142.3-1");
+      expect(out.interpretation).not.toContain("선정 불가능");
+      expect(out.warnings.some((w) => w.title === "차단시간 적용범위" && w.level === "warning")).toBe(true);
     }
   });
 });

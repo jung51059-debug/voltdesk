@@ -485,11 +485,11 @@ export const extraFormSchemas: Record<string, FormSchema> = {
   "earth-conductor": {
     slug: "earth-conductor",
     layout: "complex",
-    defaults: { faultA: "5000", time: "0.5", kFactor: "143" },
+    defaults: { faultA: "5000", time: "0.5", kFactor: "" },
     fields: [
       { id: "faultA", label: "지락·단락전류 A", kind: "number", required: true, min: 0, step: "any" },
-      { id: "time", label: "차단시간 s", kind: "number", required: true, min: 0, step: "any" },
-      { id: "kFactor", label: "재질·온도 계수 k", kind: "number", required: true, min: 0, step: "any", hint: "적용 표준 표의 k를 직접 입력. 내장 표 없음" },
+      { id: "time", label: "차단시간 s", kind: "number", required: true, min: 0, step: "any", hint: "KEC 142.3.2 단열식은 차단시간 5초 이하에만 적용합니다. 5초를 넘으면 단면적 결과를 표시하지 않습니다. 표 142.3-1 선정은 별개입니다." },
+      { id: "kFactor", label: "재질·온도 계수 k", kind: "number", min: 0, step: "any", hint: "t ≤ 5 s일 때 필요합니다. 도체 재질·절연·온도조건에 맞는 값을 관련 표준에서 확인하세요. 구리=143 같은 기본값을 넣지 않습니다." },
     ],
   },
   "spd-helper": {

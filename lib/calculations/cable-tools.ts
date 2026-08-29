@@ -87,7 +87,7 @@ export function calculateCableSizing(input: CalcInput, precision: number): Calcu
     warning(
       "error",
       "허용전류표 미내장",
-      "KEC·IEC 60364·제조사 허용전류표와 보정계수 표는 이 도구에 넣지 않았습니다. 절연·포설·온도·집합은 기록이며, k 값은 표에서 직접 옮기세요.",
+      "KEC 232.5.2 / KS C IEC 60364-5-52 표 수치는 내장하지 않습니다. 공사방법·절연·온도·집합에 맞는 Iz와 k를 표에서 직접 옮기세요.",
     ),
     warning("info", "저항 근사", "20°C 저항률 근사(Cu 0.0175, Al 0.0282 Ω·mm²/m). 리액턴스·운전온도는 미포함."),
   ];
