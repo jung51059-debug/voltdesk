@@ -11,7 +11,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div>
           <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Ampory 홈">
-            <AmporyMark className="size-8 shrink-0" />
+            <AmporyMark className="size-9 shrink-0" />
             <AmporyWordmark className="text-base" />
           </Link>
           <p className="mt-3 text-sm leading-6 text-muted">전기·시설 실무를 위한 빠른 계산과 기술 참고자료.</p>
