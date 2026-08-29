@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Noto_Sans_KR } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -63,14 +64,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ko" className={`${inter.variable} ${noto.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <meta name="naver-site-verification" content="365dbd9fadf2c2c55603122bccfc9890040eb198" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9114170820004533"
-          crossOrigin="anonymous"
-        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-full flex-col bg-surface font-sans text-ink">
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9114170820004533"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <JsonLd data={softwareJsonLd()} />
         <PreferencesProvider>
           <FavoriteProvider>
