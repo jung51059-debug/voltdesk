@@ -27,7 +27,7 @@ export default function HomePage() {
     <div className="space-y-11">
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
         <div>
-          <p className="text-sm font-medium text-primary">Ampory · 전기 · 시설관리 엔지니어링 유틸리티</p>
+          <p className="text-sm font-medium text-primary">전기 · 시설관리 엔지니어링 유틸리티</p>
           <h1 className="mt-2 text-[2.125rem] font-semibold leading-[1.2] tracking-tight sm:text-[2.75rem]">
             현장에서 바로 쓰는
             <br />
