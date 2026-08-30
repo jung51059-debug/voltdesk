@@ -33,7 +33,7 @@ export function ResultPanel({ result, split = false }: { result: CalculationResu
                 {metric.label}
                 {metric.hint ? <span className="mt-0.5 block text-[11px] font-normal">{metric.hint}</span> : null}
               </dt>
-              <dd className="shrink-0 font-semibold tabular-nums text-ink">
+              <dd className={`font-semibold text-ink ${metric.unit ? "shrink-0 tabular-nums" : "min-w-0 text-right leading-6"}`}>
                 {metric.value}
                 {metric.unit ? <span className="ml-1 font-medium text-muted">{metric.unit}</span> : null}
               </dd>

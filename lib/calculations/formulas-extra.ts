@@ -41,8 +41,8 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-motor-starting", "모터 기동 계산기", "I_start = k × I_FLC,  ΔV = k_phase × I_start × L × r", [
     { symbol: "k", name: "기동배수", unit: "—", description: "명판 또는 기동장치 설정" },
     { symbol: "I_FLC", name: "정격전류", unit: "A", description: "만부하 전류" },
-  ], { title: "FLC 60 A, DOL 6배", given: "I_FLC = 60 A, k = 6", steps: ["I_start = 360 A"], result: "360 A" }, {
-    warnings: ["기본 배수는 참고 구간이며 명판 구속전류가 우선입니다."],
+  ], { title: "FLC 60 A, k = 6", given: "I_FLC = 60 A, k = 6 (사용자 입력 예시)", steps: ["I_start = 360 A"], result: "360 A" }, {
+    warnings: ["기동배수는 사용자·제조사 입력입니다. 방식별 기본값을 넣지 않습니다."],
   }),
   f("formula-motor-start-vd", "모터 기동 전압강하", "ΔV = k_phase × I_start × L × r", [
     { symbol: "I_start", name: "기동전류", unit: "A", description: "k × FLC" },

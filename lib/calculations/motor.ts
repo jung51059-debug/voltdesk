@@ -103,26 +103,28 @@ export function calculateMotorCurrent(input: CalcInput, precision: number): Calc
   });
 }
 
+const STARTING_DISCLAIMER =
+  "실제 기동전류는 모터 특성, 기동방식, 부하조건 및 제조사 데이터에 따라 달라질 수 있습니다. 가능한 경우 제조사 기동전류 데이터를 사용하세요.";
+const ESTIMATE_NOTE = "본 결과는 입력한 기동배수와 배선조건에 따른 추정값입니다.";
+const ALLOW_UNREVIEWED = "미검토 — 허용 전압강하 기준을 입력하면 비교할 수 있습니다.";
+
+const METHOD_LABEL: Record<string, string> = {
+  dol: "DOL 직입",
+  "star-delta": "Y-Δ",
+  soft: "소프트스타터",
+  vfd: "VFD",
+};
+
 export function calculateMotorStarting(input: CalcInput, precision: number): CalculationOutcome {
   const fields = new FieldBag(input);
   const flc = fields.num("flc", "정격전류");
+  const k = fields.num("multiplier", "기동배수");
   const method = input.method ?? "dol";
-  const kUser = fields.optional("multiplier", NaN, "기동배수");
   fields.requirePositive("flc", "정격전류", flc);
+  fields.requirePositive("multiplier", "기동배수", k);
   if (fields.failed()) return fields.fail();
 
-  const typical: Record<string, { k: number; label: string; range: string }> = {
-    dol: { k: 6, label: "DOL 직입", range: "통상 5~8배 참고" },
-    "star-delta": { k: 2, label: "Y-Δ", range: "이론상 DOL 전류의 약 1/3, 현장은 1.5~2.5배 참고" },
-    soft: { k: 3, label: "소프트스타터", range: "설정 전류 제한값. 기본 3배는 예시" },
-    vfd: { k: 1.2, label: "VFD", range: "가속 전류는 보통 FLC 근처~1.5배" },
-  };
-  const spec = typical[method] ?? typical.dol;
-  const k = Number.isFinite(kUser) && kUser > 0 ? kUser : spec.k;
-  if (Number.isFinite(kUser) && kUser <= 0) {
-    return fields.fail("기동배수는 0보다 커야 합니다.");
-  }
-
+  const methodLabel = METHOD_LABEL[method] ?? method;
   const Istart = flc * k;
   return ok({
     metrics: [
@@ -131,18 +133,18 @@ export function calculateMotorStarting(input: CalcInput, precision: number): Cal
       metric("flc", "정격전류", flc, "A", precision),
     ],
     inputSummary: [
-      { label: "기동방식", value: spec.label },
-      { label: "배수 출처", value: Number.isFinite(kUser) && kUser > 0 ? "사용자 입력" : `참고값 (${spec.range})` },
+      { label: "기동방식", value: methodLabel },
+      { label: "기동배수", value: `${roundTo(k, precision)} ×FLC (사용자 입력)` },
     ],
-    interpretation: `${spec.label}에서 배수 ${roundTo(k, 2)}를 적용하면 기동전류는 ${roundTo(Istart, precision)} A입니다. 이 값은 명판 구속전류·컨트롤러 설정을 대체하지 않습니다.`,
+    interpretation: `${methodLabel}에서 사용자 입력 배수 ${roundTo(k, 2)}를 적용하면 기동전류는 ${roundTo(Istart, precision)} A입니다. 이 값은 명판 구속전류·컨트롤러 설정을 대체하지 않습니다.`,
     warnings: [
-      warning("warning", "참고 배수", spec.range + ". 제조사 데이터나 소프트스타터/VFD 설정값이 있으면 그 값을 입력하세요."),
+      warning("info", "기동전류", STARTING_DISCLAIMER),
       warning("error", "보호 정정 아님", "과전류·지락·기동 타이머 정정은 보호협조 검토가 필요합니다."),
     ],
     formulaUsed: "I_start = k × I_FLC",
     steps: [`I_start = ${roundTo(k, 3)} × ${roundTo(flc, precision)} = ${roundTo(Istart, precision)} A`],
-    reviewStatus: review("check", "기동배수는 실측·명판으로 확인하세요."),
-    assumptionsUsed: ["사용자가 배수를 넣지 않으면 방식별 흔한 참고 배수를 씁니다. 규정 표가 아닙니다."],
+    reviewStatus: review("check", "기동배수는 제조사 데이터·명판으로 확인하세요."),
+    assumptionsUsed: ["기동배수는 사용자가 입력한 값만 사용합니다. 기동방식별 기본 배수를 넣지 않습니다."],
   });
 }
 
@@ -150,7 +152,7 @@ export function calculateMotorStartVoltageDrop(input: CalcInput, precision: numb
   const fields = new FieldBag(input);
   const phase = input.phase ?? "3";
   const flc = fields.num("flc", "정격전류");
-  const k = fields.optional("multiplier", 6, "기동배수");
+  const k = fields.num("multiplier", "기동배수");
   const length = fields.num("length", "편도 길이 m");
   const rOhmKm = fields.num("resistance", "도체 저항 Ω/km");
   const V = toVolts(fields.num("voltage", "전압"), input.voltageUnit ?? "V");
@@ -159,6 +161,12 @@ export function calculateMotorStartVoltageDrop(input: CalcInput, precision: numb
   fields.requirePositive("length", "길이", length);
   fields.requirePositive("resistance", "저항", rOhmKm);
   fields.requirePositive("voltage", "전압", V);
+
+  const allowRaw = fields.raw("allowPct").trim();
+  const allow = allowRaw === "" ? NaN : fields.num("allowPct", "허용 전압강하율");
+  if (allowRaw !== "" && !fields.errors.allowPct) {
+    fields.requirePositive("allowPct", "허용 전압강하율", allow);
+  }
   if (fields.failed()) return fields.fail();
 
   const Istart = flc * k;
@@ -166,25 +174,43 @@ export function calculateMotorStartVoltageDrop(input: CalcInput, precision: numb
   const dV = phase === "1" ? 2 * Istart * lengthKm * rOhmKm : SQRT_3 * Istart * lengthKm * rOhmKm;
   const pct = (dV / V) * 100;
   const vend = V - dV;
-  const allow = fields.optional("allowPct", 15, "허용 전압강하율");
+  const hasAllow = Number.isFinite(allow) && allow > 0;
 
-  let status = review("check", "기동 전압강하는 모터 토크와 다른 부하에 영향을 줍니다. 프로젝트 허용치를 확인하세요.");
-  if (allow > 0 && pct <= allow) {
-    status = review("in-range", `사용자 허용 ${roundTo(allow, 1)}% 이하입니다. 규정 합격 판정이 아닙니다.`);
-  } else if (allow > 0 && pct > allow) {
-    status = review("caution", `사용자 허용 ${roundTo(allow, 1)}%를 초과합니다.`);
-  }
+  const compareMetrics = hasAllow
+    ? [
+        metric("allowPct", "입력 허용값", allow, "%", precision),
+        {
+          id: "compare",
+          label: "허용값 비교",
+          value:
+            pct <= allow
+              ? `${roundTo(pct, precision)}% ≤ ${roundTo(allow, precision)}% → 사용자 입력 기준 이하`
+              : `${roundTo(pct, precision)}% > ${roundTo(allow, precision)}% → 사용자 입력 기준 초과`,
+        },
+      ]
+    : [{ id: "compare", label: "허용값 비교", value: ALLOW_UNREVIEWED }];
+
+  const status = !hasAllow
+    ? review("check", ALLOW_UNREVIEWED)
+    : pct <= allow
+      ? { kind: "in-range" as const, label: "사용자 입력 기준 이하", note: `${roundTo(pct, precision)}% ≤ ${roundTo(allow, precision)}%` }
+      : { kind: "caution" as const, label: "사용자 입력 기준 초과", note: `${roundTo(pct, precision)}% > ${roundTo(allow, precision)}%` };
 
   return ok({
     metrics: [
       metric("dv", "기동 시 전압강하", dV, "V", precision, { primary: true }),
-      metric("pct", "전압강하율", pct, "%", precision),
+      metric("pct", "기동 전압강하율", pct, "%", precision),
       metric("vend", "말단 예상전압", vend, "V", precision),
       metric("istart", "기동전류", Istart, "A", precision),
+      ...compareMetrics,
     ],
     inputSummary: [
       { label: "회로", value: phase === "1" ? "단상" : "3상" },
       { label: "기동전류", value: `${roundTo(Istart, precision)} A` },
+      {
+        label: "허용 전압강하",
+        value: hasAllow ? `${roundTo(allow, precision)}% (사용자 입력)` : "미입력 · 비교 안 함",
+      },
     ],
     interpretation: `저항 근사로 본 기동 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%), 말단 약 ${roundTo(vend, precision)} V입니다.`,
     warnings: [
@@ -203,10 +229,6 @@ export function calculateMotorStartVoltageDrop(input: CalcInput, precision: numb
     reviewStatus: status,
   });
 }
-
-const STARTING_DISCLAIMER =
-  "실제 기동전류는 모터 특성, 기동방식, 부하조건 및 제조사 데이터에 따라 달라질 수 있습니다.";
-const ESTIMATE_NOTE = "본 결과는 입력한 기동배수와 배선조건에 따른 추정값입니다.";
 
 /**
  * 정격전류 → 기동전류 → (선택) 기동 전압강하.
@@ -238,10 +260,7 @@ export function calculateMotorStartingReview(input: CalcInput, precision: number
     Number.isFinite(voltage) &&
     voltage > 0;
 
-  const startWarnings = [
-    ...startOut.warnings,
-    warning("info", "기동전류", STARTING_DISCLAIMER),
-  ];
+  const startWarnings = [...startOut.warnings];
 
   if (!wantVd) {
     return {

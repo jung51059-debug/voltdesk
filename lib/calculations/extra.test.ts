@@ -168,6 +168,92 @@ describe("모터 기동 계산기 통합", () => {
     expect(metricNumber(merged, "istart")).toBeCloseTo(metricNumber(current, "flc") * 6, 1);
   });
 
+  it("허용 전압강하를 비우면 계산하고 비교는 미검토다", () => {
+    const out = calculateMotorStartingReview(
+      {
+        flcMode: "known",
+        phase: "3",
+        flc: "60",
+        method: "dol",
+        multiplier: "6",
+        length: "80",
+        resistance: "0.524",
+        voltage: "380",
+      },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(metricNumber(out, "dv")).toBeGreaterThan(0);
+    expect(metricNumber(out, "pct")).toBeGreaterThan(0);
+    expect(String(out.metrics.find((item) => item.id === "compare")?.value)).toContain("미검토");
+    expect(out.reviewStatus?.note).toContain("미검토");
+    expect(out.reviewStatus?.note).not.toMatch(/적합|정상|합격/);
+    expect(out.metrics.some((item) => item.id === "allowPct")).toBe(false);
+    expect(formSchemas["motor-starting"].defaults.allowPct).toBe("");
+    expect(formSchemas["motor-starting"].defaults.multiplier).toBe("");
+  });
+
+  it("사용자가 허용값을 넣으면 입력 기준으로만 비교한다", () => {
+    const base = {
+      flcMode: "known",
+      phase: "3",
+      flc: "60",
+      method: "dol",
+      multiplier: "6",
+      length: "80",
+      resistance: "0.524",
+      voltage: "380",
+    };
+    const below = calculateMotorStartingReview({ ...base, allowPct: "10" }, 2);
+    const above = calculateMotorStartingReview({ ...base, allowPct: "3" }, 2);
+    expect(below.ok && above.ok).toBe(true);
+    if (!below.ok || !above.ok) return;
+    expect(String(below.metrics.find((item) => item.id === "compare")?.value)).toContain("사용자 입력 기준 이하");
+    expect(below.reviewStatus?.label).toBe("사용자 입력 기준 이하");
+    expect(String(above.metrics.find((item) => item.id === "compare")?.value)).toContain("사용자 입력 기준 초과");
+    expect(above.reviewStatus?.label).toBe("사용자 입력 기준 초과");
+    expect(`${below.reviewStatus?.label} ${above.reviewStatus?.label}`).not.toMatch(/적합|정상|합격/);
+  });
+
+  it("기동배수를 비우면 기동전류를 계산하지 않는다", () => {
+    const empty = calculateMotorStartingReview({ flcMode: "known", flc: "60", method: "dol", multiplier: "" }, 2);
+    const missing = calculateMotorStartingReview({ flcMode: "known", flc: "60", method: "dol" }, 2);
+    expect(empty.ok).toBe(false);
+    expect(missing.ok).toBe(false);
+    if (empty.ok || missing.ok) return;
+    expect(empty.fieldErrors.multiplier).toBeTruthy();
+    expect(missing.fieldErrors.multiplier).toBeTruthy();
+  });
+
+  it("기동방식을 바꿔도 기동배수를 임의로 채우지 않는다", () => {
+    const emptyYd = calculateMotorStartingReview({ flcMode: "known", flc: "60", method: "star-delta", multiplier: "" }, 2);
+    expect(emptyYd.ok).toBe(false);
+    const dol = calculateMotorStartingReview({ flcMode: "known", flc: "60", method: "dol", multiplier: "4" }, 2);
+    const yd = calculateMotorStartingReview({ flcMode: "known", flc: "60", method: "star-delta", multiplier: "4" }, 2);
+    expect(dol.ok && yd.ok).toBe(true);
+    if (!dol.ok || !yd.ok) return;
+    expect(metricNumber(dol, "k")).toBeCloseTo(4, 6);
+    expect(metricNumber(yd, "k")).toBeCloseTo(4, 6);
+    expect(metricNumber(dol, "istart")).toBeCloseTo(metricNumber(yd, "istart"), 6);
+  });
+
+  it("기동 전압강하 함수도 15%·6배 기본값을 쓰지 않는다", () => {
+    const noK = calculateMotorStartVoltageDrop(
+      { phase: "3", flc: "60", length: "80", resistance: "0.524", voltage: "380" },
+      2,
+    );
+    const noAllow = calculateMotorStartVoltageDrop(
+      { phase: "3", flc: "60", multiplier: "6", length: "80", resistance: "0.524", voltage: "380" },
+      2,
+    );
+    expect(noK.ok).toBe(false);
+    expect(noAllow.ok).toBe(true);
+    if (!noAllow.ok) return;
+    expect(String(noAllow.metrics.find((item) => item.id === "compare")?.value)).toContain("미검토");
+    expect(noAllow.reviewStatus?.note).toContain("미검토");
+  });
+
   it("기동 전압강하 도구는 목록에 없고 즐겨찾기 별칭은 통합 도구로 간다", () => {
     expect(getPublishedTools().some((tool) => tool.slug === "motor-start-vd")).toBe(false);
     expect(getPublishedTools().some((tool) => tool.slug === "motor-starting")).toBe(true);

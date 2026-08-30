@@ -215,7 +215,7 @@ export const standardBases: StandardBasis[] = [
   row("generator-load", "formula-generator-load", "general-engineering", ["engineering"], "engineering", "P_load / P_rated 비율.", "부하율 %", ["ISO 8528 정격 분류 전체를 구현하지 않습니다. 프라임/스탠바이는 사용자 입력입니다."]),
   row("monthly-energy", "formula-monthly-energy", "general-engineering", ["engineering"], "engineering", "검침값 차와 변화율.", "월간 kWh 비교", ["한전 요금 산정·ISO 50001 정규화가 아닙니다."]),
   row("motor-current", "formula-motor-current", "general-engineering", ["engineering"], "engineering", "명판 P, PF, η로 전류 환산.", "정격전류 참고", ["IEC 60034 명판 절차·기동전류가 아닙니다."]),
-  row("motor-starting", "formula-motor-starting", "manufacturer-data-required", ["engineering", "manufacturer"], "engineering", "I_start = k × FLC. k는 사용자·명판.", "기동전류 참고", ["표준 기동배수표를 내장하지 않습니다."]),
+  row("motor-starting", "formula-motor-starting", "manufacturer-data-required", ["engineering", "manufacturer"], "engineering", "I_start = k × FLC. k는 사용자·명판.", "기동전류 참고", ["표준 기동배수표를 내장하지 않습니다.", "허용 전압강하 기본값을 넣지 않습니다."]),
   row("motor-start-vd", "formula-motor-start-vd", "general-engineering", ["engineering"], "approximation", "기동전류 × 선로 저항 근사.", "기동 시 전압강하 참고", ["계통·변압기 임피던스를 포함하지 않습니다."]),
   row("motor-acceleration", "formula-motor-acceleration", "general-engineering", ["engineering"], "approximation", "일정 가속토크 t = Jω/T.", "가속시간 참고", ["부하 토크 곡선·전압강하를 무시합니다."]),
   row("power-factor-correction", "formula-pfc", "general-engineering", ["engineering"], "engineering", "Qc = P(tanφ1−tanφ2).", "필요 kvar", ["수전계약 요금·필터 설계가 아닙니다."]),

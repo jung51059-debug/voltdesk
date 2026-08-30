@@ -43,7 +43,7 @@ export const extraTools: CalculatorTool[] = [
     nameEn: "Motor starting calculator",
     description: "모터 정격전류를 기준으로 기동전류를 추정하고, 기동 시 배선 전압강하를 함께 검토합니다.",
     longDescription:
-      "정격전류 또는 명판 출력으로 FLC를 구한 뒤 기동배수를 적용합니다. 배선 조건을 넣으면 기존 저항 근사로 기동 시 전압강하도 봅니다. 기동배수는 제조사·명판 값이 우선이며 방식별 숫자는 참고값입니다.",
+      "정격전류 또는 명판 출력으로 FLC를 구한 뒤, 사용자가 넣은 기동배수를 적용합니다. 배선 조건을 넣으면 기존 저항 근사로 기동 시 전압강하도 봅니다. 기동배수와 허용 전압강하는 기본값을 넣지 않으며 제조사·프로젝트 입력이 필요합니다.",
     formulaId: "formula-motor-starting",
     tags: ["기동전류", "기동 전압강하", "DOL", "Y-Δ", "VFD"],
     synonyms: ["starting current", "inrush", "직입 기동", "스타델타", "모터 기동전류", "모터 기동 전압강하", "기동 VD"],
@@ -55,9 +55,9 @@ export const extraTools: CalculatorTool[] = [
     status: "published",
     updatedAt: "2026-08-30",
     faqs: [
-      { question: "Y-Δ는 왜 배수가 낮나요?", answer: "이론상 상전압 기동이라 DOL 전류의 약 1/3입니다. 전환 충격과 부하는 별도입니다." },
-      { question: "기동배수를 비우면요?", answer: "방식별 참고값을 씁니다. 표준 기본값이 아니며 명판·컨트롤러 설정이 있으면 그 값을 넣으세요." },
-      { question: "허용 15%는 규정인가요?", answer: "아닙니다. 사용자가 프로젝트 허용치를 넣는 칸입니다." },
+      { question: "Y-Δ는 왜 배수가 낮나요?", answer: "이론상 상전압 기동이라 DOL 전류의 약 1/3입니다. 전환 충격과 부하는 별도입니다. 계산에는 제조사 기동배수를 직접 넣으세요." },
+      { question: "기동배수를 비우면요?", answer: "기동전류와 기동 전압강하를 계산하지 않고 입력을 요청합니다. 방식별 기본 배수는 넣지 않습니다." },
+      { question: "허용 전압강하를 비우면요?", answer: "기동 전압강하(V, %)는 계산하고 허용값과는 비교하지 않습니다. Ampory가 15% 같은 기본 허용치를 넣지 않습니다." },
     ],
   }),
   tool({
@@ -80,7 +80,7 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: false,
     status: "coming-soon",
     updatedAt: "2026-08-29",
-    faqs: faq("허용 15%는 규정인가요?", "아닙니다. 사용자가 프로젝트 허용치를 넣는 칸입니다."),
+    faqs: faq("허용 전압강하를 비우면요?", "기동 전압강하(V, %)는 계산하고 허용값과는 비교하지 않습니다. 기본 허용치를 넣지 않습니다."),
   }),
   tool({
     id: "tool-motor-acceleration",
