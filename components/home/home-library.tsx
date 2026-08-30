@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import Link from "next/link";
+import { SectionHeading } from "@/components/home/section-heading";
 import { ToolCard, ToolGrid } from "@/components/ui/tool-card";
 import { getToolById } from "@/lib/data/tools";
 import { loadFavorites, subscribeStorage } from "@/lib/storage/local";
@@ -14,12 +14,7 @@ export function HomeLibrary() {
 
   return (
     <section>
-      <div className="mb-4 flex items-end justify-between">
-        <h2 className="text-2xl font-semibold">즐겨찾기</h2>
-        <Link href="/favorites" className="text-sm text-primary">
-          관리
-        </Link>
-      </div>
+      <SectionHeading title="즐겨찾기" href="/favorites" linkLabel="관리" />
       <ToolGrid>
         {favs.map((tool) => (
           <ToolCard key={tool!.id} tool={tool!} />

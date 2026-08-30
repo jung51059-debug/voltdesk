@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { ArticleCard } from "@/components/ui/article-card";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { ToolCard } from "@/components/ui/tool-card";
 import { QuickCurrentPreview } from "@/components/home/quick-current-preview";
 import { HomeSearch } from "@/components/home/home-search";
 import { HomeLibrary } from "@/components/home/home-library";
+import { SectionHeading } from "@/components/home/section-heading";
 import { articles } from "@/lib/data/articles";
 import { getElectricalCategories, getFacilityCategories } from "@/lib/data/categories";
 import { getFeaturedTools, getRecentlyAddedTools } from "@/lib/data/tools";
@@ -42,12 +42,7 @@ export default function HomePage() {
       </section>
 
       <section>
-        <div className="mb-5 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold">빠른 계산 · 자주 쓰는 계산기</h2>
-          <Link href="/tools" className="text-sm font-medium text-primary">
-            전체 보기
-          </Link>
-        </div>
+        <SectionHeading title="빠른 계산 · 자주 쓰는 계산기" href="/tools" linkLabel="전체 보기" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.slice(0, 9).map((tool) => (
             <ToolCard key={tool.id} tool={tool} variant="landing" />
@@ -95,12 +90,7 @@ export default function HomePage() {
       </section>
 
       <section>
-        <div className="mb-5 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold">새로 추가된 도구</h2>
-          <Link href="/tools" className="text-sm font-medium text-primary">
-            전체 계산기 보기 →
-          </Link>
-        </div>
+        <SectionHeading title="새로 추가된 도구" href="/tools" linkLabel="전체 보기" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {recent.map((tool) => (
             <ToolCard key={tool.id} tool={tool} variant="landing" />
@@ -111,12 +101,7 @@ export default function HomePage() {
       <HomeLibrary />
 
       <section>
-        <div className="mb-5 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold">실무 참고자료</h2>
-          <Link href="/references" className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-            라이브러리 <ArrowRight className="size-4" />
-          </Link>
-        </div>
+        <SectionHeading title="실무 참고자료" href="/references" linkLabel="라이브러리" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {articles.slice(0, 6).map((article) => (
             <ArticleCard key={article.id} article={article} variant="teaser" />
