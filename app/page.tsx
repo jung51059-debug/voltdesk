@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ArticleCard } from "@/components/ui/article-card";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { ToolCard } from "@/components/ui/tool-card";
@@ -37,15 +37,6 @@ export default function HomePage() {
             한국 전기·시설관리 실무자를 위한 독립 도구입니다. 가입 없이 계산하고, 공식·가정·한계를 함께 확인하세요.
           </p>
           <HomeSearch />
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <Link href="/tools/electrical/three-phase-current" className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-white dark:text-ink">
-              빠른 3상 전류
-            </Link>
-            <Link href="/search" className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 text-sm font-medium">
-              <Search className="size-4" />
-              전체 검색
-            </Link>
-          </div>
         </div>
         <QuickCurrentPreview />
       </section>
