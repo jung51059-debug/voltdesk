@@ -448,8 +448,19 @@ export function isFacilityWorkspaceTool(tool: { href: string; slug: string; doma
   return tool.domain === "facility" && tool.href === `/tools/facility/${tool.slug}` && Boolean(formSchemas[tool.slug]);
 }
 
+const TOOL_ID_ALIASES: Record<string, string> = {
+  "tool-motor-start-vd": "tool-motor-starting",
+};
+
+export function resolveToolId(id: string): string {
+  return TOOL_ID_ALIASES[id] ?? id;
+}
+
 export function getToolById(id: string): CalculatorTool | undefined {
-  return tools.find((tool) => tool.id === id);
+  const resolved = resolveToolId(id);
+  const published = tools.find((tool) => tool.id === resolved && tool.status === "published");
+  if (published) return published;
+  return tools.find((tool) => tool.id === resolved);
 }
 
 export function getToolBySlug(slug: string): CalculatorTool | undefined {
@@ -489,7 +500,13 @@ export function getFeaturedTools(): CalculatorTool[] {
 }
 
 export function getRecentlyAddedTools(): CalculatorTool[] {
-  return getPublishedTools().filter((tool) => tool.recentlyAdded);
+  return getPublishedTools()
+    .filter((tool) => tool.recentlyAdded)
+    .sort((a, b) => {
+      const byDate = b.updatedAt.localeCompare(a.updatedAt);
+      if (byDate !== 0) return byDate;
+      return a.name.localeCompare(b.name, "ko");
+    });
 }
 
 export function getToolsByDomain(domain: CalculatorTool["domain"]): CalculatorTool[] {
@@ -503,5 +520,5 @@ export function getToolsByCategory(categoryId: string): CalculatorTool[] {
 export function getRelatedTools(tool: CalculatorTool): CalculatorTool[] {
   return tool.relatedToolIds
     .map((id) => getToolById(id))
-    .filter((item): item is CalculatorTool => Boolean(item));
+    .filter((item): item is CalculatorTool => item !== undefined && item.status === "published" && item.id !== tool.id);
 }

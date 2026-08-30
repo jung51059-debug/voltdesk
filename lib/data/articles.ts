@@ -1,4 +1,4 @@
-import type { ReferenceArticle } from "@/lib/types";
+import type { CalculatorTool, ReferenceArticle } from "@/lib/types";
 import { getToolById } from "@/lib/data/tools";
 import { guideArticles } from "@/lib/data/articles-guides";
 
@@ -102,36 +102,92 @@ export const baseArticles: ReferenceArticle[] = [
     summary:
       "MCCB는 과전류·단락을 차단하는 배선용 차단기이고, ELB(누전차단기)는 지락·누전을 검출합니다. 역할이 다르므로 한쪽만으로 상대 기능을 대체할 수 없습니다.",
     categoryId: "cat-reference-dist",
-    relatedToolIds: ["tool-breaker-current", "tool-three-phase-current"],
+    relatedToolIds: ["tool-breaker-current", "tool-three-phase-current", "tool-cable-sizing"],
     tags: ["MCCB", "ELB", "RCD", "차단기"],
-    synonyms: ["누전차단기", "배선용차단기", "ELCB", "RCD", "NFB", "MCCB vs ELB"],
-    updatedAt: "2026-08-20",
+    synonyms: ["누전차단기", "배선용차단기", "ELCB", "RCD", "NFB", "MCCB vs ELB", "과전류 보호"],
+    updatedAt: "2026-08-30",
     keyConcept:
       "과전류 보호와 감전·지락 보호는 별개 기능입니다. MCCB는 열동·전자 과전류, ELB는 잔류전류(누설)를 봅니다.",
+    formula: "참고 비교: Ib ≤ In ≤ Iz. 조건 2는 I₂ ≤ 1.45 Iz (I₂는 제조사·제품표준)",
     practicalExample:
-      "전동기 분기회로에 MCCB로 과부하를 보호하고, 인체 감전 위험이 있는 콘센트 회로에는 고감도 ELB(예: 30 mA)를 적용하는 식의 역할 분담이 일반적입니다.",
+      "부하전류 Ib = 80 A, 사용자가 넣은 차단기 In = 100 A, 케이블 Iz = 114 A이면 Ib ≤ In ≤ Iz는 숫자로 성립합니다. I₂를 넣지 않으면 조건 2는 미검토입니다. 적합 판정이 아닙니다.",
     limitations: [
       "국내 제품명(ELB, ELCB, RCD, RCBO)은 제조사마다 표기가 섞여 있습니다.",
       "차단용량(kA), 특성곡선, 선택차단은 별도 검토입니다.",
+      "I₂를 1.45 In으로 추정하지 않습니다.",
     ],
     sourceNotes: [
-      "IEC 60947-2 — 저압 차단기",
-      "IEC 61008 / 61009 — RCCB / RCBO",
+      "KEC 212.4.1 도체와 과부하 보호장치 사이의 협조 — 자동 적합 판정 아님",
       "한국전기설비규정(KEC)의 누전차단장치 관련 조항은 프로젝트 적용 시 원문을 확인하세요.",
+    ],
+    faqs: [
+      { question: "차단기는 부하전류만 보고 고르면 되나요?", answer: "안 됩니다. 케이블 허용전류, 기동, 차단용량, 트립 곡선을 함께 봅니다." },
+      { question: "I₂가 없으면요?", answer: "Ampory는 조건 2를 미검토로 둡니다. 제조사 기술사양 또는 제품표준에서 확인하세요. 1.45 In으로 추정하지 않습니다." },
+      { question: "1.45 Iz는 I₂의 정의인가요?", answer: "아닙니다. I₂ ≤ 1.45 Iz는 판정 조건입니다. I₂ 자체는 규약시간 이내 유효동작을 보장하는 전류입니다." },
+      { question: "ELB만 있으면 과전류 보호가 되나요?", answer: "순수 ELB는 누전만 봅니다. 과전류 보호가 없으면 MCCB 또는 퓨즈와 조합합니다." },
     ],
     body: [
       {
-        heading: "MCCB",
+        heading: "한눈에 보기",
         paragraphs: [
-          "Molded Case Circuit Breaker는 몰드 케이스 안의 과전류 차단기입니다. 정격전류 In, 차단용량 Icu/Ics, 트립 특성(열동-전자 또는 전자식)이 핵심 사양입니다.",
-          "단락과 과부하로부터 전로와 기기를 보호하는 것이 주목적입니다. 누설전류가 작으면 동작하지 않습니다.",
+          "MCCB는 과전류·단락, ELB는 누전입니다. 한쪽이 다른 쪽을 대체하지 않습니다.",
+          "차단기 참고 정격 계산기는 Ib·In·Iz 숫자와, I₂가 있을 때만 조건 2 수치관계를 보여 줍니다. 합격 판정이 아닙니다.",
         ],
       },
       {
-        heading: "ELB / RCD",
+        heading: "개념",
         paragraphs: [
-          "Earth Leakage Breaker는 잔류전류를 검출해 지락 시 전로를 분리합니다. 감도전류(30 mA, 100 mA, 500 mA 등)와 동작시간이 핵심입니다.",
-          "과전류 보호 기능이 없는 순수 ELB는 MCCB 또는 퓨즈와 조합해야 합니다. 과전류+누전을 한 대에 넣은 기기는 RCBO에 해당합니다.",
+          "과전류 보호와 감전·지락 보호는 별개 기능입니다.",
+        ],
+      },
+      {
+        heading: "핵심 공식",
+        paragraphs: [
+          "KEC 212.4.1 관련 참고 비교는 Ib ≤ In ≤ Iz입니다. 조건 2는 I₂ ≤ 1.45 Iz이며, I₂는 제조사 기술사양 또는 제품표준에서 확인합니다.",
+          "기본 도구의 I_ref = Ib × 임의 여유율은 KEC 적합이 아닙니다.",
+        ],
+      },
+      {
+        heading: "입력값 의미",
+        paragraphs: [
+          "Ib는 설계 부하전류, In은 차단기 정격, Iz는 보정된 도체 허용전류입니다. I₂는 규약동작전류입니다.",
+        ],
+      },
+      {
+        heading: "실제 숫자 예제",
+        paragraphs: [
+          "Ib = 80 A, In = 100 A, Iz = 114 A이면 조건 1 숫자는 80 ≤ 100 ≤ 114입니다. I₂를 비우면 조건 2는 미검토입니다.",
+        ],
+      },
+      {
+        heading: "결과 해석",
+        paragraphs: [
+          "숫자 관계는 입력값끼리의 비교입니다. 트립 곡선, 기동 오동작, 차단용량은 남아 있습니다.",
+        ],
+      },
+      {
+        heading: "실무에서 자주 틀리는 부분",
+        paragraphs: [
+          "I₂를 1.45 In으로 추정하기. ELB만으로 과전류를 맡기기. 모터 기동을 무시하고 In만 키우기.",
+        ],
+      },
+      {
+        heading: "적용 가정·한계",
+        paragraphs: [
+          "Ampory는 제조사 곡선을 내장하지 않습니다. I₂ 없으면 조건 2를 만들지 않습니다.",
+        ],
+      },
+      {
+        heading: "KEC 관련 근거",
+        paragraphs: [
+          "KEC 212.4.1은 kec-related입니다. 자동 적합 판정을 하지 않습니다.",
+        ],
+      },
+      {
+        heading: "MCCB와 ELB",
+        paragraphs: [
+          "MCCB는 정격전류 In, 차단용량 Icu/Ics, 트립 특성이 핵심입니다. 누설이 작으면 동작하지 않습니다.",
+          "ELB는 감도전류와 동작시간이 핵심입니다. 과전류 기능이 없으면 MCCB 또는 퓨즈와 조합합니다.",
         ],
       },
     ],
@@ -267,7 +323,7 @@ export const baseArticles: ReferenceArticle[] = [
     summary:
       "전압강하는 도체 저항과 리액턴스에 전류가 흐르며 생기는 전압 손실입니다. 간단한 실무 근사는 저항만으로 ΔV를 구하고, 정확한 설계는 케이블 임피던스표를 씁니다.",
     categoryId: "cat-cable",
-    relatedToolIds: ["tool-voltage-drop", "tool-cable-resistance", "tool-three-phase-current"],
+    relatedToolIds: ["tool-voltage-drop", "tool-path-voltage-drop", "tool-cable-resistance", "tool-three-phase-current"],
     tags: ["전압강하", "케이블", "임피던스"],
     synonyms: ["voltage drop", "선로 전압강하", "VD"],
     updatedAt: "2026-08-20",
@@ -354,40 +410,83 @@ export const baseArticles: ReferenceArticle[] = [
     categoryId: "cat-electrical-basics",
     relatedToolIds: ["tool-single-phase-current", "tool-three-phase-current", "tool-voltage-drop"],
     tags: ["단상", "3상", "전류"],
-    synonyms: ["단상 vs 3상", "선전류", "상전류", "three phase vs single phase"],
-    updatedAt: "2026-08-20",
+    synonyms: ["단상 vs 3상", "선전류", "상전류", "three phase vs single phase", "3상 전류"],
+    updatedAt: "2026-08-30",
     keyConcept:
       "단상 I = P / (V × PF), 3상 I = P / (√3 × VL-L × PF). 3상 공식의 V는 선간전압입니다.",
-    formula: "1φ: I = P/(V PF),  3φ: I = P/(√3 V PF)",
+    formula: "1φ: I = P/(V PF η),  3φ: I = P/(√3 V PF η)",
     practicalExample:
-      "10 kW, PF 1.0일 때 단상 220 V는 약 45.5 A, 3상 380 V는 약 15.2 A입니다.",
+      "3상 30 kW, 380 V, PF 0.85, η 0.9이면 I = 30000 / (√3 × 380 × 0.85 × 0.9) ≈ 59.6 A입니다. 10 kW, PF 1.0일 때 단상 220 V는 약 45.5 A, 3상 380 V는 약 15.2 A입니다.",
     limitations: [
       "불평형 3상은 중성선 전류가 생기고 공식 가정이 깨집니다.",
       "상전압과 선간전압을 혼동하면 √3만큼 오차가 납니다.",
     ],
     sourceNotes: [
       "기본 교류 회로 이론 — 3상 순시전력의 합이 일정한 평형 조건",
+      "단상·3상 부하전류 계산기와 동일한 관계식",
+    ],
+    faqs: [
+      { question: "3상 380V에서 30kW 전류는 몇 A인가요?", answer: "PF 0.85, 효율 0.9이면 약 59.6 A입니다. 효율을 1로 두면 약 53.6 A입니다. 3상 부하전류 계산기에서 같은 식을 씁니다." },
+      { question: "3상 공식의 전압은 상전압인가요?", answer: "선간전압입니다. 220 V를 넣으면 380 V일 때보다 크게 나옵니다." },
+      { question: "단상 10 kW와 3상 10 kW 전류가 다른 이유는?", answer: "단상은 I = P/(V PF), 3상은 I = P/(√3 V PF)이고 V의 기준도 다릅니다." },
+      { question: "효율을 모르면요?", answer: "전기 입력을 알고 있으면 1입니다. 축출력이면 명판 효율을 넣습니다." },
     ],
     body: [
       {
-        heading: "전압 표기",
+        heading: "한눈에 보기",
         paragraphs: [
-          "한국 저압에서 단상 220 V는 상-중성선, 3상 380 V는 선간인 경우가 많습니다. 400/230 V 체계에서는 숫자가 조금 다릅니다.",
+          "같은 전력이라도 단상과 3상은 전류 공식이 다릅니다. 3상은 선간전압과 √3이 들어갑니다.",
+          "Ampory 단상·3상 부하전류 계산기가 이 식을 그대로 씁니다.",
+        ],
+      },
+      {
+        heading: "개념",
+        paragraphs: [
+          "3상은 동일 전력에서 선전류가 작아 배전에 유리합니다. 전동기가 회전 자계를 스스로 만듭니다.",
+        ],
+      },
+      {
+        heading: "핵심 공식",
+        paragraphs: [
+          "단상 I = P / (V × PF × η), 3상 I = P / (√3 × V × PF × η). 전기 입력이면 η = 1입니다.",
+        ],
+      },
+      {
+        heading: "입력값 의미",
+        paragraphs: [
+          "3상의 V는 선간전압입니다. 한국 저압에서 단상 220 V는 상-중성선, 3상 380 V는 선간인 경우가 많습니다.",
+        ],
+      },
+      {
+        heading: "실제 숫자 예제",
+        paragraphs: [
+          "3상 30 kW, 380 V, PF 0.85, η 0.9 → I ≈ 59.6 A. 3상 부하전류 계산기와 같습니다.",
+          "10 kW, PF 1.0: 단상 220 V ≈ 45.5 A, 3상 380 V ≈ 15.2 A.",
+        ],
+      },
+      {
+        heading: "결과 해석",
+        paragraphs: [
+          "이 전류는 정상 운전 부하전류입니다. 모터 기동·고조파·불평형은 포함하지 않습니다.",
+        ],
+      },
+      {
+        heading: "실무에서 자주 틀리는 부분",
+        paragraphs: [
+          "상전압을 3상 선간 칸에 넣기. 축출력을 효율 없이 전기 입력처럼 쓰기.",
+        ],
+      },
+      {
+        heading: "적용 가정·한계",
+        paragraphs: [
+          "평형 3상, 정현파. 중성선·영상분은 다루지 않습니다.",
+        ],
+      },
+      {
+        heading: "전압 표기와 3상 4선",
+        paragraphs: [
           "계산 전에 명판과 수전 방식이 선간인지 상전압인지 확인하세요.",
-        ],
-      },
-      {
-        heading: "왜 3상을 쓰는가",
-        paragraphs: [
-          "동일 전력 전송 시 도체 전류가 작고, 전동기가 스스로 회전 자계를 만들며, 전력이 맥동하지 않습니다.",
-          "주거·소규모 부하 일부는 단상으로 충분하고, 동력·간선은 3상이 표준입니다.",
-        ],
-      },
-      {
-        heading: "3상 4선식 중성선과 고조파",
-        paragraphs: [
-          "3상 4선식에서는 불평형 단상부하 때문에 중성선 전류가 생깁니다. PC·SMPS·LED·UPS처럼 비선형 단상부하가 많으면 3고조파 및 triplen harmonic이 중성선에서 서로 상쇄되지 않고 합산될 수 있습니다.",
-          "현장에서는 R/S/T와 N을 각각 true-RMS로 재는 것이 유용합니다. Ampory Facility의 상전류 편차율은 영상분·중성선 계산을 포함하지 않으며, Neutral / Zero-sequence Analysis는 이후 Power Quality 영역에서 다룹니다.",
+          "3상 4선식에서는 불평형 단상부하 때문에 중성선 전류가 생깁니다. Ampory 상전류 편차율은 영상분을 포함하지 않습니다.",
         ],
       },
     ],
@@ -457,5 +556,5 @@ export function getArticlesForTool(toolId: string): ReferenceArticle[] {
 export function getRelatedToolsForArticle(article: ReferenceArticle) {
   return article.relatedToolIds
     .map((id) => getToolById(id))
-    .filter((item) => Boolean(item));
+    .filter((item): item is CalculatorTool => item !== undefined && item.status === "published");
 }

@@ -37,7 +37,7 @@ export const categories: ToolCategory[] = [
     domain: "electrical",
     name: "모터",
     nameEn: "Motors",
-    description: "정격전류, 기동전류, 기동 전압강하, 가속시간 참고 계산입니다.",
+    description: "정격전류, 기동 계산, 가속시간 참고 계산입니다.",
     icon: "Cog",
     order: 4,
   },

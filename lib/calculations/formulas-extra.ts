@@ -38,7 +38,7 @@ export const extraFormulas: FormulaDefinition[] = [
     criteriaNotes: [{ standard: "일반 공식", appliesTo: "명판 P, PF, η로 전류 환산. 모터 명판 절차 전체를 수행하지 않음" }],
     referenceSources: [{ id: "src-eng-motor", title: "일반 전기공학 전력·전류 관계식", publisher: "공학 교과서", note: "3상 I = P/(√3 V PF η)" }],
   }),
-  f("formula-motor-starting", "모터 기동전류 참고", "I_start = k × I_FLC", [
+  f("formula-motor-starting", "모터 기동 계산기", "I_start = k × I_FLC,  ΔV = k_phase × I_start × L × r", [
     { symbol: "k", name: "기동배수", unit: "—", description: "명판 또는 기동장치 설정" },
     { symbol: "I_FLC", name: "정격전류", unit: "A", description: "만부하 전류" },
   ], { title: "FLC 60 A, DOL 6배", given: "I_FLC = 60 A, k = 6", steps: ["I_start = 360 A"], result: "360 A" }, {

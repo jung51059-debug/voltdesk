@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { ShareDialog } from "@/components/calculators/dialogs";
@@ -224,6 +224,25 @@ export function CalculatorWorkspace({
     return renderField(field, values, setField, formId, error);
   }
 
+  function fieldGroup(fieldsToRender: FieldDef[]) {
+    const nodes: ReactNode[] = [];
+    let lastSection: string | undefined;
+    for (const field of fieldsToRender) {
+      const node = fieldNode(field);
+      if (!node) continue;
+      if (field.section && field.section !== lastSection) {
+        nodes.push(
+          <p key={`section-${field.section}`} className="pt-1 text-xs font-semibold tracking-wide text-primary">
+            {field.section}
+          </p>,
+        );
+        lastSection = field.section;
+      }
+      nodes.push(node);
+    }
+    return nodes;
+  }
+
   const actions = (
     <div className="mt-6 space-y-2">
       {outcome && !outcome.ok && outcome.formError ? (
@@ -307,7 +326,7 @@ export function CalculatorWorkspace({
               })}
             </div>
           ) : null}
-          <div className="space-y-3.5">{basicFields.map(fieldNode)}</div>
+          <div className="space-y-3.5">{fieldGroup(basicFields)}</div>
           {advancedFields.length > 0 ? (
             <details
               className="mt-4 rounded-xl border border-border bg-surface px-3 py-2"
@@ -321,7 +340,7 @@ export function CalculatorWorkspace({
               }}
             >
               <summary className="cursor-pointer py-2 text-sm font-medium text-primary">상세 조건 펼치기</summary>
-              <div className="space-y-3.5 pb-2 pt-1">{advancedFields.map(fieldNode)}</div>
+              <div className="space-y-3.5 pb-2 pt-1">{fieldGroup(advancedFields)}</div>
             </details>
           ) : null}
           {actions}

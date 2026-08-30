@@ -109,6 +109,23 @@ export default async function ArticlePage({ params }: Props) {
               </dl>
             </section>
           ) : null}
+          {tools.length > 0 ? (
+            <section>
+              <h2 className="text-xl font-semibold">관련 Ampory 계산기</h2>
+              <ul className="mt-3 list-disc space-y-2 pl-5 leading-7">
+                {tools.map((tool) =>
+                  tool ? (
+                    <li key={tool.id}>
+                      <Link href={tool.href} className="text-primary hover:underline">
+                        {tool.name}
+                      </Link>
+                      <span className="text-muted"> — {tool.description}</span>
+                    </li>
+                  ) : null,
+                )}
+              </ul>
+            </section>
+          ) : null}
         </div>
         <div className="space-y-4">
           {tools[0] ? (

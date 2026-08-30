@@ -1,4 +1,4 @@
-import { SQRT_3, WATTS_PER_HP, toVolts, toWatts } from "@/lib/math/units";
+import { SQRT_3, toVolts, toWatts } from "@/lib/math/units";
 import { FieldBag, metric, ok, review, roundTo, warning, type CalcInput } from "@/lib/calculations/parse";
 import { followUp } from "@/lib/calculations/handoff";
 import type { CalculationOutcome } from "@/lib/types";
@@ -201,6 +201,100 @@ export function calculateMotorStartVoltageDrop(input: CalcInput, precision: numb
       `V_end = ${roundTo(V, 2)} − ${roundTo(dV, precision)} = ${roundTo(vend, precision)} V`,
     ],
     reviewStatus: status,
+  });
+}
+
+const STARTING_DISCLAIMER =
+  "실제 기동전류는 모터 특성, 기동방식, 부하조건 및 제조사 데이터에 따라 달라질 수 있습니다.";
+const ESTIMATE_NOTE = "본 결과는 입력한 기동배수와 배선조건에 따른 추정값입니다.";
+
+/**
+ * 정격전류 → 기동전류 → (선택) 기동 전압강하.
+ * 수학은 calculateMotorCurrent / calculateMotorStarting / calculateMotorStartVoltageDrop을 그대로 호출한다.
+ */
+export function calculateMotorStartingReview(input: CalcInput, precision: number): CalculationOutcome {
+  const flcMode = input.flcMode ?? "known";
+  let resolved: CalcInput = { ...input };
+
+  if (flcMode === "from-nameplate") {
+    const currentOut = calculateMotorCurrent(input, precision);
+    if (!currentOut.ok) return currentOut;
+    const flcMetric = currentOut.metrics.find((item) => item.id === "flc");
+    resolved = { ...input, flc: String(flcMetric?.value ?? "") };
+  }
+
+  const startOut = calculateMotorStarting(resolved, precision);
+  if (!startOut.ok) return startOut;
+
+  const appliedK = startOut.metrics.find((item) => item.id === "k");
+  const length = Number(input.length);
+  const resistance = Number(input.resistance);
+  const voltage = Number(input.voltage);
+  const wantVd =
+    Number.isFinite(length) &&
+    length > 0 &&
+    Number.isFinite(resistance) &&
+    resistance > 0 &&
+    Number.isFinite(voltage) &&
+    voltage > 0;
+
+  const startWarnings = [
+    ...startOut.warnings,
+    warning("info", "기동전류", STARTING_DISCLAIMER),
+  ];
+
+  if (!wantVd) {
+    return {
+      ...startOut,
+      interpretation: `${startOut.interpretation} ${ESTIMATE_NOTE}`,
+      warnings: [
+        ...startWarnings,
+        warning(
+          "info",
+          "기동 전압강하",
+          "배선 길이·도체 저항·전압을 넣으면 기존 저항 근사로 기동 시 전압강하를 함께 봅니다.",
+        ),
+      ],
+    };
+  }
+
+  const vdOut = calculateMotorStartVoltageDrop(
+    {
+      ...resolved,
+      multiplier: appliedK ? String(appliedK.value) : resolved.multiplier,
+      phase: input.phase ?? "3",
+      length: input.length,
+      resistance: input.resistance,
+      voltage: input.voltage,
+      voltageUnit: input.voltageUnit,
+      allowPct: input.allowPct,
+    },
+    precision,
+  );
+  if (!vdOut.ok) return vdOut;
+
+  return ok({
+    metrics: [
+      ...startOut.metrics.map((item) => (item.id === "istart" ? { ...item, primary: false } : item)),
+      ...vdOut.metrics.filter((item) => item.id !== "istart"),
+    ],
+    inputSummary: [...startOut.inputSummary, ...vdOut.inputSummary.filter((row) => row.label !== "기동전류")],
+    interpretation: `${startOut.interpretation} ${vdOut.interpretation} ${ESTIMATE_NOTE}`,
+    warnings: [...startWarnings, ...vdOut.warnings],
+    formulaUsed: `${startOut.formulaUsed}. ${vdOut.formulaUsed}`,
+    steps: [...(startOut.steps ?? []), ...(vdOut.steps ?? [])],
+    reviewStatus: vdOut.reviewStatus,
+    assumptionsUsed: [...(startOut.assumptionsUsed ?? []), ...(vdOut.assumptionsUsed ?? [])],
+    followUps: [
+      followUp("정상 운전 전압강하", "/tools/electrical/voltage-drop", {
+        phase: input.phase ?? "3",
+        current: String(startOut.metrics.find((item) => item.id === "flc")?.value ?? ""),
+        voltage: input.voltage,
+        length: input.length,
+        rMode: "ohm",
+        resistance: input.resistance,
+      }),
+    ],
   });
 }
 

@@ -17,6 +17,8 @@ export type FieldDef = {
   options?: SelectOption[];
   advanced?: boolean;
   visibleWhen?: { field: string; values: string[] };
+  /** 단계형 입력에서 필드 그룹 제목 */
+  section?: string;
 };
 
 export type FormSchema = {

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const featured = getFeaturedTools();
-  const recent = getRecentlyAddedTools().slice(0, 8);
+  const recent = getRecentlyAddedTools().slice(0, 4);
   const design = getElectricalCategories();
   const facilityFocus = getFacilityCategories();
 
@@ -95,8 +95,13 @@ export default function HomePage() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold">새로 추가된 도구</h2>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-5 flex items-end justify-between">
+          <h2 className="text-2xl font-semibold">새로 추가된 도구</h2>
+          <Link href="/tools" className="text-sm font-medium text-primary">
+            전체 계산기 보기 →
+          </Link>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {recent.map((tool) => (
             <ToolCard key={tool.id} tool={tool} variant="landing" />
           ))}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateMotorCurrent } from "@/lib/calculations/motor";
+import { calculateMotorCurrent, calculateMotorStarting, calculateMotorStartingReview, calculateMotorStartVoltageDrop } from "@/lib/calculations/motor";
 import { calculatePowerFactorCorrection, calculateThd } from "@/lib/calculations/power-quality";
 import { calculateVoltageDrop, calculateTransformerLoad, calculateBreakerReference, engines } from "@/lib/calculations/engines";
 import { KEC_TABLE_142_3_1_EVIDENCE, KEC_VOLTAGE_DROP_MIXED, kecVoltageDropCanCompare, kecVoltageDropLimitPct } from "@/lib/calculations/kec-review";
@@ -47,6 +47,7 @@ import { getFormulaById } from "@/lib/data/formulas";
 import { createMeasurementRecord } from "@/lib/storage/measurement";
 import {
   getPublishedTools,
+  getRecentlyAddedTools,
   getToolById,
   isElectricalWorkspaceTool,
   isFacilityWorkspaceTool,
@@ -114,6 +115,66 @@ describe("모터 정격전류", () => {
     expect(calculateMotorCurrent({ phase: "3", power: "-10", voltage: "380", pf: "0.85", efficiency: "0.9" }, 2).ok).toBe(false);
     expect(calculateMotorCurrent({ phase: "3", power: "0", voltage: "380", pf: "0.85", efficiency: "0.9" }, 2).ok).toBe(false);
     expect(calculateMotorCurrent({ phase: "3", power: "", voltage: "380", pf: "0.85", efficiency: "0.9" }, 2).ok).toBe(false);
+  });
+});
+
+describe("모터 기동 계산기 통합", () => {
+  it("기존 기동전류 함수와 같은 숫자를 재사용한다", () => {
+    const input = { flcMode: "known", flc: "60", method: "dol", multiplier: "6" };
+    const legacy = calculateMotorStarting(input, 2);
+    const merged = calculateMotorStartingReview(input, 2);
+    expect(legacy.ok && merged.ok).toBe(true);
+    if (!legacy.ok || !merged.ok) return;
+    expect(metricNumber(merged, "istart")).toBeCloseTo(metricNumber(legacy, "istart"), 6);
+    expect(merged.interpretation).toContain("본 결과는 입력한 기동배수와 배선조건에 따른 추정값입니다");
+  });
+
+  it("배선 입력이 있으면 기존 기동 전압강하 함수와 같은 ΔV를 쓴다", () => {
+    const input = {
+      flcMode: "known",
+      phase: "3",
+      flc: "60",
+      method: "dol",
+      multiplier: "6",
+      length: "80",
+      resistance: "0.524",
+      voltage: "380",
+    };
+    const legacy = calculateMotorStartVoltageDrop(input, 2);
+    const merged = calculateMotorStartingReview(input, 2);
+    expect(legacy.ok && merged.ok).toBe(true);
+    if (!legacy.ok || !merged.ok) return;
+    expect(metricNumber(merged, "dv")).toBeCloseTo(metricNumber(legacy, "dv"), 6);
+    expect(metricNumber(merged, "pct")).toBeCloseTo(metricNumber(legacy, "pct"), 6);
+  });
+
+  it("명판 모드면 정격전류 함수의 FLC를 쓴다", () => {
+    const plate = {
+      flcMode: "from-nameplate",
+      phase: "3",
+      power: "30",
+      powerUnit: "kW",
+      voltage: "380",
+      pf: "0.85",
+      efficiency: "0.92",
+      method: "dol",
+      multiplier: "6",
+    };
+    const current = calculateMotorCurrent(plate, 2);
+    const merged = calculateMotorStartingReview(plate, 2);
+    expect(current.ok && merged.ok).toBe(true);
+    if (!current.ok || !merged.ok) return;
+    expect(metricNumber(merged, "flc")).toBeCloseTo(metricNumber(current, "flc"), 2);
+    expect(metricNumber(merged, "istart")).toBeCloseTo(metricNumber(current, "flc") * 6, 1);
+  });
+
+  it("기동 전압강하 도구는 목록에 없고 즐겨찾기 별칭은 통합 도구로 간다", () => {
+    expect(getPublishedTools().some((tool) => tool.slug === "motor-start-vd")).toBe(false);
+    expect(getPublishedTools().some((tool) => tool.slug === "motor-starting")).toBe(true);
+    expect(getToolById("tool-motor-start-vd")?.id).toBe("tool-motor-starting");
+    expect(getRecentlyAddedTools().slice(0, 4)).toHaveLength(4);
+    const dates = getRecentlyAddedTools().map((tool) => tool.updatedAt);
+    expect(dates).toEqual([...dates].sort((a, b) => b.localeCompare(a)));
   });
 });
 
