@@ -10,6 +10,7 @@ import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { parseHandoff } from "@/lib/calculations/handoff";
 import {
+  KEC_VOLTAGE_DROP_MIXED,
   KEC_VOLTAGE_DROP_START,
   KEC_VOLTAGE_DROP_STARTING,
   type KecPathStartKind,
@@ -205,6 +206,7 @@ export function PathVoltageDropClient() {
                   <option value="other">기타</option>
                   <option value="mixed">혼합 / 별도 검토</option>
                 </select>
+                {draft.kecLoad === "mixed" ? <p className="mt-1 text-xs text-muted">{KEC_VOLTAGE_DROP_MIXED}</p> : null}
               </Field>
               <Field label="검토 상태">
                 <select
@@ -240,7 +242,7 @@ export function PathVoltageDropClient() {
             </Field>
           ) : null}
           <p className="text-xs text-muted">
-            3상 선간 ΔV%는 선간전압(예: 380 V), 단상·상전압 ΔV%는 그 회로 전압(예: 220 V)과 맞추세요. 3상4선 220/380 V에서 결과적인 %는 같습니다.
+            전압강하율 기준전압을 계산 종류와 맞추세요. 저압은 계량기 2차측, 고압 이상은 변압기 2차측입니다. 3상 선간 ΔV%는 선간전압(예: 380 V), 단상·상전압 ΔV%는 그 회로 전압(예: 220 V)입니다. 3상4선 220/380 V에서 결과적인 %는 같습니다.
           </p>
 
           <div className="space-y-3">
@@ -274,13 +276,13 @@ export function PathVoltageDropClient() {
                         <option value="1">단상</option>
                       </select>
                     </Field>
-                    <Field label="기준 전압 V">
+                    <Field label="전압강하율 기준전압 V">
                       <input className={inputClass} inputMode="decimal" value={String(seg.voltageV)} onChange={(e) => patchSeg(index, { voltageV: Number(e.target.value) })} />
                     </Field>
                     <Field label="부하전류 A">
                       <input className={inputClass} inputMode="decimal" value={String(seg.currentA)} onChange={(e) => patchSeg(index, { currentA: Number(e.target.value) })} />
                     </Field>
-                    <Field label="역률 (기록)">
+                    <Field label="역률 (기록용 — 현재 전압강하 계산에는 사용되지 않음)">
                       <input className={inputClass} inputMode="decimal" value={String(seg.pf ?? "")} onChange={(e) => patchSeg(index, { pf: Number(e.target.value) })} />
                     </Field>
                     <Field label="편도 길이 m">

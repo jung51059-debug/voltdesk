@@ -152,7 +152,7 @@ export function calculateShortCircuit(input: CalcInput, precision: number): Calc
       ),
       warning(
         "info",
-        "IEC 60909 일부",
+        "IEC 60909 참고 · 일부 단락전류 근사",
         "Ik″ = c Un / (√3 Zk), ip = κ √2 Ik″, κ = 1.02 + 0.98 e^(−3R/X) 를 사용합니다. 전압계수 c와 임피던스 보정계수(K) 전체 절차는 구현하지 않았습니다.",
       ),
       warning("warning", "기여분 합성", "모터·발전기 기여는 단순 전류 합산입니다. 운전 대수·기동 여부·감쇠는 사용자가 반영해야 합니다."),
@@ -170,7 +170,7 @@ export function calculateShortCircuit(input: CalcInput, precision: number): Calc
       `ip = κ × √2 × Ik″ = ${roundTo(ip, 0)} A`,
       `Sk = √3 Un Ik / 10^6 = ${roundTo(skMva, precision)} MVA`,
     ],
-    reviewStatus: review("check", "초기 대칭 단락의 간이 IEC 60909 형태입니다. 보호협조·차단용량 확정용이 아닙니다."),
+    reviewStatus: review("check", "IEC 60909 참고. 일부 단락전류 근사입니다. IEC 60909 계산·준수가 아니며 보호협조·차단용량 확정용이 아닙니다."),
     assumptionsUsed: [
       "3상 대칭, 기본파, 임피던스 보정계수 K 미적용",
       "불평형 사고 제외",

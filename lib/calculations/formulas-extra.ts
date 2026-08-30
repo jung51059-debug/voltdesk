@@ -35,7 +35,7 @@ export const extraFormulas: FormulaDefinition[] = [
     steps: ["P = 30000 W", "분모 = √3 × 380 × 0.85 × 0.92", "I ≈ 58.1 A"],
     result: "약 58.1 A",
   }, {
-    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "명판 P, PF, η로 전류 환산. IEC 60034 명판 절차는 수행하지 않음" }],
+    criteriaNotes: [{ standard: "일반 공식", appliesTo: "명판 P, PF, η로 전류 환산. 모터 명판 절차 전체를 수행하지 않음" }],
     referenceSources: [{ id: "src-eng-motor", title: "일반 전기공학 전력·전류 관계식", publisher: "공학 교과서", note: "3상 I = P/(√3 V PF η)" }],
   }),
   f("formula-motor-starting", "모터 기동전류 참고", "I_start = k × I_FLC", [
@@ -82,7 +82,7 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "A_VD", name: "전압강하 최소 단면적", unit: "mm²", description: "허용전류 선정 아님" },
   ], { title: "3상 45 kW, 380 V, 80 m, 허용 3%", given: "Cu, PF 0.85", steps: ["Ib 계산", "ΔV_allow", "A_VD"], result: "설계전류와 전압강하 최소 단면적" }, {
     criteriaNotes: [
-      { standard: "일반 공학식", appliesTo: "Ib, ΔV, A_VD" },
+      { standard: "일반 공식", appliesTo: "Ib, ΔV, A_VD" },
       { standard: "KEC 232.5.2", appliesTo: "국내 적용 관련. 표 수치는 사용자가 입력" },
       { standard: "KS C IEC 60364-5-52", appliesTo: "공사방법·허용전류·보정 체계. 표 미내장" },
     ],
@@ -97,7 +97,7 @@ export const extraFormulas: FormulaDefinition[] = [
     criteriaNotes: [
       { standard: "KEC 232.5.2", appliesTo: "국내 적용 관련" },
       { standard: "KS C IEC 60364-5-52", appliesTo: "공사방법 → 허용전류 → 보정계수. 표 미내장" },
-      { standard: "일반 공학식", appliesTo: "Iz' = Iz × k (사용자 값)" },
+      { standard: "일반 공식", appliesTo: "Iz' = Iz × k (사용자 값)" },
     ],
   }),
   f("formula-busbar", "부스바 단면·밀도", "A = w t n, J = I/A, I²t = Isc² t", [
@@ -108,7 +108,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-transformer-sizing", "변압기 필요 kVA", "S = [P(1+손실)/PF](1+설계)(1+증설)", [
     { symbol: "P", name: "최대수요", unit: "kW", description: "" },
   ], { title: "720 kW, PF 0.9, 여유 10%+15%, 손실 3%", given: "수요 720 kW", steps: ["P'=741.6", "S_load=824", "S_need≈1042"], result: "상용 후보 1500 kVA 등" }, {
-    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "수요를 kVA로 환산. 냉각 보정은 하지 않음" }],
+    criteriaNotes: [{ standard: "일반 공식", appliesTo: "수요를 kVA로 환산. 냉각 보정은 하지 않음" }],
   }),
   f("formula-transformer-current", "변압기 정격전류", "I = S / (√3 V)", [
     { symbol: "S", name: "용량", unit: "kVA", description: "명판" },
@@ -119,14 +119,14 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-transformer-loss", "변압기 손실·효율", "P_loss = P0 + Pk β², η = Pout/(Pout+Ploss)", [
     { symbol: "β", name: "부하율", unit: "pu", description: "S/Srated" },
   ], { title: "명판 P0=1.2 kW, Pk=10.5 kW, β=0.8", given: "PF 0.9", steps: ["Ploss=P0+Pkβ²", "η"], result: "효율 %" }, {
-    criteriaNotes: [{ standard: "IEC 60076 손실 정의 (명판 값 사용)", appliesTo: "P0, Pk는 사용자가 명판에서 입력" }],
+    criteriaNotes: [{ standard: "일반 공식", appliesTo: "P_loss = P0 + Pk β². P0, Pk는 사용자가 명판에서 입력" }],
   }),
-  f("formula-short-circuit", "3상 단락 (IEC 60909 일부)", "Ik″ = c Un / (√3 Zk), ip = κ√2 Ik″, κ=1.02+0.98e^(−3R/X)", [
+  f("formula-short-circuit", "3상 단락 (일부 근사)", "Ik″ = c Un / (√3 Zk), ip = κ√2 Ik″, κ=1.02+0.98e^(−3R/X)", [
     { symbol: "c", name: "전압계수", unit: "—", description: "사용자가 표준 표 확인 후 입력" },
     { symbol: "Zk", name: "등가 임피던스", unit: "Ω", description: "변압기·계통·케이블 합성" },
   ], { title: "1000 kVA 6%Z, 380 V, c=1.05", given: "케이블 선택", steps: ["Z_tr", "Ik″", "κ", "ip"], result: "대칭전류·첨두·MVA" }, {
     criteriaNotes: [
-      { standard: "IEC 60909-0", appliesTo: "Ik″ 기본식, 첨두계수 κ 근사식. 임피던스 보정계수 K 전체 절차는 미구현" },
+      { standard: "IEC 60909-0 참고", appliesTo: "Ik″·κ 일부 근사. IEC 60909 계산·준수 아님. K 보정·불평형 단락 미구현" },
     ],
     limitations: ["불평형 사고(지락)는 제공하지 않습니다."],
   }),
@@ -134,13 +134,13 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "Ip", name: "1차 정격", unit: "A", description: "100/5A의 100" },
     { symbol: "Is", name: "2차 정격", unit: "A", description: "보통 5 또는 1" },
   ], { title: "부하 80 A, CT 100/5A", given: "Is=5 A", steps: ["n=20", "I2=4 A"], result: "2차 4 A" }, {
-    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "n = Ip/Is. IEC 61869 계급 계산은 하지 않음" }],
+    criteriaNotes: [{ standard: "일반 공식", appliesTo: "n = Ip/Is. 오차 계급 계산은 하지 않음" }],
   }),
   f("formula-pt-ratio", "PT 변성비", "n = V1 / V2", [
     { symbol: "V1", name: "1차", unit: "V", description: "" },
     { symbol: "V2", name: "2차", unit: "V", description: "흔히 110 V" },
   ], { title: "22900 / 110 V", given: "PT", steps: ["n=208.18"], result: "약 208.2" }, {
-    criteriaNotes: [{ standard: "일반 공학식", appliesTo: "n = V1/V2" }],
+    criteriaNotes: [{ standard: "일반 공식", appliesTo: "n = V1/V2" }],
   }),
   f("formula-vfd", "VFD 용량 검토", "S = max(P(1+m)/k, √3 V I (1+m)/1000/k)", [
     { symbol: "k", name: "감소계수", unit: "—", description: "제조사 표 사용자 입력" },
@@ -204,7 +204,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-battery-ah", "배터리 필요 Ah", "E = P t / (ηinv ηb k_age DOD), C = E/V", [
     { symbol: "DOD", name: "방전심도", unit: "—", description: "" },
   ], { title: "5 kW, 384 V, 15분, η 0.92/0.9, 노화 0.8, DOD 0.8", given: "UPS 배터리", steps: ["E", "C"], result: "Ah, kWh" }, {
-    criteriaNotes: [{ standard: "에너지 수지 (IEEE 485는 표 미내장)", appliesTo: "Ah 산정 수식. 제조사 런타임 곡선 미사용" }],
+    criteriaNotes: [{ standard: "에너지 수지", appliesTo: "Ah 산정 수식. 제조사 런타임 곡선·축전지 선정표 미사용" }],
   }),
   f("formula-equipment-load", "설비 부하율·가동률", "부하율=Pavg/Prated, 가동률=trun/tperiod", [
     { symbol: "Pavg", name: "평균전력", unit: "kW", description: "" },
@@ -261,16 +261,16 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-load-flow", "방사형 조류 (DistFlow 근사)", "V²_to ≈ V²_from − 2(RP+XQ)", [
     { symbol: "R,X", name: "선로 임피던스", unit: "Ω", description: "" },
   ], { title: "소스 380 V, 부하 50 kW", given: "방사형 2모선", steps: ["후방 전력", "전방 전압"], result: "모선 전압, 손실" }, {}),
-  f("formula-arc-flash", "아크 플래시 준비", "IEEE 1584 전체 계산은 제공하지 않음", [
+  f("formula-arc-flash", "아크플래시 검토 준비", "입사에너지 수치 계산 없음", [
     { symbol: "입력", name: "필요 자료", unit: "—", description: "전압, 갭, 작업거리, Ibf 등" },
   ], { title: "자료 체크리스트", given: "현장", steps: ["입력 수집"], result: "계산 보류" }, {
-    criteriaNotes: [{ standard: "IEEE 1584", appliesTo: "필요 입력 안내만. Incident Energy 수치는 미제공" }],
+    criteriaNotes: [{ standard: "관련 표준: IEEE 1584 / IEEE 1584.2", appliesTo: "검토 준비 항목. IEEE 1584 계산기 아님. Incident Energy 미제공" }],
     warnings: ["검증된 전체 모델을 구현하기 전에는 입사에너지 값을 내지 않습니다."],
   }),
-  f("formula-lightning", "낙뢰 간이 안내", "IEC 62305 전체 위험평가 아님", [
+  f("formula-lightning", "낙뢰보호 검토 항목", "위험점수·R1 계산 없음", [
     { symbol: "위치", name: "환경 요인", unit: "—", description: "사용자 선택" },
   ], { title: "간이 검토", given: "건물 개요", steps: ["요인 확인"], result: "전문가 평가 필요" }, {
-    criteriaNotes: [{ standard: "IEC 62305", appliesTo: "존재 안내. 전체 R1 계산 미구현" }],
+    criteriaNotes: [{ standard: "관련 표준: IEC 62305", appliesTo: "검토 항목 안내. IEC 62305 계산·전체 R1 미구현" }],
     warnings: ["간이 검토입니다."],
   }),
   f("formula-sld", "단선도 데이터 구조", "Graph = (Nodes, Edges)", [

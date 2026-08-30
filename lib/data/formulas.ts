@@ -24,7 +24,7 @@ export const baseFormulas: FormulaDefinition[] = [
       "모터는 기동전류와 서비스 팩터를 별도로 검토해야 합니다.",
     ],
     limitations: [
-      "IEC/KS 보호기기 선정표, 제조사 데이터, 현장 조건을 대체하지 않습니다.",
+      "보호기기 선정표, 제조사 데이터, 현장 조건을 대체하지 않습니다.",
     ],
     example: {
       title: "단상 3 kW 전열 부하",
@@ -166,7 +166,7 @@ export const baseFormulas: FormulaDefinition[] = [
         id: "src-eng-pf",
         title: "일반 전기공학 전력 삼각형",
         publisher: "공학 교과서",
-        note: "PF = P/S. IEEE 1459 측정 정의는 사용하지 않습니다.",
+        note: "PF = P/S. 측정 창·진성 역률 정의는 사용하지 않습니다.",
       },
     ],
   },
@@ -191,7 +191,7 @@ export const baseFormulas: FormulaDefinition[] = [
       "100%를 초과하면 과부하입니다. 제조사 과부하 내량과 지속시간을 확인하세요.",
     ],
     limitations: [
-      "IEC 60076 / KS C IEC 60076의 온도와 냉각 방식에 따른 용량 보정을 수행하지 않습니다.",
+      "온도와 냉각 방식에 따른 용량 보정을 수행하지 않습니다.",
     ],
     example: {
       title: "1000 kVA 변압기, 720 kW, PF 0.9",
@@ -208,7 +208,7 @@ export const baseFormulas: FormulaDefinition[] = [
         id: "src-eng-tr-load",
         title: "일반 전기공학 용량 비율",
         publisher: "공학 교과서",
-        note: "부하율 = S/S_rated. IEC 60076 냉각 보정은 수행하지 않습니다.",
+        note: "부하율 = S/S_rated. 냉각 보정은 수행하지 않습니다.",
       },
     ],
   },
@@ -281,7 +281,7 @@ export const baseFormulas: FormulaDefinition[] = [
       "제조사 런타임 곡선이 있으면 그 값을 우선하세요.",
     ],
     limitations: [
-      "IEEE 1184 / 제조사 배터리 선정 절차를 대체하지 않습니다.",
+      "제조사 배터리 선정 절차·런타임 곡선을 대체하지 않습니다.",
     ],
     example: {
       title: "384 V, 100 Ah, 20 kW 부하",
@@ -298,7 +298,7 @@ export const baseFormulas: FormulaDefinition[] = [
         id: "src-eng-ups-t",
         title: "일반 전기공학 에너지 수지",
         publisher: "공학 교과서",
-        note: "t = 가용Wh / P. IEEE 1184 선정 절차는 사용하지 않습니다.",
+        note: "t = 가용Wh / P. 제조사 런타임 곡선은 사용하지 않습니다.",
       },
     ],
   },
@@ -321,7 +321,7 @@ export const baseFormulas: FormulaDefinition[] = [
       "스탠바이 정격을 프라임처럼 연속 사용하면 안 됩니다.",
     ],
     limitations: [
-      "ISO 8528 정격 분류와 제조사 부하 프로파일을 대체하지 않습니다.",
+      "발전기 세트 정격 분류와 제조사 부하 프로파일을 대체하지 않습니다.",
     ],
     example: {
       title: "500 kW 프라임, 실제 320 kW",
@@ -334,7 +334,7 @@ export const baseFormulas: FormulaDefinition[] = [
         id: "src-eng-gen-load",
         title: "일반 전기공학 부하율",
         publisher: "공학 교과서",
-        note: "P_load/P_rated. ISO 8528 정격 분류 전체를 구현하지 않습니다.",
+        note: "P_load/P_rated. 정격 분류 전체를 구현하지 않습니다.",
       },
     ],
   },
@@ -375,7 +375,7 @@ export const baseFormulas: FormulaDefinition[] = [
         id: "src-eng-month",
         title: "일반 시설관리 사용량 비교",
         publisher: "공학 교과서",
-        note: "검침값 차. ISO 50001 정규화는 사용하지 않습니다.",
+        note: "검침값 차. 에너지 정규화는 사용하지 않습니다.",
       },
     ],
   },
@@ -392,14 +392,14 @@ export const baseFormulas: FormulaDefinition[] = [
     units: ["Ω", "mm²", "m"],
     assumptions: ["20°C DC 저항률 근사", "표피효과와 온도 보정 없음"],
     warnings: ["허용전류 선정이 아닙니다."],
-    limitations: ["IEC 60228 도체 저항표와 차이가 있을 수 있습니다."],
+    limitations: ["도체 저항 규격표와 차이가 있을 수 있습니다. 규격표를 내장하지 않습니다."],
     example: {
       title: "구리 35 mm², 100 m",
       given: "ρ = 0.0175, L = 100, A = 35",
       steps: ["R = 0.0175 × 100 / 35 ≈ 0.050 Ω", "r = 0.0175 × 1000 / 35 ≈ 0.50 Ω/km"],
       result: "약 0.050 Ω (0.50 Ω/km)",
     },
-    referenceSources: [{ id: "src-eng-r", title: "일반 전기공학 도체 저항", publisher: "공학 교과서", note: "R = ρL/A. IEC 60228 표는 사용하지 않습니다." }],
+    referenceSources: [{ id: "src-eng-r", title: "일반 전기공학 도체 저항", publisher: "공학 교과서", note: "R = ρL/A. 도체 저항표를 내장하지 않습니다." }],
   },
   {
     id: "formula-breaker-ref",
@@ -413,14 +413,14 @@ export const baseFormulas: FormulaDefinition[] = [
     units: ["A"],
     assumptions: ["연속 부하에 단순 배율만 적용", "단락·기동·선택차단 없음"],
     warnings: ["이 결과는 차단기 선정이 아닙니다."],
-    limitations: ["KEC, IEC 60947, 제조사 카탈로그를 대체하지 않습니다."],
+    limitations: ["차단기 제품표준·제조사 카탈로그를 대체하지 않습니다. KEC 적합 판정이 아닙니다."],
     example: {
       title: "87 A, 여유 1.25",
       given: "I = 87 A, k = 1.25",
       steps: ["I_ref = 108.75 A", "상용 스케일 참고 125 A"],
       result: "참고 108.8 A",
     },
-    referenceSources: [{ id: "src-eng-brk", title: "임의 여유율 참고", publisher: "공학 교과서", note: "I×k. IEC 60947 선정·KEC 적합 판정이 아닙니다." }],
+    referenceSources: [{ id: "src-eng-brk", title: "임의 여유율 참고", publisher: "공학 교과서", note: "I×k. 차단기 선정·KEC 적합 판정이 아닙니다." }],
   },
   {
     id: "formula-ups-capacity",
@@ -434,14 +434,14 @@ export const baseFormulas: FormulaDefinition[] = [
     units: ["kW", "kVA"],
     assumptions: ["고조파 증가분과 투입 돌입은 사용자가 부하 kW에 반영해야 합니다."],
     warnings: ["N+1 병렬은 모듈 대수를 별도 계산하세요."],
-    limitations: ["IEC 62040 선정 절차를 대체하지 않습니다."],
+    limitations: ["UPS 제품 선정 절차를 대체하지 않습니다."],
     example: {
       title: "40 kW, 여유 20%, PF 0.9",
       given: "P = 40 kW, growth = 0.2, PF = 0.9",
       steps: ["P_design = 48 kW", "S = 48 / 0.9 = 53.3 kVA"],
       result: "약 53.3 kVA",
     },
-    referenceSources: [{ id: "src-eng-ups-s", title: "일반 전기공학 kVA 환산", publisher: "공학 교과서", note: "IEC 62040 선정 절차는 사용하지 않습니다." }],
+    referenceSources: [{ id: "src-eng-ups-s", title: "일반 전기공학 kVA 환산", publisher: "공학 교과서", note: "UPS 제품 선정 절차는 사용하지 않습니다." }],
   },
 ];
 

@@ -157,7 +157,7 @@ export const categories: ToolCategory[] = [
     domain: "electrical",
     name: "고급 검토",
     nameEn: "Advanced tools",
-    description: "아크 플래시·낙뢰 위험은 불완전 모델을 설계 도구처럼 제공하지 않습니다.",
+    description: "아크플래시 검토 준비·낙뢰보호 검토 항목입니다. 입사에너지나 위험점수를 내지 않습니다.",
     icon: "Shield",
     order: 12,
   },

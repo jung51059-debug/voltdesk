@@ -25,6 +25,7 @@ import {
 export type { CalcInput } from "@/lib/calculations/parse";
 import type { CalcInput } from "@/lib/calculations/parse";
 import {
+  KEC_VOLTAGE_DROP_MIXED,
   kecVoltageDropCanCompare,
   kecVoltageDropJudgmentLabel,
   kecVoltageDropLimitPct,
@@ -621,13 +622,7 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
       ),
     );
   } else if (kecMode === "mixed") {
-    warnings.push(
-      warning(
-        "warning",
-        "혼합부하 · 별도 검토",
-        "조명 및 기타 부하가 함께 포함된 회로입니다. 적용 허용 전압강하는 설계 범위와 각 부하의 공급경로를 확인하여 결정하세요. 3/5 또는 6/8을 자동으로 고르지 않습니다.",
-      ),
-    );
+    warnings.push(warning("warning", "혼합부하 · 별도 검토", KEC_VOLTAGE_DROP_MIXED));
   } else if (kecMode === "review") {
     warnings.push(
       warning(
@@ -675,9 +670,9 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
       : kecMode === "out-of-scope"
         ? "독립 자가발전기에는 KEC 232.3.9가 적용되지 않습니다."
         : kecMode === "mixed"
-          ? "조명 및 기타 부하가 함께 포함된 회로입니다. 적용 허용 전압강하는 설계 범위와 각 부하의 공급경로를 확인하여 결정하세요."
+          ? KEC_VOLTAGE_DROP_MIXED
         : pathMatchesSegment
-          ? `전체 경로 허용 참고값 ${roundTo(kecLimit, 2)}% (기본 ${roundTo(kecBase, 2)}% + 거리 가산 ${roundTo(kecExtra, 3)}%). 적합 판정이 아닙니다. 사용자 입력 전압으로 %를 만들었으며 표 232.3-1의 공식 분모라고 단정하지 않습니다.`
+          ? `전체 경로 허용 참고값 ${roundTo(kecLimit, 2)}% (기본 ${roundTo(kecBase, 2)}% + 거리 가산 ${roundTo(kecExtra, 3)}%). 적합 판정이 아닙니다. ΔV%는 전압강하율 기준전압으로 만들었습니다. 저압은 계량기 2차측, 고압 이상은 변압기 2차측, 3상4선 220/380 V는 상전압 %는 220 V·선간 %는 380 V입니다.`
           : `현재 결과는 선택한 케이블 구간의 전압강하입니다. KEC 기준 검토는 인입구부터 해당 기기까지 전체 공급경로의 전압강하를 합산하여 확인하세요. 전체 경로 허용 참고값: ${roundTo(kecLimit, 2)}%.`;
 
   return result({
@@ -687,7 +682,7 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
       { label: "전류", value: `${roundTo(I, precision)} A` },
       { label: "계산 구간", value: `${roundTo(L, precision)} m` },
       { label: "KEC 경로", value: kecReview ? `${roundTo(pathM, precision)} m` : "미적용" },
-      { label: "기준 전압", value: `${roundTo(V, precision)} V` },
+      { label: "전압강하율 기준전압", value: `${roundTo(V, precision)} V` },
       { label: "KEC 검토", value: kecReview ? "켬" : "끔" },
     ],
     interpretation: `${phase === "1" ? "단상" : "3상"} 저항 근사 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%)입니다. ${kecNote}`,
@@ -732,7 +727,7 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
             : review("caution", `전체 경로 허용 참고 ${roundTo(kecLimit, 2)}%를 넘습니다. 부적합 판정이 아닙니다.`)
           : review("check", "구간 전압강하와 전체 경로 허용 참고값은 비교하지 않습니다. 경로 합산 후 확인하세요.")
         : kecMode === "mixed"
-          ? review("check", "혼합부하는 표 허용값을 자동으로 고르지 않습니다. 설계 범위와 공급경로를 확인하세요.")
+          ? review("check", KEC_VOLTAGE_DROP_MIXED)
         : kecMode === "out-of-scope"
           ? review("check", "KEC 232.3.9 적용 대상이 아닙니다.")
         : allow > 0

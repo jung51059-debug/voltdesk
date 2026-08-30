@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { calculateMotorCurrent } from "@/lib/calculations/motor";
 import { calculatePowerFactorCorrection, calculateThd } from "@/lib/calculations/power-quality";
 import { calculateVoltageDrop, calculateTransformerLoad, calculateBreakerReference, engines } from "@/lib/calculations/engines";
-import { KEC_TABLE_142_3_1_EVIDENCE, kecVoltageDropCanCompare, kecVoltageDropLimitPct } from "@/lib/calculations/kec-review";
+import { KEC_TABLE_142_3_1_EVIDENCE, KEC_VOLTAGE_DROP_MIXED, kecVoltageDropCanCompare, kecVoltageDropLimitPct } from "@/lib/calculations/kec-review";
 import {
   calculatePathVoltageDrop,
   insertPathSegment,
@@ -60,6 +60,7 @@ import {
   assertNoComplianceWording,
   getStandardBasisBySlug,
   missingStandardBasis,
+  standardBases,
   toolsByStandardStatus,
 } from "@/lib/data/standard-basis";
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
@@ -329,6 +330,8 @@ describe("전압강하 허용치", () => {
       expect(Number(out.metrics.find((m) => m.id === "kecLimit")?.value)).toBeCloseTo(3.25, 2);
       expect(out.metrics.find((m) => m.id === "kecCompare")?.value).toMatch(/기준/);
       expect(out.interpretation).toContain("적합 판정이 아닙니다");
+      expect(out.interpretation).toContain("전압강하율 기준전압");
+      expect(out.interpretation).toContain("계량기 2차측");
     }
   });
 
@@ -399,7 +402,8 @@ describe("전압강하 허용치", () => {
     if (out.ok) {
       expect(out.metrics.find((m) => m.id === "kecJudge")?.value).toBe("혼합부하 · 별도 검토");
       expect(out.metrics.some((m) => m.id === "kecLimit")).toBe(false);
-      expect(out.interpretation).toContain("공급경로를 확인하여 결정하세요");
+      expect(out.interpretation).toContain("자동으로 고르지 않습니다");
+      expect(out.interpretation).toContain("구현 해석");
     }
   });
 
@@ -544,6 +548,8 @@ describe("경로 전압강하", () => {
     if (!out.ok) return;
     expect(out.path.kecExtra).toBeCloseTo(0.25, 8);
     expect(out.path.kecLimit).toBeCloseTo(3.25, 5);
+    expect(out.interpretation).toContain("전압강하율 기준전압");
+    expect(out.interpretation).toContain("계량기 2차측");
   });
 
   it("200 m 이상에서 가산 상한 0.5%를 적용한다", () => {
@@ -579,6 +585,7 @@ describe("경로 전압강하", () => {
     expect(out.path.kecMode).toBe("mixed");
     expect(out.metrics.some((m) => m.id === "kecCompare")).toBe(false);
     expect(out.interpretation).toContain("혼합부하");
+    expect(out.interpretation).toContain("구현 해석");
   });
 
   it("전동기 기동은 표와 비교하지 않고 허용 %를 만들지 않는다", () => {
@@ -669,6 +676,28 @@ describe("KEC 표기 범위", () => {
     ]);
     expect(STANDARD_STATUS_NOTE["manufacturer-data-required"]).toContain("제조사");
     expect(STANDARD_STATUS_NOTE["verification-required"]).toContain("자동 적합 판정");
+    expect(STANDARD_STATUS_LABEL["general-engineering"]).toBe("일반 공식");
+    expect(getStandardBasisBySlug("transformer-loss")?.standardStatus).toBe("general-engineering");
+    expect(getStandardBasisBySlug("single-phase-current")?.standardStatus).toBe("general-engineering");
+    expect(getStandardBasisBySlug("earth-conductor")?.sourceDataStatus).toBe("source-data-pending");
+    expect(toolsByStandardStatus("verification-required")).toEqual([]);
+    expect(KEC_VOLTAGE_DROP_MIXED).toContain("자동으로 고르지 않습니다");
+    expect(KEC_VOLTAGE_DROP_MIXED).toContain("구현 해석");
+    expect(getStandardBasisBySlug("short-circuit")?.relatedStandards?.join(" ")).toContain("참고");
+    expect(getStandardBasisBySlug("arc-flash")?.usedInCalculation).toContain("검토 준비");
+    expect(getStandardBasisBySlug("lightning-risk")?.usedInCalculation).toContain("검토 항목");
+  });
+
+  it("미구현 IEEE/IEC/ISO/NEC를 계산 근거 필드에 넣지 않는다", () => {
+    const banned = [/IEEE 141/, /IEEE 1459/, /IEEE 1184/, /IEC 60947/, /IEC 62040/, /IEC 60228/, /ISO 50001/, /\bNEC\b/, /\bNFPA\b/];
+    for (const basis of standardBases) {
+      const fields = [basis.usedInCalculation, basis.domesticReview ?? "", ...(basis.relatedStandards ?? [])];
+      for (const field of fields) {
+        for (const re of banned) {
+          expect(field, `${basis.slug} ${field}`).not.toMatch(re);
+        }
+      }
+    }
   });
 });
 
@@ -701,6 +730,7 @@ describe("접지도체 단열식·설치조건", () => {
       expect(out.metrics.some((m) => m.id === "reviewMin")).toBe(false);
       expect(out.metrics.find((m) => m.id === "final")?.value).toContain("표 142.3-1");
       expect(out.interpretation).toContain("이 계산식의 적용범위를 벗어났습니다");
+      expect(out.interpretation).toContain("유일한 KEC 대안이라고 단정하지 않습니다");
       expect(out.interpretation).not.toContain("선정 불가능");
       expect(`${out.interpretation}${out.metrics.map((m) => m.value).join(" ")}`).not.toMatch(/KEC 적합 굵기|KEC 최종 굵기|법적 적합/);
     }

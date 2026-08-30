@@ -102,7 +102,7 @@ export const KEC_EARTH_CONDUCTOR = {
   adiabaticOutOfRangeLines: [
     "입력한 차단시간은 이 계산식의 적용범위를 벗어났습니다.",
     "KEC 142.3.2의 해당 계산식은 차단시간 5초 이하에 적용됩니다.",
-    "표 142.3-1 등 다른 선정방법을 검토하세요.",
+    "표 142.3-1을 포함한 다른 선정방법을 검토하세요. 이 계산식의 유일한 KEC 대안이라고 단정하지 않습니다.",
   ],
 } as const;
 
@@ -135,19 +135,23 @@ export const KEC_VOLTAGE_DROP_REVIEW = {
   numericLimitsEmbedded: true,
   optInOnly: true,
   /**
-   * % = ΔV / 사용자 기준전압 × 100.
-   * 2026-08-13 협회: 3상4선 220/380 V에서 상전압 %는 220 V, 선간 %는 380 V. 선간 ΔV는 상 ΔV의 √3배라 %는 동일.
-   * 표 232.3-1 공식 분모로 단정하지 않음.
+   * % = ΔV / 전압강하율 기준전압 × 100.
+   * 2024 협회: 저압 수용가 = 계량기 2차측 전압, 고압 이상 = 변압기 2차측 전압.
+   * 2026-08 협회: 3상4선 220/380 V에서 상전압 %는 220 V, 선간 %는 380 V. 선간 ΔV는 상 ΔV의 √3배라 %는 동일.
    */
-  percentageBaseVoltage: "calculation-voltage" as const,
+  percentageBaseVoltage: "drop-percent-reference" as const,
   compareOnlyWhenSegmentEqualsPath: true,
   pathUsesCumulativeDrop: true,
 } as const;
 
 export const KEC_VOLTAGE_DROP_START = {
-  lv: "저압 수전에서 일반적인 검토 기준점은 계량기 2차측입니다.",
-  "hv-plus": "고압 이상 수전에서 일반적인 검토 기준점은 변압기 2차측입니다.",
+  lv: "저압 수전에서 일반적인 검토 기준점과 전압강하율 기준전압은 계량기 2차측입니다.",
+  "hv-plus": "고압 이상 수전에서 일반적인 검토 기준점과 전압강하율 기준전압은 변압기 2차측입니다.",
 } as const;
+
+/** 혼합부하는 표 숫자를 자동 선택하지 않음. 협회: 혼재해도 표 232.3-1을 만족해야 함. 공통 간선을 조명값으로 강제하지는 않음. */
+export const KEC_VOLTAGE_DROP_MIXED =
+  "혼합부하는 조명 3% 또는 기타 5%를 자동으로 고르지 않습니다. 협회는 조명·기타가 혼재해도 표 232.3-1을 만족해야 한다고 답했으나, 공통 간선에 조명값을 강제하지는 않았습니다. 경로를 나눈다면 최종 조명 경로와 최종 기타 경로를 각각 전체 경로로 검토하고, 공통 간선 ΔV는 두 경로에 모두 넣는 해석이 자연스럽습니다. 이 안내는 협회 문구를 바탕으로 한 구현 해석입니다." as const;
 
 export const KEC_VOLTAGE_DROP_STARTING =
   "전동기 기동 또는 큰 돌입전류가 발생하는 기기는 KEC 232.3.9에 따라 표 232.3-1보다 큰 전압강하가 허용될 수 있습니다. 관련 기기 표준의 허용 전압범위를 별도로 확인하세요." as const;

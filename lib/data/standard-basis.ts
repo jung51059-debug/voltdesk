@@ -35,6 +35,7 @@ export interface StandardBasis {
   usedInCalculation: string;
   /** 배경 안내. 계산에 쓰지 않음. */
   referenceOnly?: string[];
+  sourceDataStatus: SourceDataStatus;
   methodNote: string;
   limits: string[];
   amporyScope: string;
@@ -46,7 +47,7 @@ export const STANDARD_KIND_LABEL: Record<StandardKind, string> = {
   iec: "IEC 참고",
   ieee: "IEEE 참고",
   iso: "ISO 참고",
-  engineering: "일반 공학식",
+  engineering: "일반 공식",
   manufacturer: "제조사 데이터 필요",
   "needs-review": "기준 확인 필요",
 };
@@ -54,11 +55,25 @@ export const STANDARD_KIND_LABEL: Record<StandardKind, string> = {
 export const STANDARD_STATUS_LABEL: Record<StandardStatus, string> = {
   "verified-kec": "KEC 구조 적용",
   "kec-related": "KEC 관련",
-  "international-reference": "국제 기준 참고",
-  "general-engineering": "일반 공학식",
+  "international-reference": "국제 참고",
+  "general-engineering": "일반 공식",
   "manufacturer-data-required": "제조사 데이터 필요",
   "verification-required": "기준 검증 필요",
 };
+
+export const SOURCE_DATA_STATUSES = ["verified", "user-input", "source-data-pending", "manufacturer-data-required"] as const;
+export type SourceDataStatus = (typeof SOURCE_DATA_STATUSES)[number];
+
+export const SOURCE_DATA_STATUS_LABEL: Record<SourceDataStatus, string> = {
+  verified: "검증된 공식 표",
+  "user-input": "사용자 입력",
+  "source-data-pending": "공식 표 미내장 (확보 전)",
+  "manufacturer-data-required": "제조사 데이터",
+};
+
+/** 국제 규격 번호가 있어도 전체 절차·적합 판정을 했다는 뜻이 아닙니다. */
+export const INTERNATIONAL_REFERENCE_DISCLAIMER =
+  "이 규격은 관련 분야의 참고 문헌이며, 현재 계산기가 해당 규격의 전체 계산 절차나 적합성 판정을 구현한다는 의미는 아닙니다.";
 
 /** 사용자가 왜 어떤 값은 바로 계산하고 어떤 값은 조심히 보여주는지 설명합니다. */
 export const STANDARD_STATUS_NOTE: Record<StandardStatus, string> = {
@@ -67,9 +82,9 @@ export const STANDARD_STATUS_NOTE: Record<StandardStatus, string> = {
   "kec-related":
     "관련 KEC 조항은 확인되었으나 표·조건·적합 판정을 계산 로직에 완전히 구현하지 않았습니다.",
   "international-reference":
-    "계산 또는 범위 안내에 국제 표준을 참고합니다. 국내 적합 판정이 아닙니다.",
+    "계산 또는 범위 안내에 국제 표준을 참고합니다. 국내 적합 판정이 아닙니다. 해당 규격 전체의 계산 절차나 적합성 판정을 구현한 것이 아닙니다.",
   "general-engineering":
-    "정현파·정상상태 전력·전류 관계식입니다. 표준 표를 내장하지 않습니다.",
+    "일반 전기공학 관계식입니다. 특정 표준 표를 내장하지 않습니다.",
   "manufacturer-data-required":
     "실제 결과는 제조사 방전곡선·효율·정격조건에 따라 달라질 수 있습니다.",
   "verification-required":
@@ -77,9 +92,9 @@ export const STANDARD_STATUS_NOTE: Record<StandardStatus, string> = {
 };
 
 export const METHOD_LABEL: Record<CalculationMethod, string> = {
-  engineering: "일반 공학식",
+  engineering: "일반 전기공학 관계식",
   approximation: "근사식",
-  standard: "표준 기반 계산",
+  standard: "확인된 표준 수식",
 };
 
 const FORBIDDEN_BADGE = /KEC 합격|KEC 인증|법적 적합/;
@@ -93,7 +108,7 @@ function row(
   methodNote: string,
   amporyScope: string,
   limits: string[],
-  extra?: Partial<Pick<StandardBasis, "domesticReview" | "relatedStandards" | "usedInCalculation" | "referenceOnly">>,
+  extra?: Partial<Pick<StandardBasis, "domesticReview" | "relatedStandards" | "usedInCalculation" | "referenceOnly" | "sourceDataStatus">>,
 ): StandardBasis {
   return {
     slug,
@@ -104,9 +119,24 @@ function row(
     methodNote,
     amporyScope,
     limits,
-    usedInCalculation: extra?.usedInCalculation ?? methodNote,
     ...extra,
+    usedInCalculation: extra?.usedInCalculation ?? methodNote,
+    sourceDataStatus: extra?.sourceDataStatus ?? defaultSourceDataStatus(slug, standardStatus),
   };
+}
+
+const PENDING_TABLE_SLUGS = new Set([
+  "cable-ampacity",
+  "cable-sizing",
+  "earth-conductor",
+  "path-voltage-drop",
+  "voltage-drop",
+]);
+
+function defaultSourceDataStatus(slug: string, status: StandardStatus): SourceDataStatus {
+  if (status === "manufacturer-data-required") return "manufacturer-data-required";
+  if (PENDING_TABLE_SLUGS.has(slug)) return "source-data-pending";
+  return "user-input";
 }
 
 const GENERAL = "정현파·정상상태 전력·전류 관계식. 표준 표를 내장하지 않습니다.";
@@ -134,9 +164,9 @@ export const standardBases: StandardBasis[] = [
     ],
     {
       domesticReview: "KEC 232.3.9",
-      relatedStandards: ["KS C IEC 60364-5-52 부속서 G (인용 관계 안내)"],
-      usedInCalculation: "ΔV는 계산 구간 편도 L. 표 232.3-1 가산은 인입구→기기 경로 길이. 구간=경로일 때만 ΔV%와 허용 참고값을 비교. 혼합부하는 표 숫자를 고르지 않음. % 분모는 사용자 기준전압(계산 전압 종류와 일치)",
-      referenceOnly: ["독립 자가발전기, 혼합부하, 수전방식 미입력, 구간≠경로 시 표와 수치 비교 없음"],
+      relatedStandards: ["KS C IEC 60364-5-52 부속서 G (KEC 인용 관계, 계산 미사용)"],
+      usedInCalculation: "ΔV는 계산 구간 편도 L. 표 232.3-1 가산은 인입구→기기 경로 길이. 구간=경로일 때만 ΔV%와 허용 참고값을 비교. 혼합부하는 표 숫자를 고르지 않음. % 분모는 전압강하율 기준전압(저압=계량기 2차, 고압 이상=변압기 2차, 계산 종류와 일치)",
+      referenceOnly: ["독립 자가발전기, 혼합부하, 수전방식 미입력, 구간≠경로 시 표와 수치 비교 없음", "R/X·역률 보정 ΔV는 미구현"],
     },
   ),
   row(
@@ -155,9 +185,9 @@ export const standardBases: StandardBasis[] = [
     ],
     {
       domesticReview: "KEC 232.3.9",
-      relatedStandards: ["KS C IEC 60364-5-52 부속서 G (인용 관계 안내)"],
-      usedInCalculation: "Σ(구간 ΔV%). 가산은 Σ길이. 정상운전·단일 부하종류일 때만 누적%와 허용 참고값 비교. % = ΔV/사용자 전압",
-      referenceOnly: ["독립 자가발전기, 혼합부하, 기동·돌입, 수전방식 미입력 시 표와 수치 비교 없음"],
+      relatedStandards: ["KS C IEC 60364-5-52 부속서 G (KEC 인용 관계, 계산 미사용)"],
+      usedInCalculation: "Σ(구간 ΔV%). 가산은 Σ길이. 정상운전·단일 부하종류일 때만 누적%와 허용 참고값 비교. % = ΔV/전압강하율 기준전압. 역률은 기록만. 혼합은 자동 3%/5% 없음",
+      referenceOnly: ["독립 자가발전기, 혼합부하, 기동·돌입, 수전방식 미입력 시 표와 수치 비교 없음", "R/X 모델·역률 보정 ΔV는 미구현"],
     },
   ),
   row("cable-resistance", "formula-cable-resistance", "general-engineering", ["engineering"], "approximation", "R = ρL/A (20°C DC 근사).", "편도 저항·Ω/km", ["IEC 60228 도체 저항표는 사용하지 않습니다.", "허용전류 선정이 아닙니다."]),
@@ -236,11 +266,11 @@ export const standardBases: StandardBasis[] = [
   row("transformer-sizing", "formula-transformer-sizing", "general-engineering", ["engineering"], "engineering", "수요 kW를 여유·역률로 kVA화.", "필요 kVA 참고", ["냉각 방식 보정·탭·병렬은 포함하지 않습니다."]),
   row("transformer-current", "formula-transformer-current", "general-engineering", ["engineering"], "engineering", "I = S/(√3 V).", "1·2차 정격전류", ["단락·보호 정격이 아닙니다."]),
   row("transformer-parallel", "formula-transformer-parallel", "general-engineering", ["engineering"], "engineering", "S/z 비례 분담.", "병렬 분담 kVA", ["탭·위상·순환전류 상세는 없습니다."]),
-  row("transformer-loss", "formula-transformer-loss", "international-reference", ["iec"], "engineering", "P_loss = P0 + Pk β². P0·Pk는 명판 입력.", "손실·효율 참고", ["온도 보정·냉각 방식 환산을 하지 않습니다."], {
-    relatedStandards: ["IEC 60076 손실 정의(명판 값)"],
+  row("transformer-loss", "formula-transformer-loss", "general-engineering", ["engineering"], "engineering", "P_loss = P0 + Pk β². P0·Pk는 명판 입력.", "손실·효율 참고", ["온도 보정·냉각 방식 환산을 하지 않습니다."], {
+    relatedStandards: ["IEC 60076 손실 정의(명판 값, 계산 표 미내장)"],
   }),
   row("short-circuit", "formula-short-circuit", "international-reference", ["iec"], "standard", "Ik″ = c Un/(√3 Zk), κ 근사식.", "3상 초기 대칭·첨두 근사", ["K 보정 전체·지락·2선 단락은 없습니다."], {
-    relatedStandards: ["IEC 60909-0 (Ik″ 및 κ 근사)"],
+    relatedStandards: ["IEC 60909-0 참고 (Ik″·κ 일부 근사, K 보정·불평형 단락 미구현)"],
   }),
   row("ct-ratio", "formula-ct-ratio", "general-engineering", ["engineering"], "engineering", "n = Ip/Is.", "변류비·2차 전류", ["IEC 61869 오차 계급·ALF를 계산하지 않습니다."]),
   row("pt-ratio", "formula-pt-ratio", "general-engineering", ["engineering"], "engineering", "n = V1/V2.", "변성비", ["부담·계급 계산이 없습니다."]),
@@ -258,7 +288,7 @@ export const standardBases: StandardBasis[] = [
     "earth-conductor",
     "formula-earth-conductor",
     "kec-related",
-    ["kec", "iec"],
+    ["kec"],
     "standard",
     "S = (I/k)√t. 별도 보호도체이면 설치조건 최소를 분리 표시. k는 사용자 입력.",
     "단열식 결과와 설치조건 최소단면적. 표 142.3-1은 미내장",
@@ -296,11 +326,11 @@ export const standardBases: StandardBasis[] = [
   row("cable-schedule", "formula-cable-schedule", "general-engineering", ["engineering"], "engineering", "목록 관리.", "케이블 태그 목록", ["자동 굵기 선정이 아닙니다."]),
   row("panel-schedule", "formula-panel-schedule", "general-engineering", ["engineering"], "engineering", "상전류 평균편차.", "반 불평형 %", ["KEC 부하불평형률·영상분이 아닙니다."]),
   row("load-flow", "formula-load-flow", "general-engineering", ["engineering"], "approximation", "방사형 DistFlow 근사.", "모선 전압·손실", ["환상망·불평형 조류가 아닙니다."]),
-  row("arc-flash", "formula-arc-flash", "international-reference", ["ieee"], "engineering", "IEEE 1584 입력 자료 정리. 수치 계산 없음.", "준비 체크리스트", ["입사에너지· Arc Flash Boundary 값을 내지 않습니다."], {
-    relatedStandards: ["IEEE 1584 (입력 안내만)"],
+  row("arc-flash", "formula-arc-flash", "international-reference", ["ieee"], "engineering", "아크플래시 검토 준비. 입사에너지 수치 없음.", "검토 준비 항목", ["IEEE 1584 계산기·준수가 아닙니다. 입사에너지·경계 값을 내지 않습니다."], {
+    relatedStandards: ["관련 표준: IEEE 1584 / IEEE 1584.2 (자료 수집 안내. 수치 계산 없음)"],
   }),
-  row("lightning-risk", "formula-lightning", "international-reference", ["iec"], "engineering", "IEC 62305 전체 평가가 아님을 전제로 한 안내.", "간이 위치 안내", ["R1 등 전체 위험평가를 하지 않습니다."], {
-    relatedStandards: ["IEC 62305 (범위 안내)"],
+  row("lightning-risk", "formula-lightning", "international-reference", ["iec"], "engineering", "낙뢰보호 검토 항목. 위험점수 없음.", "검토 항목 안내", ["IEC 62305 계산·전체 위험평가가 아닙니다."], {
+    relatedStandards: ["관련 표준: IEC 62305 (범위 안내)"],
   }),
   row("sld", "formula-sld", "general-engineering", ["engineering"], "engineering", "노드·엣지 데이터 구조.", "단선도 초안", ["해석·보호협조 계산이 아닙니다."]),
   row("field-compare", "formula-field-compare", "general-engineering", ["engineering"], "engineering", "실측−설계. 허용은 사용자.", "편차 비교", ["시험 합격 판정이 아닙니다."]),

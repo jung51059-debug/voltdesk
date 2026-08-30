@@ -213,7 +213,17 @@ export const baseFormSchemas: Record<string, FormSchema> = {
         ],
         hint: "이 케이블 구간의 편도 길이. ΔV 계산에만 씁니다.",
       },
-      { id: "voltage", label: "기준 전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits },
+      {
+        id: "voltage",
+        label: "전압강하율 기준전압",
+        kind: "number",
+        required: true,
+        min: 0,
+        step: "any",
+        unitField: "voltageUnit",
+        units: voltageUnits,
+        hint: "ΔV% 분모. 저압 수용가는 계량기 2차측, 고압 이상은 변압기 2차측. 3상 선간 계산은 선간전압(예: 380 V), 단상·상전압 계산은 그 회로 전압(예: 220 V).",
+      },
       {
         id: "rMode",
         label: "저항 입력",
@@ -290,7 +300,7 @@ export const baseFormSchemas: Record<string, FormSchema> = {
           { value: "mixed", label: "혼합 / 별도 검토" },
         ],
         visibleWhen: { field: "kecReview", values: ["on"] },
-        hint: "혼합은 조명·기타 중 하나를 자동으로 고르지 않습니다.",
+        hint: "혼합은 조명·기타 중 하나를 자동으로 고르지 않습니다. 경로를 나눈다면 최종 조명 경로와 최종 기타 경로를 각각 검토하고, 공통 간선 ΔV는 양쪽에 넣습니다. 협회 문구를 바탕으로 한 구현 해석입니다.",
       },
       {
         id: "kecPathSame",

@@ -1,7 +1,8 @@
+import Link from "next/link";
 import type { FormulaDefinition } from "@/lib/types";
 import { EngineeringDisclaimer } from "@/components/calculators/engineering-disclaimer";
 import { StandardBadgeRow, StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
-import { METHOD_LABEL, getStandardBasisByFormulaId } from "@/lib/data/standard-basis";
+import { INTERNATIONAL_REFERENCE_DISCLAIMER, METHOD_LABEL, SOURCE_DATA_STATUS_LABEL, getStandardBasisByFormulaId } from "@/lib/data/standard-basis";
 
 export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition }) {
   const basis = getStandardBasisByFormulaId(formula.id);
@@ -41,18 +42,24 @@ export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition })
                 <StandardStatusNote status={basis.standardStatus} />
                 <StandardBadgeRow kinds={basis.kinds} />
               </div>
+              <p>
+                <span className="font-medium text-ink">계산 근거</span> — {METHOD_LABEL[basis.method]} · {basis.usedInCalculation}
+              </p>
               {basis.domesticReview ? (
                 <p>
-                  <span className="font-medium text-ink">국내 적용 검토</span> — {basis.domesticReview}
+                  <span className="font-medium text-ink">국내 관련</span> — {basis.domesticReview}
                 </p>
               ) : null}
               {basis.relatedStandards && basis.relatedStandards.length > 0 ? (
-                <p>
-                  <span className="font-medium text-ink">관련 표준</span> — {basis.relatedStandards.join(" · ")}
-                </p>
+                <div className="space-y-1">
+                  <p>
+                    <span className="font-medium text-ink">국제 참고</span> — {basis.relatedStandards.join(" · ")}
+                  </p>
+                  <p className="text-xs leading-5">{INTERNATIONAL_REFERENCE_DISCLAIMER}</p>
+                </div>
               ) : null}
               <p>
-                <span className="font-medium text-ink">계산 방식</span> — {METHOD_LABEL[basis.method]} · {basis.usedInCalculation}
+                <span className="font-medium text-ink">데이터 출처</span> — {SOURCE_DATA_STATUS_LABEL[basis.sourceDataStatus]}
               </p>
               {basis.referenceOnly && basis.referenceOnly.length > 0 ? (
                 <p>
@@ -94,6 +101,11 @@ export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition })
           <p className="mt-2 font-medium">결과: {formula.example.result}</p>
         </div>
       </details>
+      <p className="pt-2 text-sm">
+        <Link href="/sources" className="font-medium text-primary hover:underline">
+          전체 계산기 출처
+        </Link>
+      </p>
       <EngineeringDisclaimer />
     </div>
   );

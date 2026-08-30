@@ -1,5 +1,6 @@
 import { fail, metric, warning } from "@/lib/calculations/helpers";
 import {
+  KEC_VOLTAGE_DROP_MIXED,
   KEC_VOLTAGE_DROP_START,
   KEC_VOLTAGE_DROP_STARTING,
   kecVoltageDropJudgmentLabel,
@@ -237,13 +238,7 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
       warning("warning", "적용 대상 아님", "KEC 232.3.9는 전력공급자로부터 수전하는 수용가설비 기준입니다. 독립 자가발전기에는 해당하지 않습니다."),
     );
   } else if (kecMode === "mixed") {
-    warnings.push(
-      warning(
-        "warning",
-        "혼합부하 · 별도 검토",
-        "조명 및 기타 부하가 함께 포함된 회로입니다. 적용 허용 전압강하는 설계 범위와 각 부하의 공급경로를 확인하여 결정하세요. 3/5 또는 6/8을 자동으로 고르지 않습니다.",
-      ),
-    );
+    warnings.push(warning("warning", "혼합부하 · 별도 검토", KEC_VOLTAGE_DROP_MIXED));
   } else if (kecMode === "starting") {
     warnings.push(warning("warning", "전동기 기동 / 돌입전류", KEC_VOLTAGE_DROP_STARTING));
   } else if (kecMode === "review") {
@@ -294,10 +289,10 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
       : kecMode === "out-of-scope"
         ? "독립 자가발전기에는 KEC 232.3.9가 적용되지 않습니다."
         : kecMode === "mixed"
-          ? "혼합부하는 표 허용값을 자동으로 고르지 않습니다."
+          ? KEC_VOLTAGE_DROP_MIXED
         : kecMode === "starting"
           ? KEC_VOLTAGE_DROP_STARTING
-        : `전체 경로 허용 참고값 ${roundTo(kecLimit, 2)}% (기본 ${roundTo(kecBase, 2)}% + 거리 가산 ${roundTo(kecExtra, 3)}%, 경로 ${roundTo(totalLengthM, 1)} m). 적합 판정이 아닙니다.`;
+        : `전체 경로 허용 참고값 ${roundTo(kecLimit, 2)}% (기본 ${roundTo(kecBase, 2)}% + 거리 가산 ${roundTo(kecExtra, 3)}%, 경로 ${roundTo(totalLengthM, 1)} m). 적합 판정이 아닙니다. ΔV%는 전압강하율 기준전압으로 만들었습니다. 저압은 계량기 2차측, 고압 이상은 변압기 2차측, 3상4선 220/380 V는 상전압 %는 220 V·선간 %는 380 V입니다.`;
 
   const lastPhase = computed[computed.length - 1]?.phase ?? "3";
 
@@ -336,7 +331,7 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
         : kecMode === "starting"
           ? review("check", "일반 정상상태 기준과 직접 비교하지 않습니다. 관련 기기 표준의 허용 전압범위를 확인하세요.")
         : kecMode === "mixed"
-          ? review("check", "혼합부하는 표 허용값을 자동으로 고르지 않습니다.")
+          ? review("check", KEC_VOLTAGE_DROP_MIXED)
         : kecMode === "out-of-scope"
           ? review("check", "KEC 232.3.9 적용 대상이 아닙니다.")
         : review("check", "허용 전압강하율은 프로젝트 기준을 확인하세요."),

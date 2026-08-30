@@ -109,7 +109,7 @@ export const guideArticles: ReferenceArticle[] = [
     [
       { heading: "개념", paragraphs: ["차단기 차단용량과 열적 내량을 보려면 사고점 단락전류가 필요합니다.  conservatively 큰 값과 작은 값(보호 감도)이 모두 의미가 있습니다."] },
       { heading: "언제 사용하는가", paragraphs: ["수전 변압기 2차, 간선 말단의 1차 스케일 확인. 보호협조 확정 전."] },
-      { heading: "공식", paragraphs: ["IEC 60909의 Ik″ 기본식과 첨두계수 κ=1.02+0.98e^(−3R/X)를 사용합니다. 전압계수 c는 표를 확인 후 입력합니다."] },
+      { heading: "공식", paragraphs: ["IEC 60909 참고. Ik″ 기본식과 첨두계수 κ=1.02+0.98e^(−3R/X)의 일부 근사입니다. IEC 60909 계산·준수가 아닙니다. 전압계수 c는 표를 확인 후 입력합니다."] },
       { heading: "입력값 설명", paragraphs: ["%Z는 명판. 케이블 R,X는 제조사 km당 값. 모터 기여는 운전 중인 합성 kVA와 x″."] },
       { heading: "계산 순서", paragraphs: ["임피던스 합 → |Z| → Ik″ → R/X → κ → ip → MVA."] },
       { heading: "실무 예제", paragraphs: ["변압기+짧은 케이블만 넣고 결과를 본 뒤, 계통 단락용량을 켜 민감도를 봅니다."] },

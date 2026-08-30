@@ -11,8 +11,8 @@ import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 
 export const metadata: Metadata = {
-  title: "낙뢰 위험 간이 안내",
-  description: "IEC 62305 전체 위험평가가 아님을 전제로 한 Ampory 낙뢰·LPS 간이 검토 안내입니다.",
+  title: "낙뢰보호 검토 항목",
+  description: "낙뢰보호 검토 항목 안내입니다. IEC 62305 계산·전체 위험평가가 아닙니다.",
   alternates: { canonical: "/tools/advanced/lightning-risk" },
 };
 
@@ -21,20 +21,20 @@ export default function LightningPage() {
   const formula = getFormulaById("formula-lightning");
   return (
     <div className="max-w-3xl">
-      <JsonLd data={breadcrumbJsonLd([{ name: "홈", href: "/" }, { name: "낙뢰 간이", href: "/tools/advanced/lightning-risk" }])} />
+      <JsonLd data={breadcrumbJsonLd([{ name: "홈", href: "/" }, { name: "낙뢰보호 검토 항목", href: "/tools/advanced/lightning-risk" }])} />
       {tool ? <JsonLd data={faqJsonLd(tool.faqs)} /> : null}
-      <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/advanced", label: "고급" }, { label: "낙뢰 간이" }]} />
+      <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/advanced", label: "고급" }, { label: "낙뢰보호 검토 항목" }]} />
       <TrackRecentTool id="tool-lightning" />
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-medium text-warning-ink">간이 검토</p>
-          <h1 className="mt-1 text-3xl font-semibold">낙뢰 위험 간이 안내</h1>
+          <h1 className="mt-1 text-3xl font-semibold">낙뢰보호 검토 항목</h1>
         </div>
-        <FavoriteButton toolId="tool-lightning" toolName="낙뢰 위험 간이 안내" />
+        <FavoriteButton toolId="tool-lightning" toolName="낙뢰보호 검토 항목" />
       </header>
       <p className="mt-4 leading-7 text-muted">
-        IEC 62305 계열의 전체 위험평가(R1 등)는 뇌격 밀도, 구조 계수, 인명·경제 손실 가중치가 얽힌 절차입니다. 불완전한
-        점수를 설계 판정처럼 제공하지 않습니다.
+        관련 표준: IEC 62305. 전체 위험평가(R1 등)는 뇌격 밀도, 구조 계수, 인명·경제 손실 가중치가 얽힌 절차입니다. IEC
+        62305 계산이 아니며, 불완전한 점수를 설계 판정처럼 제공하지 않습니다.
       </p>
       <h2 className="mt-8 text-xl font-semibold">확인할 항목</h2>
       <ul className="mt-3 list-disc space-y-2 pl-5 leading-7">

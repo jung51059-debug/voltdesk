@@ -11,8 +11,8 @@ import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 
 export const metadata: Metadata = {
-  title: "아크 플래시 준비 도구",
-  description: "IEEE 1584 아크 플래시 계산에 필요한 입력 자료와 PPE 검토 준비를 안내합니다. 입사에너지 수치는 제공하지 않습니다.",
+  title: "아크플래시 검토 준비",
+  description: "아크플래시 검토 준비 항목을 안내합니다. IEEE 1584 계산기가 아니며 입사에너지 수치는 제공하지 않습니다.",
   alternates: { canonical: "/tools/advanced/arc-flash" },
 };
 
@@ -28,13 +28,13 @@ export default function ArcFlashPage() {
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs text-muted">고급 검토</p>
-          <h1 className="mt-1 text-3xl font-semibold">아크 플래시 준비 도구</h1>
+          <h1 className="mt-1 text-3xl font-semibold">아크플래시 검토 준비</h1>
         </div>
-        <FavoriteButton toolId="tool-arc-flash" toolName="아크 플래시 준비 도구" />
+        <FavoriteButton toolId="tool-arc-flash" toolName="아크플래시 검토 준비" />
       </header>
       <p className="mt-4 leading-7 text-muted">
-        IEEE 1584 기반 입사에너지· Arc Flash Boundary를 사이트에서 숫자로 내지 않습니다. 필수 입력이나 검증된 구현이
-        갖춰지기 전에는 임의의 cal/cm² 값을 제공하지 않습니다.
+        관련 표준: IEEE 1584 / IEEE 1584.2. IEEE 1584 계산기가 아니며 입사에너지·경계 값을 사이트에서 숫자로 내지
+        않습니다. 필수 입력이나 검증된 구현이 갖춰지기 전에는 임의의 cal/cm² 값을 제공하지 않습니다.
       </p>
       <h2 className="mt-8 text-xl font-semibold">개념</h2>
       <p className="mt-3 leading-7">

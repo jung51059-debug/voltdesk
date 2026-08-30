@@ -294,7 +294,7 @@ export function calculateEarthConductor(input: CalcInput, precision: number): Ca
     metrics.push({
       id: "final",
       label: "최종 선정",
-      value: "표 142.3-1 등 별도 선정방법 검토 필요",
+      value: "표 142.3-1 등 별도 선정방법 검토 필요 (유일한 대안은 아님)",
       primary: true,
     });
   }
@@ -305,7 +305,7 @@ export function calculateEarthConductor(input: CalcInput, precision: number): Ca
     reviewMin !== null
       ? `검토상 필요한 최소값 ${roundTo(reviewMin, precision)} mm². 표 142.3-1까지 반영한 최종 선정값이 아닙니다.`
       : !timeOk
-        ? "기계적 최소값만으로 최종 보호도체 굵기를 정하지 않습니다. 표 142.3-1 등 별도 선정방법을 검토하세요."
+        ? "기계적 최소값만으로 최종 보호도체 굵기를 정하지 않습니다. 표 142.3-1을 포함한 다른 선정방법을 검토하세요. 유일한 KEC 대안이라고 단정하지 않습니다."
         : "설치조건 최소는 이 설치형태에 자동 적용하지 않습니다.";
 
   return ok({
@@ -341,7 +341,7 @@ export function calculateEarthConductor(input: CalcInput, precision: number): Ca
     ],
     reviewStatus: timeOk
       ? review("check", "열적 결과와 설치조건 최소를 나란히 본 참고입니다. 표 142.3-1 선정과 현장 설치상태 확인이 남습니다.")
-      : review("caution", "단열식 적용범위 밖입니다. 설치조건 최소만으로는 굵기를 정하지 않습니다. 표 142.3-1 등 다른 선정방법을 검토하세요."),
+      : review("caution", "단열식 적용범위 밖입니다. 설치조건 최소만으로는 굵기를 정하지 않습니다. 표 142.3-1을 포함한 다른 선정방법을 검토하세요. 유일한 KEC 대안이라고 단정하지 않습니다."),
     nextChecks: [
       "표 142.3-1 선정 경로는 아직 Ampory에 없습니다.",
       "기계적 보호 여부는 전선관·트렁킹 등 현장 조건과 검사기관 확인이 필요합니다.",

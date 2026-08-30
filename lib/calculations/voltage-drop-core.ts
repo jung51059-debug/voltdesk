@@ -31,10 +31,10 @@ export function voltageDropFormula(phase: VoltageDropPhase): string {
  */
 export function voltageKindHint(phase: VoltageDropPhase, voltageV: number): string | null {
   if (phase === "3" && voltageV >= 200 && voltageV <= 250) {
-    return "3상 선간 ΔV%는 보통 선간전압(예: 380 V)을 기준으로 합니다. 3상4선 220/380 V에서 상전압 %는 220 V, 선간 %는 380 V이며 결과적인 %는 같습니다.";
+    return "전압강하율 기준전압을 계산 종류와 맞추세요. 3상 선간 ΔV%는 선간전압(예: 380 V), 3상4선 220/380 V에서 상전압 %는 220 V입니다. 결과적인 %는 같습니다.";
   }
   if (phase === "1" && voltageV >= 360 && voltageV <= 420) {
-    return "단상·상전압 ΔV%는 그 회로의 기준전압(예: 220 V)과 맞추세요. 3상 선간 계산이면 회로를 3상으로 바꾸세요.";
+    return "전압강하율 기준전압을 계산 종류와 맞추세요. 단상·상전압 ΔV%는 그 회로 전압(예: 220 V)입니다. 3상 선간 계산이면 회로를 3상으로 바꾸세요.";
   }
   return null;
 }

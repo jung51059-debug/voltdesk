@@ -157,8 +157,8 @@ export const baseArticles: ReferenceArticle[] = [
       "제품 상용 명칭이 제조사마다 다를 수 있습니다.",
     ],
     sourceNotes: [
-      "IEC 60947-6-1 — Transfer switching equipment",
-      "NFPA 110 / IEEE 446 비상전원 절체의 일반 개념",
+      "IEC 60947-6-1 — 절체 스위치 제품 분류 참고. Ampory가 해당 규격을 구현하지 않습니다.",
+      "NFPA 110 / IEEE 446 — 미국 비상전원 개념 참고. Ampory 기본 계산 범위에서 제외합니다.",
     ],
     body: [
       {
@@ -198,8 +198,7 @@ export const baseArticles: ReferenceArticle[] = [
       "의료·소방 비상전원은 별도 법규 분류를 따릅니다.",
     ],
     sourceNotes: [
-      "IEC 62040 — Uninterruptible power systems",
-      "ISO 8528 — 발전기 세트 정격",
+      "IEC 62040 · ISO 8528 — 관련 분야 개념 참고. Ampory 계산기가 해당 선정 절차를 구현하지 않습니다.",
     ],
     body: [
       {
