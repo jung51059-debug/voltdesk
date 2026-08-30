@@ -29,9 +29,16 @@ export function StandardBadge({ kind }: { kind: StandardKind }) {
   );
 }
 
-export function StandardStatusBadge({ status }: { status: StandardStatus }) {
+export function StandardStatusBadge({
+  status,
+  size = "sm",
+}: {
+  status: StandardStatus;
+  size?: "sm" | "md";
+}) {
+  const sizing = size === "md" ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-[11px]";
   return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_TONE[status]}`}>
+    <span className={`inline-flex rounded-full font-medium ${sizing} ${STATUS_TONE[status]}`}>
       {STANDARD_STATUS_LABEL[status]}
     </span>
   );

@@ -1,6 +1,13 @@
-import { KEC_EARTH_CONDUCTOR } from "@/lib/calculations/kec-review";
+import {
+  KEC_EARTH_CONDUCTOR,
+  KEC_EARTH_MECHANICAL_MIN,
+  kecEarthMechanicalMinMm2,
+  type KecEarthInstall,
+  type KecEarthMaterial,
+  type KecEarthMechProtect,
+} from "@/lib/calculations/kec-review";
 import { FieldBag, metric, ok, review, roundTo, warning, type CalcInput } from "@/lib/calculations/parse";
-import type { CalculationOutcome } from "@/lib/types";
+import type { CalculationOutcome, ResultMetric } from "@/lib/types";
 
 export function calculateLux(input: CalcInput, precision: number): CalculationOutcome {
   const fields = new FieldBag(input);
@@ -210,7 +217,7 @@ export function calculateSoilResistivity(input: CalcInput, precision: number): C
   });
 }
 
-/** 단열식 S = (I / k) √t . k는 사용자가 표준 표에서 입력 */
+/** 단열식 S = (I / k) √t 와 별도 보호도체의 설치조건 최소를 분리 표시. */
 export function calculateEarthConductor(input: CalcInput, precision: number): CalculationOutcome {
   const fields = new FieldBag(input);
   const I = fields.num("faultA", "지락·단락전류 A");
@@ -221,60 +228,124 @@ export function calculateEarthConductor(input: CalcInput, precision: number): Ca
 
   const timeOk = t <= KEC_EARTH_CONDUCTOR.adiabaticTimeLimitS + 1e-9;
   const outOfRange = KEC_EARTH_CONDUCTOR.adiabaticOutOfRangeLines.join(" ");
+  const install = (input.peInstall ?? "cable") as KecEarthInstall;
+  const material = (input.peMaterial ?? "cu") as KecEarthMaterial;
+  const protect = (input.peProtect ?? "protected") as KecEarthMechProtect;
+  const mechMin = kecEarthMechanicalMinMm2(install, material, protect);
 
-  if (!timeOk) {
-    return ok({
-      metrics: [{ id: "scope", label: "단열식 계산", value: "적용범위 밖", primary: true }],
-      inputSummary: [
-        { label: "I", value: `${I} A` },
-        { label: "t", value: `${t} s` },
-        { label: "t ≤ 5 s", value: "이 계산식의 적용범위 밖" },
-      ],
-      interpretation: outOfRange,
-      warnings: [
-        warning("error", "k·표 미내장", "KEC 142.3.2는 표 142.3-1 또는 계산식으로 선정합니다. Ampory는 단열식만 제공하며 k 수치표는 내장하지 않습니다."),
-        warning("warning", "차단시간 적용범위", outOfRange),
-      ],
-      formulaUsed: "S = (I / k) × √t  (t ≤ 5 s)",
-      steps: [
-        `t = ${t} s > 5 s — Ampory가 제공하는 단열식 계산방법의 적용범위 밖입니다.`,
-        "단면적 결과는 표시하지 않습니다. 표 142.3-1 등 다른 선정방법을 별도로 검토하세요.",
-      ],
-      reviewStatus: review("caution", "현재 Ampory 단열식 계산방법의 적용범위 밖입니다. 표 142.3-1 등 다른 선정방법을 검토하세요."),
-    });
+  let s: number | null = null;
+  let k = 0;
+  if (timeOk) {
+    k = fields.num("kFactor", "재질 계수 k");
+    fields.requirePositive("kFactor", "k", k);
+    if (fields.failed()) return fields.fail();
+    s = (I / k) * Math.sqrt(t);
   }
 
-  const k = fields.num("kFactor", "재질 계수 k");
-  fields.requirePositive("kFactor", "k", k);
-  if (fields.failed()) return fields.fail();
-  const s = (I / k) * Math.sqrt(t);
+  const installLabel =
+    install === "cable" ? "케이블의 일부" : install === "same-enclosure" ? "선도체와 동일 외함" : "별도 보호도체";
+  const reviewMin = s !== null && mechMin !== null ? Math.max(s, mechMin) : null;
 
   const warnings = [
     warning(
       "error",
       "k·표 미내장",
-      "KEC 142.3.2는 표 142.3-1 또는 계산식으로 선정합니다. Ampory는 단열식만 제공하며 k 수치표는 내장하지 않습니다.",
+      "KEC 142.3.2는 표 142.3-1 또는 계산식으로 산정하고, 설치조건 최소단면적에도 적합해야 합니다. Ampory는 단열식과 별도 보호도체 설치조건만 제공하며 k 수치표·표 142.3-1은 내장하지 않습니다.",
     ),
     warning(
-      "info",
+      timeOk ? "info" : "warning",
       "차단시간 적용범위",
-      "단열식은 차단시간 5초 이하에 적용하는 계산 경로입니다. 표 142.3-1 선정과 병행 확인하세요.",
+      timeOk
+        ? "단열식은 차단시간 5초 이하에 적용하는 계산 경로입니다. 표 142.3-1 선정과 병행 확인하세요."
+        : outOfRange,
     ),
   ];
+  if (install === "separate") {
+    warnings.push(warning("info", "기계적 보호 안내", KEC_EARTH_MECHANICAL_MIN.conduitNote));
+  } else {
+    warnings.push(
+      warning(
+        "info",
+        "설치조건 최소 미적용",
+        "케이블의 일부이거나 선도체와 동일 외함에 설치되면 Cu 2.5/4·Al 16 mm² 규칙을 자동 적용하지 않습니다.",
+      ),
+    );
+  }
+
+  const metrics: ResultMetric[] = [];
+  if (s !== null) {
+    metrics.push(metric("s", "열적 계산 결과", s, "mm²", precision, { primary: reviewMin === null }));
+  } else {
+    metrics.push({ id: "scope", label: "열적 계산 결과", value: "단열식 적용범위 밖", primary: reviewMin === null });
+  }
+  if (mechMin !== null) {
+    metrics.push(metric("mech", "설치조건 최소단면적", mechMin, "mm²", precision));
+  } else {
+    metrics.push({ id: "mech", label: "설치조건 최소단면적", value: "해당 없음 (이 설치형태에 2.5/4/16 미적용)" });
+  }
+  if (reviewMin !== null) {
+    metrics.push(
+      metric("reviewMin", "검토상 필요한 최소값", reviewMin, "mm²", precision, {
+        primary: true,
+        hint: "표 142.3-1 및 기타 조건을 모두 검토한 최종 선정값이 아닙니다.",
+      }),
+    );
+  } else if (!timeOk) {
+    metrics.push({
+      id: "final",
+      label: "최종 선정",
+      value: "표 142.3-1 등 별도 선정방법 검토 필요",
+      primary: true,
+    });
+  }
+
+  const thermalText = s !== null ? `${roundTo(s, precision)} mm²` : "계산하지 않음 (단열식 적용범위 밖)";
+  const mechText = mechMin !== null ? `${roundTo(mechMin, precision)} mm²` : "해당 없음";
+  const reviewText =
+    reviewMin !== null
+      ? `검토상 필요한 최소값 ${roundTo(reviewMin, precision)} mm². 표 142.3-1까지 반영한 최종 선정값이 아닙니다.`
+      : !timeOk
+        ? "기계적 최소값만으로 최종 보호도체 굵기를 정하지 않습니다. 표 142.3-1 등 별도 선정방법을 검토하세요."
+        : "설치조건 최소는 이 설치형태에 자동 적용하지 않습니다.";
 
   return ok({
-    metrics: [metric("s", "최소 단면적(단열 공식)", s, "mm²", precision, { primary: true })],
+    metrics,
     inputSummary: [
       { label: "I", value: `${I} A` },
       { label: "t", value: `${t} s` },
-      { label: "k", value: String(k) },
-      { label: "t ≤ 5 s", value: "적용범위 내" },
+      { label: "k", value: timeOk ? String(k) : "미사용" },
+      { label: "설치 형태", value: installLabel },
+      ...(install === "separate"
+        ? [
+            { label: "재질", value: material === "cu" ? "구리" : "알루미늄" },
+            { label: "기계적 보호", value: protect === "protected" ? "보호됨" : "보호되지 않음" },
+          ]
+        : []),
+      { label: "t ≤ 5 s", value: timeOk ? "적용범위 내" : "이 계산식의 적용범위 밖" },
     ],
-    interpretation: `S = (I/k)√t = ${roundTo(s, precision)} mm². KEC 142.3.2 보호도체 최소 단면적의 계산식 경로입니다. 차단시간 5초 이하 적용범위. k와 표 142.3-1은 사용자가 원문에서 확인해야 합니다.`,
+    interpretation: timeOk
+      ? `열적 계산 결과 ${thermalText}. 설치조건 최소단면적 ${mechText}. ${reviewText}`
+      : `${outOfRange} 열적 계산 결과 ${thermalText}. 설치조건 최소단면적 ${mechText}. ${reviewText}`,
     warnings,
-    formulaUsed: "S = (I / k) × √t  (t ≤ 5 s)",
-    steps: [`S = (${I} / ${k}) × √${t} = ${roundTo(s, precision)} mm²`],
-    reviewStatus: review("check", "단열 공식 결과입니다. 기계적 강도·시공 최소 굵기를 추가 확인하세요."),
+    formulaUsed: timeOk
+      ? "S = (I / k) × √t  (t ≤ 5 s). 별도 보호도체이면 설치조건 최소와 분리 표시"
+      : "S = (I / k) × √t  (t ≤ 5 s). 이번 입력은 단열식 적용범위 밖",
+    steps: [
+      timeOk ? `S = (${I} / ${k}) × √${t} = ${roundTo(s!, precision)} mm²` : `t = ${t} s > 5 s — 단열식 결과를 표시하지 않습니다.`,
+      mechMin !== null
+        ? `설치조건 최소 = ${roundTo(mechMin, precision)} mm² (${material === "cu" ? "Cu" : "Al"}, ${protect === "protected" ? "보호됨" : "보호되지 않음"})`
+        : "설치조건 최소 미적용",
+      reviewMin !== null
+        ? `검토상 필요한 최소값 = max(${roundTo(s!, precision)}, ${roundTo(mechMin!, precision)}) = ${roundTo(reviewMin, precision)} mm²`
+        : "최종 선정값을 자동으로 정하지 않습니다.",
+    ],
+    reviewStatus: timeOk
+      ? review("check", "열적 결과와 설치조건 최소를 나란히 본 참고입니다. 표 142.3-1 선정과 현장 설치상태 확인이 남습니다.")
+      : review("caution", "단열식 적용범위 밖입니다. 설치조건 최소만으로는 굵기를 정하지 않습니다. 표 142.3-1 등 다른 선정방법을 검토하세요."),
+    nextChecks: [
+      "표 142.3-1 선정 경로는 아직 Ampory에 없습니다.",
+      "기계적 보호 여부는 전선관·트렁킹 등 현장 조건과 검사기관 확인이 필요합니다.",
+    ],
   });
 }
 

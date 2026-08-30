@@ -84,6 +84,15 @@ export const HANDOFF_KEYS = new Set([
   "kecLoad",
   "kecPathSame",
   "kecPathLength",
+  "rMode",
+  "resistance",
+  "resistanceUnit",
+  "area",
+  "startKind",
+  "kecDuty",
+  "peInstall",
+  "peMaterial",
+  "peProtect",
 ]);
 
 const VALUE = /^[0-9A-Za-z._+\-]+$/;

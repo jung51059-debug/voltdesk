@@ -17,7 +17,7 @@ export const categories: ToolCategory[] = [
     domain: "electrical",
     name: "케이블 / 배선",
     nameEn: "Cable and wiring",
-    description: "굵기 1차 검토, 전압강하, 도체 저항, 병렬·허용전류 비교를 모았습니다.",
+    description: "굵기 1차 검토, 단일·경로 전압강하, 도체 저항, 병렬·허용전류 비교를 모았습니다.",
     icon: "Cable",
     order: 2,
   },

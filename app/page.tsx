@@ -20,32 +20,28 @@ export const metadata: Metadata = {
 export default function HomePage() {
   const featured = getFeaturedTools();
   const recent = getRecentlyAddedTools().slice(0, 8);
-  const electrical = getElectricalCategories();
-  const facility = getFacilityCategories();
-  const design = electrical.filter((c) =>
-    ["electrical-basics", "cable", "transformer", "motor", "protection", "power-system", "schedule"].includes(c.slug),
-  );
-  const facilityFocus = facility;
+  const design = getElectricalCategories();
+  const facilityFocus = getFacilityCategories();
 
   return (
-    <div className="space-y-14">
-      <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+    <div className="space-y-11">
+      <section className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
         <div>
           <p className="text-sm font-medium text-primary">Ampory · 전기 · 시설관리 엔지니어링 유틸리티</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-2 text-[2.125rem] font-semibold leading-[1.2] tracking-tight sm:text-[2.75rem]">
             현장에서 바로 쓰는
             <br />
             전기 계산과 실무 참고
           </h1>
-          <p className="mt-4 max-w-xl text-lg leading-8 text-muted">
+          <p className="mt-3 max-w-xl text-base leading-7 text-muted">
             한국 전기·시설관리 실무자를 위한 독립 도구입니다. 가입 없이 계산하고, 공식·가정·한계를 함께 확인하세요.
           </p>
           <HomeSearch />
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <Link href="/tools/electrical/three-phase-current" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-white dark:text-ink">
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <Link href="/tools/electrical/three-phase-current" className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-white dark:text-ink">
               빠른 3상 전류
             </Link>
-            <Link href="/search" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 text-sm font-medium">
+            <Link href="/search" className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 text-sm font-medium">
               <Search className="size-4" />
               전체 검색
             </Link>

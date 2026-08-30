@@ -74,7 +74,7 @@ export const guideArticles: ReferenceArticle[] = [
     "전압강하를 단계별로 보는 방법",
     "전류, 길이, 도체 저항으로 ΔV와 % , 말단 전압을 구하는 실무 안내입니다.",
     "cat-cable",
-    ["tool-voltage-drop", "tool-cable-sizing"],
+    ["tool-voltage-drop", "tool-path-voltage-drop", "tool-cable-sizing"],
     ["전압강하", "VD"],
     ["voltage drop", "선로전압강하"],
     "전압강하는 선로 임피던스에 전류가 흐르며 생기는 전압 차이입니다. Ampory 기본 도구는 저항 성분 근사입니다.",

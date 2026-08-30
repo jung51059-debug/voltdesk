@@ -31,6 +31,14 @@ import {
   type KecVoltageDropLoad,
   type KecVoltageDropSupply,
 } from "@/lib/calculations/kec-review";
+import {
+  conductorROhmKmFromSize,
+  resistiveVoltageDropVolts,
+  voltageDropFormula,
+  voltageDropPercent,
+  voltageKindHint,
+  type VoltageDropPhase,
+} from "@/lib/calculations/voltage-drop-core";
 
 function num(input: CalcInput, id: string, label: string): number {
   return parseNumber(input[id], label);
@@ -531,7 +539,7 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
       const area = num(input, "area", "단면적 mm²");
       if (area <= 0) fieldErrors.area = "단면적은 0보다 커야 합니다.";
       const material = (input.material ?? "cu") as "cu" | "al";
-      rOhmKm = conductorOhmPerKm(resistivityOf(material), area);
+      rOhmKm = conductorROhmKmFromSize(material, area);
     } else {
       rOhmKm = toOhmPerKm(num(input, "resistance", "도체 저항"), input.resistanceUnit ?? "ohm/km");
       if (rOhmKm <= 0) fieldErrors.resistance = "저항은 0보다 커야 합니다.";
@@ -543,8 +551,9 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
   if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
 
   const lengthKm = L / 1000;
-  const dV = phase === "1" ? 2 * I * lengthKm * rOhmKm : SQRT_3 * I * lengthKm * rOhmKm;
-  const pct = (dV / V) * 100;
+  const vdPhase = (phase === "1" ? "1" : "3") as VoltageDropPhase;
+  const dV = resistiveVoltageDropVolts(vdPhase, I, L, rOhmKm);
+  const pct = voltageDropPercent(dV, V);
   const vend = V - dV;
   let allow = 0;
   try {
@@ -593,6 +602,8 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
   const warnings = [
     warning("info", "저항 근사", "리액턴스와 온도 보정은 포함하지 않았습니다. 정확한 설계는 케이블 임피던스표를 사용하세요."),
   ];
+  const kindHint = voltageKindHint(vdPhase, V);
+  if (kindHint) warnings.push(warning("info", "기준전압", kindHint));
   if (!kecReview) {
     warnings.push(
       warning(
@@ -681,10 +692,23 @@ export function calculateVoltageDrop(input: CalcInput, precision: number): Calcu
     ],
     interpretation: `${phase === "1" ? "단상" : "3상"} 저항 근사 전압강하는 ${roundTo(dV, precision)} V (${roundTo(pct, precision)}%)입니다. ${kecNote}`,
     warnings,
-    formulaUsed:
-      phase === "1"
-        ? "ΔV = 2 × I × L × r / 1000"
-        : "ΔV = √3 × I × L × r / 1000",
+    followUps: [
+      followUp("전체 공급경로의 전압강하를 검토하시나요?", "/tools/electrical/path-voltage-drop", {
+        phase,
+        current: input.current,
+        voltage: input.voltage,
+        length: input.length,
+        rMode: input.rMode,
+        resistance: input.resistance,
+        material: input.material,
+        area: input.area,
+        kecReview: input.kecReview,
+        kecScope: input.kecScope,
+        kecSupply: input.kecSupply,
+        kecLoad: input.kecLoad,
+      }),
+    ],
+    formulaUsed: voltageDropFormula(vdPhase),
     steps: [
       `L = ${roundTo(lengthKm, 5)} km, r = ${roundTo(rOhmKm, 4)} Ω/km`,
       phase === "1"

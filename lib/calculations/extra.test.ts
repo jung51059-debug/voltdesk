@@ -2,7 +2,16 @@ import { describe, expect, it } from "vitest";
 import { calculateMotorCurrent } from "@/lib/calculations/motor";
 import { calculatePowerFactorCorrection, calculateThd } from "@/lib/calculations/power-quality";
 import { calculateVoltageDrop, calculateTransformerLoad, calculateBreakerReference, engines } from "@/lib/calculations/engines";
-import { kecVoltageDropCanCompare, kecVoltageDropLimitPct } from "@/lib/calculations/kec-review";
+import { KEC_TABLE_142_3_1_EVIDENCE, kecVoltageDropCanCompare, kecVoltageDropLimitPct } from "@/lib/calculations/kec-review";
+import {
+  calculatePathVoltageDrop,
+  insertPathSegment,
+  movePathSegment,
+  removePathSegment,
+  type PathVoltageDropInput,
+  type PathVoltageDropSegmentInput,
+} from "@/lib/calculations/path-voltage-drop";
+import { resistiveVoltageDropVolts, voltageDropPercent } from "@/lib/calculations/voltage-drop-core";
 import { calculateEarthConductor, calculateLux } from "@/lib/calculations/site-tools";
 import {
   exportLoadScheduleCsv,
@@ -353,6 +362,7 @@ describe("전압강하 허용치", () => {
       expect(out.interpretation).toContain("전체 공급경로");
       expect(out.inputSummary.some((row) => row.label === "계산 구간" && row.value.includes("40"))).toBe(true);
       expect(out.inputSummary.some((row) => row.label === "KEC 경로" && row.value.includes("160"))).toBe(true);
+      expect(out.followUps?.some((item) => item.href.startsWith("/tools/electrical/path-voltage-drop"))).toBe(true);
     }
   });
 
@@ -454,6 +464,159 @@ describe("전압강하 허용치", () => {
   });
 });
 
+function pathSeg(partial: Partial<PathVoltageDropSegmentInput> & { name: string; lengthM: number }): PathVoltageDropSegmentInput {
+  return {
+    id: partial.id ?? partial.name,
+    phase: "3",
+    voltageV: 380,
+    currentA: 80,
+    pf: 0.85,
+    rMode: "ohm",
+    resistanceOhmKm: 0.727,
+    ...partial,
+  };
+}
+
+function pathInput(partial: Partial<PathVoltageDropInput> & { segments: PathVoltageDropSegmentInput[] }): PathVoltageDropInput {
+  return {
+    startKind: "meter-2nd",
+    startLabel: "계량기 2차",
+    kecReview: true,
+    kecScope: "utility",
+    kecSupply: "lv",
+    kecLoad: "other",
+    kecDuty: "normal",
+    ...partial,
+  };
+}
+
+describe("경로 전압강하", () => {
+  it("단일구간 경로는 누적값으로 표와 비교한다", () => {
+    const out = calculatePathVoltageDrop(pathInput({ segments: [pathSeg({ name: "부하", lengthM: 80 })] }), 4);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const expected = voltageDropPercent(resistiveVoltageDropVolts("3", 80, 80, 0.727), 380);
+    expect(out.path.totalLengthM).toBe(80);
+    expect(out.path.totalDropPct).toBeCloseTo(expected, 6);
+    expect(out.path.kecLimit).toBe(5);
+    expect(out.metrics.find((m) => m.id === "kecCompare")?.value).toBe("수치관계 기준 이하");
+    expect(out.followUps ?? []).toEqual([]);
+    expect(`${out.interpretation}${out.metrics.map((m) => m.value).join(" ")}`).not.toMatch(/KEC 적합|KEC 합격|법적 적합/);
+  });
+
+  it("3개 구간을 누적한다", () => {
+    const segments = [
+      pathSeg({ name: "MDB", lengthM: 40 }),
+      pathSeg({ name: "DB", lengthM: 60, currentA: 60 }),
+      pathSeg({ name: "부하", lengthM: 60, currentA: 40 }),
+    ];
+    const out = calculatePathVoltageDrop(pathInput({ segments }), 4);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const p1 = voltageDropPercent(resistiveVoltageDropVolts("3", 80, 40, 0.727), 380);
+    const p2 = voltageDropPercent(resistiveVoltageDropVolts("3", 60, 60, 0.727), 380);
+    const p3 = voltageDropPercent(resistiveVoltageDropVolts("3", 40, 60, 0.727), 380);
+    expect(out.path.segments).toHaveLength(3);
+    expect(out.path.totalLengthM).toBe(160);
+    expect(out.path.totalDropPct).toBeCloseTo(p1 + p2 + p3, 6);
+    expect(out.path.kecLimit).toBeCloseTo(5.3, 5);
+    expect(out.path.compare).toBe("below");
+    expect(out.interpretation).toContain("계량기 2차");
+  });
+
+  it("99m / 100m / 101m 가산을 구분한다", () => {
+    const at = (lengthM: number) => {
+      const out = calculatePathVoltageDrop(pathInput({ segments: [pathSeg({ name: "부하", lengthM })] }), 4);
+      expect(out.ok).toBe(true);
+      return out.ok ? out.path.kecExtra : NaN;
+    };
+    expect(at(99)).toBe(0);
+    expect(at(100)).toBe(0);
+    expect(at(101)).toBeCloseTo(0.005, 8);
+  });
+
+  it("150 m 조명은 +0.25%를 가산한다", () => {
+    const out = calculatePathVoltageDrop(
+      pathInput({ kecLoad: "lighting", segments: [pathSeg({ name: "조명", lengthM: 150 })] }),
+      4,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.path.kecExtra).toBeCloseTo(0.25, 8);
+    expect(out.path.kecLimit).toBeCloseTo(3.25, 5);
+  });
+
+  it("200 m 이상에서 가산 상한 0.5%를 적용한다", () => {
+    const out = calculatePathVoltageDrop(pathInput({ segments: [pathSeg({ name: "간선", lengthM: 220 })] }), 4);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.path.kecExtra).toBeCloseTo(0.5, 8);
+    expect(out.path.kecLimit).toBeCloseTo(5.5, 5);
+  });
+
+  it("저압·고압 조명/기타 기준값을 쓴다", () => {
+    const run = (supply: "lv" | "hv-plus", load: "lighting" | "other", lengthM: number) => {
+      const out = calculatePathVoltageDrop(
+        pathInput({ kecSupply: supply, kecLoad: load, segments: [pathSeg({ name: "부하", lengthM })] }),
+        2,
+      );
+      expect(out.ok).toBe(true);
+      return out.ok ? out.path.kecLimit : NaN;
+    };
+    expect(run("lv", "lighting", 80)).toBe(3);
+    expect(run("lv", "other", 80)).toBe(5);
+    expect(run("hv-plus", "lighting", 80)).toBe(6);
+    expect(run("hv-plus", "other", 80)).toBe(8);
+  });
+
+  it("혼합부하는 표 숫자를 고르지 않는다", () => {
+    const out = calculatePathVoltageDrop(
+      pathInput({ kecLoad: "mixed", segments: [pathSeg({ name: "혼합", lengthM: 80 })] }),
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.path.kecMode).toBe("mixed");
+    expect(out.metrics.some((m) => m.id === "kecCompare")).toBe(false);
+    expect(out.interpretation).toContain("혼합부하");
+  });
+
+  it("전동기 기동은 표와 비교하지 않고 허용 %를 만들지 않는다", () => {
+    const out = calculatePathVoltageDrop(
+      pathInput({ kecDuty: "starting", segments: [pathSeg({ name: "모터", lengthM: 80 })] }),
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.path.kecMode).toBe("starting");
+    expect(out.metrics.some((m) => m.id === "kecCompare")).toBe(false);
+    expect(out.interpretation).toContain("표 232.3-1보다 큰 전압강하");
+    expect(out.interpretation).not.toMatch(/허용 \d|모터니까/);
+    expect(out.reviewStatus?.note).toContain("직접 비교하지 않습니다");
+  });
+
+  it("구간 추가·삭제·순서변경을 한다", () => {
+    const one = [pathSeg({ name: "A", lengthM: 40, id: "a" })];
+    const two = insertPathSegment(one, 1);
+    expect(two).toHaveLength(2);
+    const moved = movePathSegment(two, 1, 0);
+    expect(moved[0]?.name).not.toBe("A");
+    expect(removePathSegment(two, 1)).toHaveLength(1);
+    expect(removePathSegment(one, 0)).toHaveLength(1);
+  });
+
+  it("3상 220 V 입력은 기준전압 안내를 한다", () => {
+    const out = calculatePathVoltageDrop(
+      pathInput({ segments: [pathSeg({ name: "상전압", lengthM: 40, voltageV: 220 })] }),
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.warnings.some((w) => w.message.includes("380"))).toBe(true);
+    expect(out.path.totalDropPct).toBeCloseTo(voltageDropPercent(resistiveVoltageDropVolts("3", 80, 40, 0.727), 220), 6);
+  });
+});
+
 describe("KEC 표기 범위", () => {
   it("60287을 사용 표준으로 붙이지 않는다", () => {
     for (const tool of getPublishedTools()) {
@@ -475,8 +638,15 @@ describe("KEC 표기 범위", () => {
     expect(getStandardBasisBySlug("breaker-current")?.standardStatus).toBe("kec-related");
     expect(getStandardBasisBySlug("voltage-drop")?.standardStatus).toBe("kec-related");
     expect(getStandardBasisBySlug("voltage-drop")?.usedInCalculation).toContain("구간=경로");
+    expect(getStandardBasisBySlug("path-voltage-drop")?.standardStatus).toBe("kec-related");
+    expect(getStandardBasisBySlug("path-voltage-drop")?.usedInCalculation).toContain("Σ(구간 ΔV%)");
     expect(getStandardBasisBySlug("earth-conductor")?.standardStatus).toBe("kec-related");
-    expect(getStandardBasisBySlug("earth-conductor")?.usedInCalculation).toContain("결과 숨김");
+    expect(getStandardBasisBySlug("earth-conductor")?.usedInCalculation).toContain("열적 결과 숨김");
+    expect(getStandardBasisBySlug("earth-conductor")?.usedInCalculation).not.toMatch(/16\/35|S\/2/);
+    expect(KEC_TABLE_142_3_1_EVIDENCE.embedded).toBe(false);
+    expect(KEC_TABLE_142_3_1_EVIDENCE.implementNow).toBe(false);
+    expect(KEC_TABLE_142_3_1_EVIDENCE.rows.cuOver35Half.status).toBe("confirmed");
+    expect(KEC_TABLE_142_3_1_EVIDENCE.rows.sAtMost16Same.status).toBe("question-only");
     expect(getStandardBasisBySlug("earth-conductor")?.domesticReview).toBe("KEC 142.3.2 보호도체 최소 단면적");
     expect(getStandardBasisBySlug("earth-conductor")?.relatedStandards).toEqual(["KS C IEC 60364-5-54"]);
     expect(getStandardBasisBySlug("ups-backup-time")?.standardStatus).toBe("manufacturer-data-required");
@@ -494,6 +664,7 @@ describe("KEC 표기 범위", () => {
       "cable-ampacity",
       "cable-sizing",
       "earth-conductor",
+      "path-voltage-drop",
       "voltage-drop",
     ]);
     expect(STANDARD_STATUS_NOTE["manufacturer-data-required"]).toContain("제조사");
@@ -501,13 +672,37 @@ describe("KEC 표기 범위", () => {
   });
 });
 
-describe("접지도체 단열식", () => {
+describe("접지도체 단열식·설치조건", () => {
   it("k 기본값 없이 계산하고 t≤5 s를 표시한다", () => {
     const out = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143" }, 2);
     expect(out.ok).toBe(true);
     if (out.ok) {
-      expect(out.interpretation).toContain("5초 이하");
+      expect(out.interpretation).toContain("열적 계산 결과");
       expect(out.inputSummary.some((row) => row.label === "t ≤ 5 s" && row.value === "적용범위 내")).toBe(true);
+    }
+  });
+
+  it("t = 5 s는 단열식을 허용한다", () => {
+    const out = calculateEarthConductor({ faultA: "5000", time: "5", kFactor: "143" }, 2);
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.some((m) => m.id === "s")).toBe(true);
+      expect(out.metrics.find((m) => m.id === "scope")).toBeUndefined();
+    }
+  });
+
+  it("t = 5.01 s는 열적 결과를 숨긴다", () => {
+    const out = calculateEarthConductor({ faultA: "5000", time: "5.01", kFactor: "143", peInstall: "separate", peMaterial: "cu", peProtect: "unprotected" }, 2);
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(out.metrics.some((m) => m.id === "s")).toBe(false);
+      expect(out.metrics.find((m) => m.id === "scope")?.value).toBe("단열식 적용범위 밖");
+      expect(Number(out.metrics.find((m) => m.id === "mech")?.value)).toBe(4);
+      expect(out.metrics.some((m) => m.id === "reviewMin")).toBe(false);
+      expect(out.metrics.find((m) => m.id === "final")?.value).toContain("표 142.3-1");
+      expect(out.interpretation).toContain("이 계산식의 적용범위를 벗어났습니다");
+      expect(out.interpretation).not.toContain("선정 불가능");
+      expect(`${out.interpretation}${out.metrics.map((m) => m.value).join(" ")}`).not.toMatch(/KEC 적합 굵기|KEC 최종 굵기|법적 적합/);
     }
   });
 
@@ -520,17 +715,63 @@ describe("접지도체 단열식", () => {
     }
   });
 
-  it("t가 5초를 넘으면 단면적을 숨기고 적용범위만 안내한다", () => {
-    const out = calculateEarthConductor({ faultA: "5000", time: "6", kFactor: "143" }, 2);
+  it("별도 Cu 보호됨은 2.5 mm², 보호되지 않음은 4 mm²", () => {
+    const prot = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143", peInstall: "separate", peMaterial: "cu", peProtect: "protected" }, 2);
+    const unprot = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143", peInstall: "separate", peMaterial: "cu", peProtect: "unprotected" }, 2);
+    expect(prot.ok && unprot.ok).toBe(true);
+    if (prot.ok && unprot.ok) {
+      expect(Number(prot.metrics.find((m) => m.id === "mech")?.value)).toBe(2.5);
+      expect(Number(unprot.metrics.find((m) => m.id === "mech")?.value)).toBe(4);
+    }
+  });
+
+  it("별도 Al은 보호 여부와 관계없이 16 mm²", () => {
+    const prot = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143", peInstall: "separate", peMaterial: "al", peProtect: "protected" }, 2);
+    const unprot = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143", peInstall: "separate", peMaterial: "al", peProtect: "unprotected" }, 2);
+    expect(prot.ok && unprot.ok).toBe(true);
+    if (prot.ok && unprot.ok) {
+      expect(Number(prot.metrics.find((m) => m.id === "mech")?.value)).toBe(16);
+      expect(Number(unprot.metrics.find((m) => m.id === "mech")?.value)).toBe(16);
+    }
+  });
+
+  it("케이블 일부와 동일 외함에는 2.5/4/16을 적용하지 않는다", () => {
+    const cable = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143", peInstall: "cable" }, 2);
+    const same = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143", peInstall: "same-enclosure" }, 2);
+    expect(cable.ok && same.ok).toBe(true);
+    if (cable.ok && same.ok) {
+      expect(cable.metrics.some((m) => m.id === "reviewMin")).toBe(false);
+      expect(same.metrics.some((m) => m.id === "reviewMin")).toBe(false);
+      expect(String(cable.metrics.find((m) => m.id === "mech")?.value)).toContain("해당 없음");
+      expect(String(same.metrics.find((m) => m.id === "mech")?.value)).toContain("해당 없음");
+    }
+  });
+
+  it("단열식이 기계적 최소보다 작으면 검토 최소는 설치조건 값이다", () => {
+    const out = calculateEarthConductor(
+      { faultA: "500", time: "0.1", kFactor: "143", peInstall: "separate", peMaterial: "cu", peProtect: "unprotected" },
+      2,
+    );
     expect(out.ok).toBe(true);
     if (out.ok) {
-      expect(out.metrics.some((m) => m.id === "s")).toBe(false);
-      expect(out.metrics.find((m) => m.id === "scope")?.value).toBe("적용범위 밖");
-      expect(out.interpretation).toContain("이 계산식의 적용범위를 벗어났습니다");
-      expect(out.interpretation).toContain("차단시간 5초 이하");
-      expect(out.interpretation).toContain("표 142.3-1");
-      expect(out.interpretation).not.toContain("선정 불가능");
-      expect(out.warnings.some((w) => w.title === "차단시간 적용범위" && w.level === "warning")).toBe(true);
+      const thermal = Number(out.metrics.find((m) => m.id === "s")?.value);
+      expect(thermal).toBeLessThan(4);
+      expect(Number(out.metrics.find((m) => m.id === "mech")?.value)).toBe(4);
+      expect(Number(out.metrics.find((m) => m.id === "reviewMin")?.value)).toBe(4);
+      expect(out.metrics.find((m) => m.id === "reviewMin")?.label).toBe("검토상 필요한 최소값");
+    }
+  });
+
+  it("단열식이 기계적 최소보다 크면 검토 최소는 열적 값이다", () => {
+    const out = calculateEarthConductor(
+      { faultA: "5000", time: "0.5", kFactor: "143", peInstall: "separate", peMaterial: "cu", peProtect: "unprotected" },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      const thermal = Number(String(out.metrics.find((m) => m.id === "s")?.value).replace(/,/g, ""));
+      expect(thermal).toBeGreaterThan(4);
+      expect(Number(String(out.metrics.find((m) => m.id === "reviewMin")?.value).replace(/,/g, ""))).toBeCloseTo(thermal, 2);
     }
   });
 });
@@ -551,6 +792,7 @@ describe("검색 동의어", () => {
     expect(searchCatalog("배터리").length).toBeGreaterThan(0);
     expect(searchCatalog("불평형").some((h) => h.href.includes("phase-unbalance"))).toBe(true);
     expect(searchCatalog("로드테스트").some((h) => h.href.includes("generator-load-test"))).toBe(true);
+    expect(searchCatalog("경로 전압강하").some((h) => h.href.includes("path-voltage-drop"))).toBe(true);
   });
 });
 

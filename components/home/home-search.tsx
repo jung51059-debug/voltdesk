@@ -10,7 +10,7 @@ export function HomeSearch() {
 
   return (
     <form
-      className="mt-8"
+      className="mt-5"
       onSubmit={(event) => {
         event.preventDefault();
         const query = q.trim();
@@ -28,10 +28,10 @@ export function HomeSearch() {
             value={q}
             onChange={(event) => setQ(event.target.value)}
             placeholder="무엇을 계산하시나요? 전압강하, 변압기, UPS, 전류..."
-            className="h-14 w-full rounded-2xl border border-border-strong bg-card pl-12 pr-4 text-base shadow-[var(--shadow)]"
+            className="h-12 w-full rounded-2xl border border-border-strong bg-card pl-12 pr-4 text-base shadow-[var(--shadow)]"
           />
         </div>
-        <button type="submit" className="h-14 rounded-2xl bg-primary px-6 text-sm font-semibold text-white dark:text-ink">
+        <button type="submit" className="h-12 rounded-2xl bg-primary px-6 text-sm font-semibold text-white dark:text-ink">
           검색
         </button>
       </div>

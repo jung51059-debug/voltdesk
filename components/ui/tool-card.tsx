@@ -23,6 +23,14 @@ export function ToolCard({
   const category = getCategoryById(tool.categoryId);
   const landing = variant === "landing";
   const basis = getStandardBasisBySlug(tool.slug);
+  const tags = [
+    category ? (
+      <span key="category" className="inline-flex w-fit rounded-full bg-info px-2.5 py-1 text-xs font-medium text-primary">
+        {category.name}
+      </span>
+    ) : null,
+    basis ? <StandardStatusBadge key="status" status={basis.standardStatus} size="md" /> : null,
+  ].filter(Boolean).slice(0, 2);
 
   return (
     <article
@@ -36,14 +44,7 @@ export function ToolCard({
         </div>
         <FavoriteButton toolId={tool.id} toolName={tool.name} />
       </div>
-      <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-        {category ? (
-          <p className="inline-flex w-fit rounded-full bg-info px-2 py-0.5 text-[11px] font-medium text-primary">
-            {category.name}
-          </p>
-        ) : null}
-        {basis ? <StandardStatusBadge status={basis.standardStatus} /> : null}
-      </div>
+      {tags.length > 0 ? <div className="mb-1.5 flex flex-wrap items-center gap-1.5">{tags}</div> : null}
       <h3 className={`font-semibold tracking-tight text-ink ${landing ? "text-lg" : "text-[15px] leading-snug"}`}>
         <Link href={tool.href} className="after:absolute after:inset-0">
           {tool.name}

@@ -37,7 +37,25 @@ export function SearchPageClient({ initialQuery }: { initialQuery: string }) {
           검색
         </button>
       </form>
-      <p className="mt-3 text-xs text-muted">예: {SEARCH_EXAMPLES.join(" · ")}</p>
+      <p className="mt-3 flex flex-wrap items-center gap-x-1 gap-y-1 text-xs text-muted">
+        <span>예:</span>
+        {SEARCH_EXAMPLES.map((example, index) => (
+          <span key={example} className="inline-flex items-center gap-1">
+            <button
+              type="button"
+              className="text-primary hover:underline"
+              onClick={() => {
+                setQuery(example);
+                pushRecentSearch(example);
+                router.replace(`/search?q=${encodeURIComponent(example)}`);
+              }}
+            >
+              {example}
+            </button>
+            {index < SEARCH_EXAMPLES.length - 1 ? <span aria-hidden>·</span> : null}
+          </span>
+        ))}
+      </p>
       <div className="mt-6 divide-y divide-border rounded-[22px] border border-border bg-card p-2">
         {query.trim() && results.length === 0 ? (
           <EmptyState icon={Search} title="결과가 없습니다" description="다른 한글 키워드, 영문 용어, 약어를 시도해 보세요." />

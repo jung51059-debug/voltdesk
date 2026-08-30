@@ -194,6 +194,7 @@ export const baseTools: CalculatorTool[] = [
       "tool-three-phase-current",
       "tool-single-phase-current",
       "tool-cable-resistance",
+      "tool-path-voltage-drop",
     ],
     relatedArticleIds: ["art-voltage-drop", "art-cable-sizing"],
     complexity: "intermediate",
@@ -205,7 +206,52 @@ export const baseTools: CalculatorTool[] = [
       {
         question: "전압강하 허용치는 얼마인가요?",
         answer:
-          "기본 계산은 허용 %를 강제하지 않습니다. 수전 수용가면 KEC 232.3.9 검토를 켠 뒤 수전방식·부하종류를 넣을 수 있습니다. 계산 구간이 인입구→기기 전체 경로와 같을 때만 구간 ΔV%와 표 232.3-1 허용 참고값을 비교합니다. 구간만 계산한 경우에는 비교하지 않습니다. 독립 자가발전기에는 해당하지 않습니다. 적합 판정이 아닙니다.",
+          "기본 계산은 허용 %를 강제하지 않습니다. 수전 수용가면 KEC 232.3.9 검토를 켠 뒤 수전방식·부하종류를 넣을 수 있습니다. 계산 구간이 인입구→기기 전체 경로와 같을 때만 구간 ΔV%와 표 232.3-1 허용 참고값을 비교합니다. 구간만 계산한 경우에는 비교하지 않고, 경로 전압강하 계산기에서 누적합니다. 독립 자가발전기에는 해당하지 않습니다. 적합 판정이 아닙니다.",
+      },
+    ],
+  },
+  {
+    id: "tool-path-voltage-drop",
+    slug: "path-voltage-drop",
+    href: "/tools/electrical/path-voltage-drop",
+    categoryId: "cat-cable",
+    domain: "electrical",
+    name: "경로 전압강하 계산기",
+    nameEn: "Path voltage drop calculator",
+    description: "인입구부터 최종 부하까지 여러 배선 구간의 누적 전압강하를 검토합니다.",
+    longDescription:
+      "KEC 232.3.9 관련 검토를 위해 기준점부터 최종 기기까지 구간 ΔV를 합산합니다. 변압기는 필수 구간이 아니며, 표 232.3-1 비교는 누적값과 전체 경로 길이에 적용합니다. 적합 판정이 아닙니다.",
+    formulaId: "formula-path-voltage-drop",
+    tags: ["전압강하", "경로", "KEC", "누적", "VD"],
+    synonyms: [
+      "path voltage drop",
+      "경로 전압강하",
+      "누적 전압강하",
+      "전체 경로 전압강하",
+      "인입 전압강하",
+    ],
+    relatedToolIds: ["tool-voltage-drop", "tool-cable-sizing", "tool-cable-resistance"],
+    relatedArticleIds: ["art-voltage-drop", "art-cable-sizing"],
+    complexity: "advanced",
+    featured: true,
+    recentlyAdded: true,
+    status: "published",
+    updatedAt: "2026-08-30",
+    faqs: [
+      {
+        question: "기존 전압강하 계산기와 무엇이 다른가요?",
+        answer:
+          "기존 도구는 케이블 한 구간을 빠르게 계산합니다. 이 도구는 기준점부터 최종 기기까지 여러 구간을 더해 KEC 232.3.9 관련 참고값과 비교합니다.",
+      },
+      {
+        question: "변압기를 꼭 넣어야 하나요?",
+        answer:
+          "아닙니다. 저압 수전은 보통 계량기 2차측부터, 고압 이상 수전은 변압기 2차측부터 해당 부하까지입니다. 구간은 자유롭게 추가합니다.",
+      },
+      {
+        question: "모터 기동은 몇 %까지 허용되나요?",
+        answer:
+          "Ampory가 허용 %를 만들지 않습니다. 기동·돌입 상태에서는 표 232.3-1과 직접 비교하지 않으며, 관련 기기 표준의 전압범위를 확인하세요.",
       },
     ],
   },
@@ -418,8 +464,28 @@ export function getPublishedTools(): CalculatorTool[] {
   return tools.filter((tool) => tool.status === "published");
 }
 
+/** 홈 「빠른 계산」과 검색 제안 앞부분. 나머지는 카탈로그 순. */
+const FEATURED_ORDER = [
+  "tool-three-phase-current",
+  "tool-single-phase-current",
+  "tool-voltage-drop",
+  "tool-path-voltage-drop",
+  "tool-transformer-load",
+  "tool-kw-kva-hp",
+  "tool-power-factor",
+  "tool-ups-backup-time",
+  "tool-generator-load",
+];
+
 export function getFeaturedTools(): CalculatorTool[] {
-  return getPublishedTools().filter((tool) => tool.featured);
+  const featured = getPublishedTools().filter((tool) => tool.featured);
+  const byId = new Map(featured.map((tool) => [tool.id, tool]));
+  const pinned = FEATURED_ORDER.flatMap((id) => {
+    const tool = byId.get(id);
+    return tool ? [tool] : [];
+  });
+  const pinnedIds = new Set(FEATURED_ORDER);
+  return [...pinned, ...featured.filter((tool) => !pinnedIds.has(tool.id))];
 }
 
 export function getRecentlyAddedTools(): CalculatorTool[] {

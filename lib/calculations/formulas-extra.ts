@@ -182,7 +182,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-earth-conductor", "접지도체 단열식", "S = (I/k) √t", [
     { symbol: "k", name: "재질 계수", unit: "A√s/mm²", description: "표준 표를 사용자가 입력" },
   ], { title: "5 kA, 0.5 s, k=143", given: "사용자 k", steps: ["S=(5000/143)√0.5"], result: "mm²" }, {
-    criteriaNotes: [{ standard: "KEC 142.3.2 계산식 / KS C IEC 60364-5-54", appliesTo: "단열식만 사용. t ≤ 5 s에만 결과 표시. t > 5 s는 적용범위 밖(선정 불가가 아님). 표 142.3-1·k 수치는 내장하지 않음" }],
+    criteriaNotes: [{ standard: "KEC 142.3.2 계산식·설치조건 / KS C IEC 60364-5-54", appliesTo: "나(단열식 t≤5 s)와 다(별도 보호도체 기계적 최소)만. 가(표 142.3-1)는 시행본 전체 확인 전 미구현. 16/35/S/2 미내장" }],
   }),
   f("formula-spd", "SPD 간이 체크", "공식 선정 없음 — 위치·Uc·In 확인", [
     { symbol: "Uc", name: "최대 연속 전압", unit: "V", description: "명판" },
@@ -232,6 +232,32 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-panel-schedule", "반 불평형", "불평형% = max|I−Iavg| / Iavg × 100", [
     { symbol: "I_R,S,T", name: "상전류", unit: "A", description: "" },
   ], { title: "R 40, S 38, T 52 A", given: "3상", steps: ["avg=43.3", "불평형"], result: "%" }, {}),
+  f("formula-path-voltage-drop", "경로 전압강하 누적", "ΣΔV%,  단상 ΔV=2ILr/1000,  3상 ΔV=√3 ILr/1000", [
+    { symbol: "ΣΔV%", name: "누적 전압강하율", unit: "%", description: "기준점부터 최종 기기까지 구간 %의 합" },
+    { symbol: "L_path", name: "전체 경로 길이", unit: "m", description: "해당 배선구간 길이의 합. 표 232.3-1 가산에 사용" },
+  ], {
+    title: "계량기 2차 → MDB → DB → 부하, 160 m",
+    given: "저압 기타, 3상 380 V, 각 구간 저항 근사",
+    steps: ["구간 ΔV% 합산", "경로 160 m → 가산 0.3%", "허용 참고 5.3%와 수치관계만 비교"],
+    result: "누적 %와 전체 경로 허용 참고값",
+  }, {
+    criteriaNotes: [{
+      standard: "KEC 232.3.9 / 표 232.3-1 (협회 공개 Q&A)",
+      appliesTo: "누적 ΔV%와 전체 경로 길이 가산. 혼합부하·기동은 표 비교 없음. 적합 판정 아님",
+    }],
+    assumptions: [
+      "각 구간은 기존 전압강하 계산기와 같은 저항 근사입니다.",
+      "저압 수전은 보통 계량기 2차측부터, 고압 이상 수전은 변압기 2차측부터입니다.",
+      "변압기는 필수 구간이 아닙니다.",
+    ],
+    warnings: [
+      "자동 적합 판정을 하지 않습니다.",
+      "전동기 기동 허용 %를 Ampory가 만들지 않습니다.",
+    ],
+    limitations: [
+      "표 232.3-1 숫자·거리 가산은 대한전기협회 공개 Q&A를 근거로 하며 현재 시행본을 확인해야 합니다.",
+    ],
+  }),
   f("formula-load-flow", "방사형 조류 (DistFlow 근사)", "V²_to ≈ V²_from − 2(RP+XQ)", [
     { symbol: "R,X", name: "선로 임피던스", unit: "Ω", description: "" },
   ], { title: "소스 380 V, 부하 50 kW", given: "방사형 2모선", steps: ["후방 전력", "전방 전압"], result: "모선 전압, 손실" }, {}),

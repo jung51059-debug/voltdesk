@@ -8,7 +8,7 @@ export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition })
 
   return (
     <div className="mt-8 space-y-2 border-t border-border pt-6">
-      <details className="group" open>
+      <details className="group">
         <summary className="cursor-pointer text-sm font-medium text-ink">사용 공식</summary>
         <div className="mt-3 space-y-3 text-sm leading-6 text-muted">
           <p className="font-mono text-base text-primary">{formula.formula}</p>
@@ -31,7 +31,7 @@ export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition })
           ))}
         </ul>
       </details>
-      <details open>
+      <details>
         <summary className="cursor-pointer text-sm font-medium text-ink">계산 기준 및 참고자료</summary>
         <div className="mt-3 space-y-3 text-sm leading-6 text-muted">
           {basis ? (

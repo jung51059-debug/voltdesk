@@ -485,11 +485,43 @@ export const extraFormSchemas: Record<string, FormSchema> = {
   "earth-conductor": {
     slug: "earth-conductor",
     layout: "complex",
-    defaults: { faultA: "5000", time: "0.5", kFactor: "" },
+    defaults: { faultA: "5000", time: "0.5", kFactor: "", peInstall: "cable", peMaterial: "cu", peProtect: "protected" },
     fields: [
       { id: "faultA", label: "지락·단락전류 A", kind: "number", required: true, min: 0, step: "any" },
-      { id: "time", label: "차단시간 s", kind: "number", required: true, min: 0, step: "any", hint: "KEC 142.3.2 단열식은 차단시간 5초 이하에만 적용합니다. 5초를 넘으면 단면적 결과를 표시하지 않습니다. 표 142.3-1 선정은 별개입니다." },
-      { id: "kFactor", label: "재질·온도 계수 k", kind: "number", min: 0, step: "any", hint: "t ≤ 5 s일 때 필요합니다. 도체 재질·절연·온도조건에 맞는 값을 관련 표준에서 확인하세요. 구리=143 같은 기본값을 넣지 않습니다." },
+      { id: "time", label: "차단시간 s", kind: "number", required: true, min: 0, step: "any", hint: "KEC 142.3.2 단열식은 차단시간 5초 이하에만 적용합니다. 5초를 넘으면 열적 결과를 표시하지 않습니다. 설치조건 최소는 그대로 표시합니다." },
+      { id: "kFactor", label: "재질·온도 계수 k", kind: "number", min: 0, step: "any", hint: "k 값은 도체 재질, 절연재료 및 허용온도 조건 등에 따라 관련 기준에서 확인하여 입력하세요. 구리=143 같은 기본값을 넣지 않습니다. t ≤ 5 s일 때 필요합니다." },
+      {
+        id: "peInstall",
+        label: "보호도체 설치 형태",
+        kind: "select",
+        options: [
+          { value: "cable", label: "케이블의 일부" },
+          { value: "same-enclosure", label: "선도체와 동일 외함에 설치" },
+          { value: "separate", label: "별도 보호도체" },
+        ],
+        hint: "별도 보호도체일 때만 Cu 2.5/4·Al 16 mm² 설치조건 최소를 적용합니다.",
+      },
+      {
+        id: "peMaterial",
+        label: "도체 재질",
+        kind: "select",
+        options: [
+          { value: "cu", label: "구리" },
+          { value: "al", label: "알루미늄" },
+        ],
+        visibleWhen: { field: "peInstall", values: ["separate"] },
+      },
+      {
+        id: "peProtect",
+        label: "기계적 손상에 대한 보호",
+        kind: "select",
+        options: [
+          { value: "protected", label: "보호됨" },
+          { value: "unprotected", label: "보호되지 않음" },
+        ],
+        visibleWhen: { field: "peInstall", values: ["separate"] },
+        hint: "전선관, 트렁킹 내부 등 기계적 손상으로부터 보호되는 설치가 이에 해당할 수 있습니다. 특정 현장의 설치상태를 Ampory가 판정하지 않습니다.",
+      },
     ],
   },
   "spd-helper": {

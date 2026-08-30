@@ -58,7 +58,14 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             className="h-11 w-full bg-transparent text-base outline-none placeholder:text-muted"
             aria-label="검색어"
           />
-          <kbd className="hidden rounded-md border border-border px-1.5 py-0.5 text-[11px] text-muted sm:inline">ESC</kbd>
+          <button
+            type="button"
+            onClick={onClose}
+            className="hidden rounded-md border border-border px-1.5 py-0.5 text-[11px] text-muted hover:bg-info sm:inline"
+            aria-label="검색 닫기"
+          >
+            ESC
+          </button>
         </form>
         <div className="max-h-[min(70vh,480px)] overflow-y-auto p-3">
           {query.trim() ? (

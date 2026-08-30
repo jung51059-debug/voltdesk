@@ -622,8 +622,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "접지도체 굵기 (단열식)",
     nameEn: "Earthing conductor adiabatic",
-    description: "KEC 142.3.2 계산식 S=(I/k)√t 로 최소 단면적을 계산합니다. 차단시간 5초 이하, k는 사용자가 넣습니다.",
-    longDescription: "국내 적용 관련: KEC 142.3.2 보호도체 최소 단면적. 관련 표준: KS C IEC 60364-5-54. 단열식은 차단시간 5초 이하에만 적용합니다. 표 142.3-1과 k값은 별도 확인이 필요합니다.",
+    description: "KEC 142.3.2 단열식과 별도 보호도체의 설치조건 최소단면적을 분리해 검토합니다. k는 사용자가 넣습니다.",
+    longDescription: "국내 적용 관련: KEC 142.3.2 보호도체 최소 단면적. 관련 표준: KS C IEC 60364-5-54. 단열식은 차단시간 5초 이하에만 적용합니다. 별도 보호도체이면 기계적 최소(Cu 2.5/4, Al 16)를 따로 보여 줍니다. 표 142.3-1은 시행본 전체를 확인하기 전에는 내장하지 않습니다.",
     formulaId: "formula-earth-conductor",
     tags: ["접지도체", "PE", "굵기"],
     synonyms: ["earth conductor", "접지선 굵기", "PE선"],
@@ -634,7 +634,20 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("k를 모르면 어떻게 하나요?", "구리=143 같은 값을 자동으로 넣지 않습니다. 도체 재질·절연·온도조건에 맞는 k를 KS C IEC 60364-5-54 등에서 확인하세요. 또는 표 142.3-1로 선정하세요."),
+    faqs: [
+      {
+        question: "k를 모르면 어떻게 하나요?",
+        answer: "구리=143 같은 값을 자동으로 넣지 않습니다. 도체 재질, 절연재료 및 허용온도 조건에 맞는 k를 관련 기준에서 확인하세요. 또는 표 142.3-1로 선정하세요.",
+      },
+      {
+        question: "전선관에 넣으면 기계적 보호인가요?",
+        answer: "전선관·트렁킹 내부 등이 해당할 수 있다는 안내만 합니다. 특정 현장의 설치상태를 Ampory가 판정하지 않습니다.",
+      },
+      {
+        question: "표 142.3-1로도 선정할 수 있나요?",
+        answer: "협회는 표(가) 또는 계산식(나)으로 산정하고 설치조건(다)에 적합해야 한다고 설명합니다. Ampory는 아직 표 전체를 내장하지 않습니다. 표 적용 기준은 실제 설치 선도체 단면적입니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-spd-helper",

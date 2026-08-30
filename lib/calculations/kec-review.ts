@@ -26,18 +26,83 @@ export const KEC_OVERCURRENT_COORD = {
   cond2: "I2 ≤ 1.45 Iz",
 } as const;
 
+export type KecEarthInstall = "cable" | "same-enclosure" | "separate";
+export type KecEarthMaterial = "cu" | "al";
+export type KecEarthMechProtect = "protected" | "unprotected";
+
+/** 협회 공개 Q&A: 별도 보호도체(케이블 일부가 아니고 동일 외함도 아님)일 때의 기계적 최소. */
+export const KEC_EARTH_MECHANICAL_MIN = {
+  appliesWhen: "separate" as const,
+  protected: { cu: 2.5, al: 16 },
+  unprotected: { cu: 4, al: 16 },
+  conduitNote:
+    "전선관, 트렁킹 내부 등 기계적 손상으로부터 보호되는 설치가 이에 해당할 수 있습니다. 특정 현장의 설치상태를 Ampory가 판정하지 않습니다.",
+} as const;
+
+export function kecEarthMechanicalMinMm2(
+  install: KecEarthInstall,
+  material: KecEarthMaterial,
+  protect: KecEarthMechProtect,
+): number | null {
+  if (install !== "separate") return null;
+  return KEC_EARTH_MECHANICAL_MIN[protect][material];
+}
+
+/**
+ * 표 142.3-1. 일부 행 규칙은 공개 Q&A에 보이지만 표 전체는 미확인.
+ * 16 / 35 / S/2 로직을 계산에 넣지 않는다. 시행본 전체 확보 후 가 경로로 추가.
+ */
+export const KEC_TABLE_142_3_1_EVIDENCE = {
+  embedded: false,
+  implementNow: false,
+  inputBasis: "actual-installed-phase-conductor",
+  inputBasisStatus: "confirmed" as const,
+  inputBasisNote: "2025년 협회: 표 적용 기준은 설계 필요 굵기가 아니라 실제 설치 선도체 단면적",
+  sameMaterialMeans: "same-metal",
+  sameMaterialStatus: "confirmed" as const,
+  sameMaterialNote: "2021년 협회: 표 142.3-1은 IEC 60364-5-54 표 54.2 인용. 같은 재질은 금속 재질이 같다는 뜻",
+  rows: {
+    cuOver35Half: {
+      rule: "Cu 선도체 S > 35 mm² → Cu 보호도체 ≥ S/2",
+      status: "confirmed" as const,
+      source: "2023년 협회 답변",
+    },
+    sAtMost16Same: {
+      rule: "S ≤ 16 mm² → 선도체와 동일",
+      status: "question-only" as const,
+      source: "공식 Q&A 질문 문구. 협회가 숫자 세트를 다시 확정한 형태는 아님",
+    },
+    between16And35: {
+      rule: "16 < S ≤ 35 mm² → 16 mm²",
+      status: "question-only" as const,
+      source: "공식 Q&A 질문 문구. 협회가 숫자 세트를 다시 확정한 형태는 아님",
+    },
+    otherMaterialPairs: {
+      rule: "다른 재질 조합 전체",
+      status: "insufficient" as const,
+    },
+    fullTable: {
+      rule: "시행 중인 표 142.3-1 전체 행·열",
+      status: "needs-official-text" as const,
+    },
+  },
+  futureFlow: "사용자 가(표) 또는 나(단열식) 선택 후, 별도 보호도체이면 다(설치조건 최소)와 비교",
+} as const;
+
 export const KEC_EARTH_CONDUCTOR = {
   article: "KEC 142.3.2 보호도체 최소 단면적",
   related: "KS C IEC 60364-5-54",
   table: "표 142.3-1 (협회: IEC 60364-5-54 표 54.2 인용)",
   formula: "S = (I/k)√t  (조 142.3.2의 계산식)",
   kTableEmbedded: false,
+  table142Embedded: false,
+  table142Evidence: KEC_TABLE_142_3_1_EVIDENCE,
   adiabaticTimeLimitS: 5,
   /** t > 5 s이면 단열식 결과를 숨긴다. 보호도체 선정 불가가 아니라 이 계산식의 적용범위 밖. */
   adiabaticOutOfRangeLines: [
     "입력한 차단시간은 이 계산식의 적용범위를 벗어났습니다.",
     "KEC 142.3.2의 해당 계산식은 차단시간 5초 이하에 적용됩니다.",
-    "표 142.3-1 등 적용 가능한 보호도체 선정방법을 별도로 검토하세요.",
+    "표 142.3-1 등 다른 선정방법을 검토하세요.",
   ],
 } as const;
 
@@ -69,16 +134,36 @@ export const KEC_VOLTAGE_DROP_REVIEW = {
   autoJudgment: false,
   numericLimitsEmbedded: true,
   optInOnly: true,
-  /** 표 %의 분모 전압. 협회 공개 Q&A에서 미확인. 계산은 사용자 기준전압을 쓰되 KEC 공식 분모로 단정하지 않음. */
-  percentageBaseVoltage: "unverified" as const,
+  /**
+   * % = ΔV / 사용자 기준전압 × 100.
+   * 2026-08-13 협회: 3상4선 220/380 V에서 상전압 %는 220 V, 선간 %는 380 V. 선간 ΔV는 상 ΔV의 √3배라 %는 동일.
+   * 표 232.3-1 공식 분모로 단정하지 않음.
+   */
+  percentageBaseVoltage: "calculation-voltage" as const,
   compareOnlyWhenSegmentEqualsPath: true,
+  pathUsesCumulativeDrop: true,
 } as const;
 
-/** 향후 인입→MDB→DB→부하 구간 합산용. 지금은 계산기를 만들지 않음. */
+export const KEC_VOLTAGE_DROP_START = {
+  lv: "저압 수전에서 일반적인 검토 기준점은 계량기 2차측입니다.",
+  "hv-plus": "고압 이상 수전에서 일반적인 검토 기준점은 변압기 2차측입니다.",
+} as const;
+
+export const KEC_VOLTAGE_DROP_STARTING =
+  "전동기 기동 또는 큰 돌입전류가 발생하는 기기는 KEC 232.3.9에 따라 표 232.3-1보다 큰 전압강하가 허용될 수 있습니다. 관련 기기 표준의 허용 전압범위를 별도로 확인하세요." as const;
+
+export type KecPathStartKind = "meter-2nd" | "transformer-2nd" | "custom";
+
+export type KecVoltageDropDuty = "normal" | "starting";
+
 export type KecPathVoltageDropSegment = {
   id: string;
-  label: string;
+  name: string;
+  phase: "1" | "3";
+  voltageV: number;
+  currentA: number;
   lengthM: number;
+  dropV?: number;
   dropPct?: number;
 };
 
