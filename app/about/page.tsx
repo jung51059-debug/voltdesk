@@ -73,10 +73,7 @@ export default function AboutPage() {
 
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">운영 안내</h2>
-          <p>
-            즐겨찾기와 환경설정은 이 브라우저에만 저장됩니다. 광고는 Google AdSense를 사용할 수 있으며, 검색·즐겨찾기·설정
-            화면에는 광고 스크립트를 넣지 않습니다.
-          </p>
+          <p>즐겨찾기와 환경설정은 현재 사용 중인 브라우저에 저장됩니다.</p>
           <p>
             공식 오류나 가정 개선은{" "}
             <Link href="/contact" className="font-medium text-primary hover:underline">
