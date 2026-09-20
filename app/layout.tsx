@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Inter, Noto_Sans_KR } from "next/font/google";
+import { AdSenseLoader } from "@/components/ads/adsense-loader";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { RecentToolsStrip } from "@/components/layout/recent-tools-strip";
@@ -67,11 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-full flex-col bg-surface font-sans text-ink">
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9114170820004533"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        <AdSenseLoader />
         <JsonLd data={softwareJsonLd()} />
         <PreferencesProvider>
           <FavoriteProvider>

@@ -7,7 +7,9 @@ describe("사이트맵", () => {
     const paths = sitemapEntries();
     expect(paths).not.toContain("/favorites");
     expect(paths).not.toContain("/settings");
+    expect(paths).not.toContain("/search");
     expect(paths).toContain("/");
+    expect(paths).toContain("/about");
     expect(paths).toContain("/references");
   });
 });

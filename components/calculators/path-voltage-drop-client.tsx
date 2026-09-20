@@ -5,10 +5,15 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ResultPanel } from "@/components/calculators/result-panel";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
+import { RelatedResources } from "@/components/calculators/related-resources";
 import { StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { parseHandoff } from "@/lib/calculations/handoff";
+import { getCalculatorGuide } from "@/lib/data/calculator-guides";
+import { getRelatedArticles } from "@/lib/data/articles";
+import { getRelatedTools, getToolBySlug } from "@/lib/data/tools";
 import {
   KEC_VOLTAGE_DROP_MIXED,
   KEC_VOLTAGE_DROP_START,
@@ -106,6 +111,9 @@ export function PathVoltageDropClient() {
   const { prefs } = usePreferences();
   const formula = getFormulaById("formula-path-voltage-drop");
   const basis = getStandardBasisBySlug("path-voltage-drop");
+  const tool = getToolBySlug("path-voltage-drop");
+  const related = tool ? getRelatedTools(tool) : [];
+  const articles = tool ? getRelatedArticles(tool.relatedArticleIds) : [];
   const [draft, setDraft] = useState<Draft>(() => store.load());
   const [hydrated, setHydrated] = useState(false);
 
@@ -168,6 +176,10 @@ export function PathVoltageDropClient() {
               전압강하 계산기
             </Link>
             를 쓰세요.
+          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-6">
+            구간마다 전류나 전선이 다를 때 한 구간 계산기보다 이 도구가 맞습니다. 허용값 비교는 사용자가 넣은 기준이 있을
+            때만 하며, 자동 합격이 아닙니다.
           </p>
         </div>
         <FavoriteButton toolId="tool-path-voltage-drop" toolName="경로 전압강하 계산기" />
@@ -362,16 +374,14 @@ export function PathVoltageDropClient() {
         </div>
       </div>
 
-      {formula ? <TechnicalDisclosure formula={formula} /> : null}
+      {formula ? (
+        <>
+          <CalculatorExplain slug="path-voltage-drop" formula={formula} />
+          <TechnicalDisclosure formula={formula} variant={getCalculatorGuide("path-voltage-drop") ? "compact" : "full"} />
+        </>
+      ) : null}
 
-      <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-6 text-sm">
-        <Link href="/tools/electrical/voltage-drop" className="text-muted hover:text-primary">
-          전압강하 계산기
-        </Link>
-        <Link href="/tools/electrical/cable-sizing" className="text-muted hover:text-primary">
-          케이블 굵기
-        </Link>
-      </nav>
+      <RelatedResources related={related} articles={articles} />
     </div>
   );
 }

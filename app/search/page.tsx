@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "검색",
   description: "전기 계산기, 시설 관리 도구, 실무 참고자료를 한글·영문·약어로 검색합니다.",
   alternates: { canonical: "/search" },
+  robots: { index: false, follow: true },
 };
 
 export default async function SearchPage({

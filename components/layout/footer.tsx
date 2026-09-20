@@ -50,6 +50,16 @@ export function Footer() {
           <p className="text-sm font-semibold">사이트</p>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li>
+              <Link href="/about" className="hover:text-primary">
+                소개
+              </Link>
+            </li>
+            <li>
+              <Link href="/references" className="hover:text-primary">
+                실무 참고
+              </Link>
+            </li>
+            <li>
               <Link href="/privacy" className="hover:text-primary">
                 개인정보 처리방침
               </Link>

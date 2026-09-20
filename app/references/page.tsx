@@ -5,7 +5,7 @@ import { articles } from "@/lib/data/articles";
 
 export const metadata: Metadata = {
   title: "실무 엔지니어링 참고자료",
-  description: "kW와 kVA, CT 100/5A, MCCB와 ELB, ATS와 CTTS, 전압강하 원리 등 검색에 잘 걸리는 전기·시설 실무 설명.",
+  description: "kW와 kVA, 수용률과 부하율, 차단기와 케이블, 전압강하 원리 등 계산기와 맞춰 읽는 전기·시설 실무 설명.",
   alternates: { canonical: "/references" },
 };
 

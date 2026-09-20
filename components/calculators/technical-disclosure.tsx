@@ -4,26 +4,36 @@ import { EngineeringDisclaimer } from "@/components/calculators/engineering-disc
 import { StandardBadgeRow, StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
 import { INTERNATIONAL_REFERENCE_DISCLAIMER, METHOD_LABEL, SOURCE_DATA_STATUS_LABEL, getStandardBasisByFormulaId } from "@/lib/data/standard-basis";
 
-export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition }) {
+export function TechnicalDisclosure({
+  formula,
+  variant = "full",
+}: {
+  formula: FormulaDefinition;
+  /** full: 공식·예제를 기본으로 펼침. compact: 본문에 이미 있는 공식·예제는 숨기고 근거만 둡니다. */
+  variant?: "full" | "compact";
+}) {
   const basis = getStandardBasisByFormulaId(formula.id);
+  const compact = variant === "compact";
 
   return (
     <div className="mt-8 space-y-2 border-t border-border pt-6">
-      <details className="group">
-        <summary className="cursor-pointer text-sm font-medium text-ink">사용 공식</summary>
-        <div className="mt-3 space-y-3 text-sm leading-6 text-muted">
-          <p className="font-mono text-base text-primary">{formula.formula}</p>
-          <ul className="space-y-1">
-            {formula.variables.map((variable) => (
-              <li key={variable.symbol}>
-                <span className="font-mono text-ink">{variable.symbol}</span> · {variable.name} ({variable.unit})
-                {variable.description ? ` — ${variable.description}` : ""}
-              </li>
-            ))}
-          </ul>
-          {formula.units.length > 0 ? <p>단위: {formula.units.join(", ")}</p> : null}
-        </div>
-      </details>
+      {compact ? null : (
+        <details className="group" open>
+          <summary className="cursor-pointer text-sm font-medium text-ink">사용 공식</summary>
+          <div className="mt-3 space-y-3 text-sm leading-6 text-muted">
+            <p className="font-mono text-base text-primary">{formula.formula}</p>
+            <ul className="space-y-1">
+              {formula.variables.map((variable) => (
+                <li key={variable.symbol}>
+                  <span className="font-mono text-ink">{variable.symbol}</span> · {variable.name} ({variable.unit})
+                  {variable.description ? ` — ${variable.description}` : ""}
+                </li>
+              ))}
+            </ul>
+            {formula.units.length > 0 ? <p>단위: {formula.units.join(", ")}</p> : null}
+          </div>
+        </details>
+      )}
       <details>
         <summary className="cursor-pointer text-sm font-medium text-ink">가정·한계</summary>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
@@ -88,19 +98,21 @@ export function TechnicalDisclosure({ formula }: { formula: FormulaDefinition })
           </ul>
         </div>
       </details>
-      <details>
-        <summary className="cursor-pointer text-sm font-medium text-ink">실무 예제</summary>
-        <div className="mt-3 text-sm leading-6">
-          <p className="font-medium text-ink">{formula.example.title}</p>
-          <p className="text-muted">입력: {formula.example.given}</p>
-          <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted">
-            {formula.example.steps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-          <p className="mt-2 font-medium">결과: {formula.example.result}</p>
-        </div>
-      </details>
+      {compact ? null : (
+        <details open>
+          <summary className="cursor-pointer text-sm font-medium text-ink">실무 예제</summary>
+          <div className="mt-3 text-sm leading-6">
+            <p className="font-medium text-ink">{formula.example.title}</p>
+            <p className="text-muted">입력: {formula.example.given}</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted">
+              {formula.example.steps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+            <p className="mt-2 font-medium">결과: {formula.example.result}</p>
+          </div>
+        </details>
+      )}
       <p className="pt-2 text-sm">
         <Link href="/sources" className="font-medium text-primary hover:underline">
           전체 계산기 출처

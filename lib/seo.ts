@@ -51,11 +51,11 @@ export function sitemapEntries() {
   // 즐겨찾기·설정은 robots에서 차단하므로 사이트맵에 넣지 않습니다.
   const staticPaths = [
     "/",
+    "/about",
     "/tools",
     "/tools/electrical",
     "/tools/facility",
     "/references",
-    "/search",
     "/privacy",
     "/terms",
     "/contact",

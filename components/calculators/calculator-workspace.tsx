@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
-import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { ShareDialog } from "@/components/calculators/dialogs";
+import { RelatedResources } from "@/components/calculators/related-resources";
 import { ResultPanel } from "@/components/calculators/result-panel";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
+import { getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { WarningPanel } from "@/components/calculators/warning-panel";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -295,6 +297,9 @@ export function CalculatorWorkspace({
             </div>
           ) : null}
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{tool.description}</p>
+          {tool.longDescription && tool.longDescription !== tool.description ? (
+            <p className="mt-2 max-w-2xl text-sm leading-6">{tool.longDescription}</p>
+          ) : null}
         </div>
         <FavoriteButton toolId={tool.id} toolName={tool.name} />
       </header>
@@ -348,7 +353,9 @@ export function CalculatorWorkspace({
         <div>{resultBlock}</div>
       </form>
 
-      <TechnicalDisclosure formula={formula} />
+      <CalculatorExplain slug={tool.slug} formula={formula} />
+
+      <TechnicalDisclosure formula={formula} variant={getCalculatorGuide(tool.slug) ? "compact" : "full"} />
 
       {tool.faqs.length > 0 ? (
         <section className="mt-8 border-t border-border pt-6">
@@ -364,21 +371,15 @@ export function CalculatorWorkspace({
         </section>
       ) : null}
 
-      <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-6 text-sm">
-        <button type="button" className="text-muted hover:text-primary" onClick={() => setShareOpen(true)}>
-          공유
-        </button>
-        {related.map((item) => (
-          <Link key={item.id} href={item.href} className="text-muted hover:text-primary">
-            {item.name}
-          </Link>
-        ))}
-        {articles.map((article) => (
-          <Link key={article.id} href={article.href} className="text-muted hover:text-primary">
-            {article.title}
-          </Link>
-        ))}
-      </nav>
+      <RelatedResources
+        related={related}
+        articles={articles}
+        share={
+          <button type="button" className="text-muted hover:text-primary" onClick={() => setShareOpen(true)}>
+            공유
+          </button>
+        }
+      />
 
       <ShareDialog
         open={shareOpen}

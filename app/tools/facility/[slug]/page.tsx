@@ -23,7 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: tool.name,
     description: tool.longDescription,
     alternates: { canonical: tool.href },
-    openGraph: { title: tool.name, description: tool.description },
+    openGraph: { title: tool.name, description: tool.longDescription },
+    robots: tool.status === "published" ? undefined : { index: false, follow: true },
   };
 }
 

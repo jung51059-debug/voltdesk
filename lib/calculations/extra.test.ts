@@ -52,6 +52,9 @@ import {
   isElectricalWorkspaceTool,
   isFacilityWorkspaceTool,
 } from "@/lib/data/tools";
+import { articles, getArticleById } from "@/lib/data/articles";
+import { calculatorGuides, getCalculatorGuide } from "@/lib/data/calculator-guides";
+import { sitemapEntries } from "@/lib/seo";
 import { searchCatalog } from "@/lib/search";
 import {
   STANDARD_KIND_LABEL,
@@ -391,6 +394,46 @@ describe("카탈로그 정합", () => {
       expect(assertNoComplianceWording(basis.amporyScope)).toBe(true);
       for (const limit of basis.limits) expect(assertNoComplianceWording(limit)).toBe(true);
     }
+  });
+
+  it("도구·참고자료 상호 링크 ID가 존재한다", () => {
+    for (const tool of getPublishedTools()) {
+      for (const id of tool.relatedArticleIds) {
+        expect(getArticleById(id), `${tool.slug} → ${id}`).toBeTruthy();
+      }
+    }
+    for (const article of articles) {
+      for (const id of article.relatedToolIds) {
+        expect(getToolById(id), `${article.slug} → ${id}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("참고자료 제목과 슬러그가 고유하다", () => {
+    expect(new Set(articles.map((article) => article.slug)).size).toBe(articles.length);
+    expect(new Set(articles.map((article) => article.title)).size).toBe(articles.length);
+  });
+
+  it("핵심 계산기 가이드는 고유 본문을 가진다", () => {
+    const firstLines = calculatorGuides.map((guide) => guide.whenToUse[0]);
+    expect(new Set(firstLines).size).toBe(firstLines.length);
+    for (const slug of [
+      "single-phase-current",
+      "three-phase-current",
+      "voltage-drop",
+      "cable-sizing",
+      "breaker-current",
+      "motor-starting",
+    ]) {
+      expect(getCalculatorGuide(slug), slug).toBeTruthy();
+    }
+  });
+
+  it("사이트맵에 소개를 넣고 검색·즐겨찾기는 뺀다", () => {
+    const paths = sitemapEntries();
+    expect(paths).toContain("/about");
+    expect(paths).not.toContain("/search");
+    expect(paths).not.toContain("/favorites");
   });
 });
 
