@@ -6,15 +6,19 @@ import { QuickCurrentPreview } from "@/components/home/quick-current-preview";
 import { HomeSearch } from "@/components/home/home-search";
 import { HomeLibrary } from "@/components/home/home-library";
 import { SectionHeading } from "@/components/home/section-heading";
+import { JsonLd } from "@/components/seo/json-ld";
 import { articles } from "@/lib/data/articles";
 import { getElectricalCategories, getFacilityCategories } from "@/lib/data/categories";
 import { getFeaturedTools, getRecentlyAddedTools } from "@/lib/data/tools";
+import { websiteJsonLd } from "@/lib/seo";
 import type { Metadata } from "next";
+
+const homeDescription =
+  "현장에서 바로 쓰는 전기 계산과 실무 참고. 케이블, 변압기, 모터, 역률, UPS, 발전기, 부하 스케줄을 로그인 없이 계산합니다.";
 
 export const metadata: Metadata = {
   title: "전기·시설관리 엔지니어링 유틸리티",
-  description:
-    "현장에서 바로 쓰는 전기 계산과 실무 참고. 케이블, 변압기, 모터, 역률, UPS, 발전기, 부하 스케줄을 로그인 없이 계산합니다.",
+  description: homeDescription,
 };
 
 export default function HomePage() {
@@ -25,6 +29,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-11">
+      <JsonLd data={websiteJsonLd(homeDescription)} />
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
         <div>
           <p className="text-sm font-medium text-primary">전기 · 시설관리 엔지니어링 유틸리티</p>

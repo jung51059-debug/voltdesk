@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PanelScheduleClient } from "@/components/schedules/panel-schedule-client";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
 export const metadata: Metadata = {
@@ -15,7 +15,14 @@ export default function PanelSchedulePage() {
   const tool = getToolBySlug("panel-schedule");
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd([{ name: "홈", href: "/" }, { name: "반 스케줄", href: "/tools/schedules/panel" }])} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "홈", href: "/" },
+          { name: "Schedule", href: "/tools/categories/schedule" },
+          { name: "반 스케줄", href: "/tools/schedules/panel" },
+        ])}
+      />
+      {tool ? <JsonLd data={calculatorJsonLd(tool, { name: "반 · MCC 스케줄", description: metadata.description ?? undefined })} /> : null}
       {tool ? <JsonLd data={faqJsonLd(tool.faqs)} /> : null}
       <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/schedule", label: "Schedule" }, { label: "반 스케줄" }]} />
       <PanelScheduleClient />

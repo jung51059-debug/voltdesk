@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { getRelatedArticles } from "@/lib/data/articles";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getPublishedTools, getRelatedTools, getToolBySlug, isElectricalWorkspaceTool } from "@/lib/data/tools";
-import { breadcrumbJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorBreadcrumbItems, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -33,13 +33,8 @@ export default async function ElectricalToolPage({ params }: Props) {
 
   return (
     <>
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "홈", href: "/" },
-          { name: "전기 계산기", href: "/tools/electrical" },
-          { name: tool.pageHeading ?? tool.name, href: tool.href },
-        ])}
-      />
+      <JsonLd data={breadcrumbJsonLd(calculatorBreadcrumbItems(tool))} />
+      <JsonLd data={calculatorJsonLd(tool)} />
       <JsonLd data={faqJsonLd(tool.faqs)} />
       <CalculatorWorkspace tool={tool} formula={formula} related={related} articles={articles} />
     </>

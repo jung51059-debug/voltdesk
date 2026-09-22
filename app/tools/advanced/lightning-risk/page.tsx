@@ -6,7 +6,7 @@ import { EngineeringDisclaimer } from "@/components/calculators/engineering-disc
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { TrackRecentTool } from "@/components/calculators/track-recent-tool";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 
@@ -21,7 +21,14 @@ export default function LightningPage() {
   const formula = getFormulaById("formula-lightning");
   return (
     <div className="max-w-3xl">
-      <JsonLd data={breadcrumbJsonLd([{ name: "홈", href: "/" }, { name: "낙뢰보호 검토 항목", href: "/tools/advanced/lightning-risk" }])} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "홈", href: "/" },
+          { name: "고급", href: "/tools/categories/advanced" },
+          { name: "낙뢰보호 검토 항목", href: "/tools/advanced/lightning-risk" },
+        ])}
+      />
+      {tool ? <JsonLd data={calculatorJsonLd(tool, { description: metadata.description ?? undefined })} /> : null}
       {tool ? <JsonLd data={faqJsonLd(tool.faqs)} /> : null}
       <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/advanced", label: "고급" }, { label: "낙뢰보호 검토 항목" }]} />
       <TrackRecentTool id="tool-lightning" />

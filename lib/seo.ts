@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { articles } from "@/lib/data/articles";
-import { getHubCategories } from "@/lib/data/categories";
+import { getCategoryById, getHubCategories } from "@/lib/data/categories";
 import { getPublishedTools } from "@/lib/data/tools";
-import { SITE, type CalculatorTool } from "@/lib/types";
+import { SITE, type CalculatorTool, type ReferenceArticle } from "@/lib/types";
 
 export function absoluteUrl(path: string): string {
+  if (path === "/" || path === "") return SITE.url;
   return new URL(path, SITE.url).toString();
 }
 
@@ -47,18 +48,74 @@ export function faqJsonLd(faqs: { question: string; answer: string }[]) {
   };
 }
 
-export function softwareJsonLd() {
+/** 홈페이지 전용. 사이트 검색창은 noindex라 SearchAction을 넣지 않습니다. */
+export function websiteJsonLd(description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE.name,
+    url: SITE.url,
+    description,
+    inLanguage: "ko",
+  };
+}
+
+/** 계산기 화면의 제목·설명으로 만드는 웹 도구. 별점·리뷰는 넣지 않습니다. */
+export function calculatorJsonLd(
+  tool: CalculatorTool,
+  options?: { name?: string; description?: string },
+) {
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: SITE.name,
-    applicationCategory: "BusinessApplication",
+    name: options?.name ?? tool.pageHeading ?? tool.name,
+    description: options?.description ?? tool.metaDescription ?? tool.longDescription,
+    url: absoluteUrl(tool.href),
+    applicationCategory: "UtilitiesApplication",
     operatingSystem: "Web",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
-    description: SITE.description,
-    url: SITE.url,
+    offers: { "@type": "Offer", price: 0, priceCurrency: "KRW" },
     inLanguage: "ko",
   };
+}
+
+/** 계산기 화면 breadcrumb(홈 → 전기/시설 → 카테고리 → 계산기)와 같은 단계. */
+export function calculatorBreadcrumbItems(tool: CalculatorTool) {
+  const category = getCategoryById(tool.categoryId);
+  return [
+    { name: "홈", href: "/" },
+    {
+      name: tool.domain === "facility" ? "시설" : "전기",
+      href: tool.domain === "facility" ? "/tools/facility" : "/tools/electrical",
+    },
+    ...(category ? [{ name: category.name, href: `/tools/categories/${category.slug}` }] : []),
+    { name: tool.pageHeading ?? tool.name, href: tool.href },
+  ];
+}
+
+/** 실무 가이드. 화면에 없는 작성자·발행일·이미지는 만들지 않습니다. */
+export function articleJsonLd(article: ReferenceArticle) {
+  const url = absoluteUrl(article.href);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.summary,
+    url,
+    mainEntityOfPage: url,
+    dateModified: article.updatedAt,
+    inLanguage: "ko",
+  };
+}
+
+/** 가이드 화면 breadcrumb와 같은 단계. 카테고리는 목록의 앵커입니다. */
+export function articleBreadcrumbItems(article: ReferenceArticle) {
+  const category = getCategoryById(article.categoryId);
+  return [
+    { name: "홈", href: "/" },
+    { name: "실무 참고", href: "/references" },
+    ...(category ? [{ name: category.name, href: `/references#${category.slug}` }] : []),
+    { name: article.title, href: article.href },
+  ];
 }
 
 export function sitemapEntries() {

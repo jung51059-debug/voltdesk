@@ -6,7 +6,7 @@ import { EngineeringDisclaimer } from "@/components/calculators/engineering-disc
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { TrackRecentTool } from "@/components/calculators/track-recent-tool";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 
@@ -21,7 +21,14 @@ export default function ArcFlashPage() {
   const formula = getFormulaById("formula-arc-flash");
   return (
     <div className="max-w-3xl">
-      <JsonLd data={breadcrumbJsonLd([{ name: "홈", href: "/" }, { name: "아크 플래시", href: "/tools/advanced/arc-flash" }])} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "홈", href: "/" },
+          { name: "고급", href: "/tools/categories/advanced" },
+          { name: "아크 플래시", href: "/tools/advanced/arc-flash" },
+        ])}
+      />
+      {tool ? <JsonLd data={calculatorJsonLd(tool, { description: metadata.description ?? undefined })} /> : null}
       {tool ? <JsonLd data={faqJsonLd(tool.faqs)} /> : null}
       <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/advanced", label: "고급" }, { label: "아크 플래시" }]} />
       <TrackRecentTool id="tool-arc-flash" />

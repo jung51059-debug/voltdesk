@@ -7,8 +7,6 @@ import { RecentToolsStrip } from "@/components/layout/recent-tools-strip";
 import { FavoriteProvider } from "@/components/providers/favorite-provider";
 import { PreferencesProvider } from "@/components/providers/preferences-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
-import { JsonLd } from "@/components/seo/json-ld";
-import { softwareJsonLd } from "@/lib/seo";
 import { SITE } from "@/lib/types";
 import "./globals.css";
 
@@ -68,7 +66,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col bg-surface font-sans text-ink">
         <AdSenseLoader />
-        <JsonLd data={softwareJsonLd()} />
         <PreferencesProvider>
           <FavoriteProvider>
             <ToastProvider>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SldClient } from "@/components/schedules/sld-client";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
 export const metadata: Metadata = {
@@ -15,7 +15,14 @@ export default function SldPage() {
   const tool = getToolBySlug("sld");
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd([{ name: "홈", href: "/" }, { name: "단선도", href: "/tools/advanced/sld" }])} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "홈", href: "/" },
+          { name: "Schedule", href: "/tools/categories/schedule" },
+          { name: "단선도", href: "/tools/advanced/sld" },
+        ])}
+      />
+      {tool ? <JsonLd data={calculatorJsonLd(tool, { name: "단선도 초안", description: metadata.description ?? undefined })} /> : null}
       {tool ? <JsonLd data={faqJsonLd(tool.faqs)} /> : null}
       <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/schedule", label: "Schedule" }, { label: "단선도" }]} />
       <SldClient />

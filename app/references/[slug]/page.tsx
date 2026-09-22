@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentArticle } from "@/components/references/track-recent-article";
 import { articles, getArticleBySlug, getRelatedArticles, getRelatedToolsForArticle } from "@/lib/data/articles";
 import { getCategoryById } from "@/lib/data/categories";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { articleBreadcrumbItems, articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,13 +39,8 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <article>
       <TrackRecentArticle id={article.id} />
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "홈", href: "/" },
-          { name: "실무 참고", href: "/references" },
-          { name: article.title, href: article.href },
-        ])}
-      />
+      <JsonLd data={breadcrumbJsonLd(articleBreadcrumbItems(article))} />
+      <JsonLd data={articleJsonLd(article)} />
       {article.faqs && article.faqs.length > 0 ? <JsonLd data={faqJsonLd(article.faqs)} /> : null}
       <Breadcrumb
         items={[
