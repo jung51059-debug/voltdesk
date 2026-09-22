@@ -50,9 +50,13 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "3상 부하전류 계산기",
     nameEn: "Three-phase load current calculator",
-    description: "3상 선간전압과 유효전력으로 선전류를 계산합니다.",
+    pageHeading: "3상 전류 계산기 - 380V kW를 A로 계산",
+    metaTitle: "3상 전류 계산기 | 380V kW를 A로 계산",
+    metaDescription:
+      "전압, 부하전력, 역률을 입력해 3상 선전류를 계산합니다. 380V 30kW·역률 0.9·효율 1은 약 50.64A이며, 공식과 확인할 사항을 함께 제공합니다.",
+    description: "선간전압, 유효전력, 역률로 3상 선전류를 계산합니다.",
     longDescription:
-      "3상 평형 부하의 선전류 I = P / (√3 × V × PF × η)를 계산합니다. 변압기, 모터, 수전반 부하 검토의 출발점으로 사용합니다.",
+      "380V, 30kW, 역률 0.9, 효율 1이면 선전류는 약 50.64A입니다. 계산된 전류만으로 차단기나 전선 굵기를 정하지 않습니다.",
     formulaId: "formula-three-phase-current",
     tags: ["3상", "전류", "선전류", "380V", "440V"],
     synonyms: [
@@ -64,12 +68,13 @@ export const baseTools: CalculatorTool[] = [
       "load current",
     ],
     relatedToolIds: [
-      "tool-single-phase-current",
-      "tool-transformer-load",
-      "tool-voltage-drop",
+      "tool-kw-kva-hp",
       "tool-power-factor",
+      "tool-voltage-drop",
+      "tool-transformer-load",
+      "tool-single-phase-current",
     ],
-    relatedArticleIds: ["art-single-vs-three", "art-transformer-load", "art-breaker-and-cable"],
+    relatedArticleIds: ["art-motor-kw-input", "art-kw-vs-kva", "art-single-vs-three", "art-phase-unbalance-neutral", "art-breaker-and-cable"],
     complexity: "basic",
     featured: true,
     recentlyAdded: false,
@@ -77,9 +82,28 @@ export const baseTools: CalculatorTool[] = [
     updatedAt: "2026-08-20",
     faqs: [
       {
-        question: "380 V와 400 V 중 무엇을 넣나요?",
+        question: "380V 30kW는 몇 A인가요?",
         answer:
-          "실제 사용 선간전압을 넣습니다. 한국 저압 동력은 380 V가 흔하고, IEC 공칭은 400 V인 경우가 있습니다.",
+          "역률 0.9, 효율 1이면 30,000W / (√3 × 380 × 0.9) = 50.64A입니다. 효율을 0.92로 두면 55.05A입니다.",
+      },
+      {
+        question: "역률이 낮아지면 전류는 어떻게 변하나요?",
+        answer: "같은 전력과 전압에서 역률은 분모에 있습니다. 역률이 낮아지면 선전류는 커집니다.",
+      },
+      {
+        question: "계산된 전류로 바로 차단기를 선정해도 되나요?",
+        answer:
+          "안 됩니다. 부하 특성, 기동전류, 허용전류, 설치조건과 제조사 자료를 따로 확인해야 합니다.",
+      },
+      {
+        question: "효율은 언제 1로 두나요?",
+        answer:
+          "입력한 kW가 이미 전기 입력이면 효율은 1입니다. 모터 축출력이면 명판 효율로 나눕니다. 화면 기본값 0.92는 예시입니다.",
+      },
+      {
+        question: "380V와 400V 중 무엇을 넣나요?",
+        answer:
+          "실제 사용 선간전압을 넣습니다. 한국 저압 동력은 380V가 흔하고, IEC 공칭은 400V인 경우가 있습니다.",
       },
     ],
   },
@@ -91,14 +115,23 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "kW / kVA / HP 환산기",
     nameEn: "kW / kVA / HP converter",
-    description: "유효전력, 피상전력, 마력을 역률과 함께 변환합니다.",
+    pageHeading: "kW·kVA 변환 계산기",
+    metaTitle: "kW kVA 변환 계산기 | 역률 반영",
+    metaDescription:
+      "역률을 반영해 kW와 kVA를 변환합니다. 100kW·역률 0.8은 125kVA이고, 둘을 같은 값으로 보면 안 되는 경우를 함께 설명합니다.",
+    description: "유효전력(kW)과 피상전력(kVA)을 역률로 변환합니다. 마력(HP) 환산도 같은 화면에서 합니다.",
     longDescription:
-      "kW, kVA, HP 사이의 단위 환산을 수행합니다. 1 HP = 0.746 kW(기계적 마력)를 사용하며, 역률을 입력하면 피상전력을 함께 계산합니다.",
+      "100kW를 역률 0.8로 나누면 125kVA이고, 125kVA에 0.8을 곱하면 100kW입니다. 역률이 1이 아니면 kW와 kVA는 같지 않습니다.",
     formulaId: "formula-kw-kva-hp",
     tags: ["kW", "kVA", "HP", "환산", "마력"],
     synonyms: ["킬로와트", "킬로볼트암페어", "마력", "horsepower", "converter", "단위변환"],
-    relatedToolIds: ["tool-power-factor", "tool-three-phase-current", "tool-transformer-load"],
-    relatedArticleIds: ["art-kw-vs-kva", "art-power-factor-poor"],
+    relatedToolIds: [
+      "tool-power-factor",
+      "tool-transformer-load",
+      "tool-transformer-sizing",
+      "tool-three-phase-current",
+    ],
+    relatedArticleIds: ["art-kw-vs-kva", "art-motor-kw-input", "art-power-factor-poor", "art-transformer-sizing"],
     complexity: "basic",
     featured: true,
     recentlyAdded: false,
@@ -106,9 +139,26 @@ export const baseTools: CalculatorTool[] = [
     updatedAt: "2026-08-20",
     faqs: [
       {
-        question: "모터 10 HP는 전기 용량이 얼마인가요?",
+        question: "100kW는 몇 kVA인가요?",
+        answer: "역률 0.8이면 100 / 0.8 = 125kVA입니다. 역률을 모르면 kVA를 정할 수 없습니다.",
+      },
+      {
+        question: "kW와 kVA는 어떻게 다른가요?",
         answer:
-          "출력 10 HP ≈ 7.46 kW입니다. 입력 kW는 효율로 나누고, 변압기·MCC 용량은 역률을 나눈 kVA를 검토해야 합니다.",
+          "kW는 실제로 일을 하는 유효전력입니다. kVA는 전압과 전류가 담당하는 피상전력입니다. kW = kVA × 역률입니다.",
+      },
+      {
+        question: "역률 없이 kW와 kVA를 같은 값으로 봐도 되나요?",
+        answer: "역률이 1일 때만 같습니다. 역률이 낮으면 같은 일을 해도 kVA와 전류가 더 커집니다.",
+      },
+      {
+        question: "125kVA는 몇 kW인가요?",
+        answer: "역률 0.8이면 125 × 0.8 = 100kW입니다.",
+      },
+      {
+        question: "모터 10HP는 전기 용량이 얼마인가요?",
+        answer:
+          "출력 10HP는 7.46kW입니다. 전기 입력은 효율로 더 크고, 변압기 용량은 그 입력을 역률로 나눈 kVA로 봅니다.",
       },
     ],
   },
@@ -127,7 +177,7 @@ export const baseTools: CalculatorTool[] = [
     tags: ["역률", "PF", "무효전력", "kvar"],
     synonyms: ["power factor", "cosφ", "코사인파이", "역률개선", "무효전력"],
     relatedToolIds: ["tool-kw-kva-hp", "tool-transformer-load", "tool-three-phase-current"],
-    relatedArticleIds: ["art-power-factor-poor", "art-kw-vs-kva"],
+    relatedArticleIds: ["art-pfc-location", "art-power-factor-poor", "art-kw-vs-kva"],
     complexity: "basic",
     featured: true,
     recentlyAdded: false,
@@ -149,20 +199,24 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "변압기 용량·부하율 계산기",
     nameEn: "Transformer capacity and load ratio calculator",
-    description: "정격 kVA 대비 설계 부하 또는 현장 측정 전압·전류로 부하율과 여유 용량을 산정합니다.",
+    pageHeading: "변압기 부하율 계산기",
+    metaTitle: "변압기 부하율 계산기 | kW·kVA·역률 계산",
+    metaDescription:
+      "부하 kW를 역률로 kVA로 바꾼 뒤 변압기 정격 대비 부하율을 계산합니다. 500kVA에 300kW·역률 0.8이면 75%입니다.",
+    description: "정격 kVA와 부하(kW 또는 kVA)로 변압기 부하율을 계산합니다.",
     longDescription:
-      "설계 계산(kW 또는 kVA)과 현장 측정(전압·전류) 모드를 제공합니다. R/S/T가 있으면 평균전류 기반 추정 부하와 최대상 전류를 보여 줍니다. 온도·고조파 derating은 포함하지 않습니다.",
+      "부하가 kW이면 역률로 kVA를 만든 다음 정격으로 나눕니다. 500kVA, 300kW, 역률 0.8은 375kVA, 부하율 75%입니다. 전압·전류 측정도 가능하고, 온도·고조파 보정은 하지 않습니다.",
     formulaId: "formula-transformer-load",
     tags: ["변압기", "부하율", "kVA", "TR"],
     synonyms: ["변압기 부하율", "transformer load", "변압기용량", "TR 부하", "부하율 계산"],
     relatedToolIds: [
-      "tool-three-phase-current",
+      "tool-kw-kva-hp",
+      "tool-power-factor",
       "tool-transformer-sizing",
+      "tool-three-phase-current",
       "tool-field-compare",
-      "tool-phase-unbalance",
-      "tool-load-schedule",
     ],
-    relatedArticleIds: ["art-transformer-load", "art-kw-vs-kva", "art-demand-vs-load-factor"],
+    relatedArticleIds: ["art-transformer-load", "art-kw-vs-kva", "art-transformer-sizing", "art-demand-vs-load-factor"],
     complexity: "intermediate",
     featured: true,
     recentlyAdded: false,
@@ -170,9 +224,21 @@ export const baseTools: CalculatorTool[] = [
     updatedAt: "2026-08-20",
     faqs: [
       {
-        question: "적정 부하율은 얼마인가요?",
+        question: "500kVA 변압기에 300kW를 사용하면 부하율은 얼마인가요?",
+        answer: "역률 0.8이면 300 / 0.8 = 375kVA이고, 375 / 500 × 100 = 75%입니다.",
+      },
+      {
+        question: "kW를 그대로 kVA로 나누면 되나요?",
+        answer: "안 됩니다. 부하가 kW이면 역률로 kVA를 만든 다음 정격 kVA로 나눕니다.",
+      },
+      {
+        question: "역률이 변하면 부하율도 변하나요?",
+        answer: "kW가 같아도 역률이 낮아지면 부하 kVA가 커져 부하율이 올라갑니다.",
+      },
+      {
+        question: "부하율 몇 %가 적정한가요?",
         answer:
-          "프로젝트 운영기준과 제조사·냉각조건을 확인하세요. Ampory가 부하율 구간을 합격/경고로 나누지 않습니다.",
+          "이 계산이 정하지 않습니다. 부하 특성, 피크부하, 운전조건, 설비 구성과 적용 기준을 함께 봐야 합니다.",
       },
     ],
   },
@@ -184,9 +250,12 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "전압강하 계산기",
     nameEn: "Voltage drop calculator",
-    description: "전류, 길이, 도체 저항으로 단상·3상 전압강하를 근사 계산합니다.",
+    metaTitle: "전압강하 계산기 | 전선·거리별 전압강하 계산",
+    metaDescription:
+      "전류, 거리, 도체 저항으로 단상·3상 전압강하를 계산합니다. 저항 근사식과 계산 예제, 결과를 볼 때 확인할 사항을 함께 제공합니다.",
+    description: "전류, 편도 길이, 도체 저항으로 단상·3상 전압강하를 계산합니다.",
     longDescription:
-      "저항 기반 근사식으로 전압강하(V)와 전압강하율(%)을 계산합니다. 단면적·재질 입력 또는 Ω/km 직접 입력을 지원합니다.",
+      "3상은 √3 × I × L × r / 1000, 단상은 2 × I × L × r / 1000입니다. 80A·80m·0.727Ω/km·380V 3상은 8.06V(2.12%)입니다. 리액턴스는 포함하지 않습니다.",
     formulaId: "formula-voltage-drop",
     tags: ["전압강하", "케이블", "VD", "전선"],
     synonyms: ["voltage drop", "전압 강하", "선로전압강하", "케이블 전압강하", "VD%"],
@@ -196,13 +265,26 @@ export const baseTools: CalculatorTool[] = [
       "tool-cable-resistance",
       "tool-path-voltage-drop",
     ],
-    relatedArticleIds: ["art-voltage-drop", "art-cable-sizing"],
+    relatedArticleIds: ["art-voltage-drop", "art-motor-start-dip", "art-voltage-drop-guide", "art-cable-sizing"],
     complexity: "intermediate",
     featured: true,
     recentlyAdded: false,
     status: "published",
     updatedAt: "2026-08-20",
     faqs: [
+      {
+        question: "이 계산기는 어떤 식을 쓰나요?",
+        answer:
+          "단상은 ΔV = 2 × I × L × r / 1000, 3상은 ΔV = √3 × I × L × r / 1000입니다. L은 편도 길이(m), r은 Ω/km입니다. 리액턴스와 역률 보정은 넣지 않습니다.",
+      },
+      {
+        question: "80A, 80m, 0.727Ω/km, 380V 3상은 얼마인가요?",
+        answer: "전압강하는 8.06V, 강하율은 2.12%입니다. 말단 예상전압은 371.94V입니다.",
+      },
+      {
+        question: "한 구간 결과로 인입부터 기기까지 판단해도 되나요?",
+        answer: "구간 전압강하입니다. 인입구부터 기기까지는 경로 전압강하 계산기에서 구간을 더해 봅니다.",
+      },
       {
         question: "전압강하 허용치는 얼마인가요?",
         answer:
@@ -231,7 +313,7 @@ export const baseTools: CalculatorTool[] = [
       "인입 전압강하",
     ],
     relatedToolIds: ["tool-voltage-drop", "tool-cable-sizing", "tool-cable-resistance"],
-    relatedArticleIds: ["art-voltage-drop", "art-cable-sizing"],
+    relatedArticleIds: ["art-voltage-drop-guide", "art-motor-start-dip", "art-voltage-drop", "art-cable-sizing"],
     complexity: "advanced",
     featured: true,
     recentlyAdded: true,
@@ -299,7 +381,7 @@ export const baseTools: CalculatorTool[] = [
     tags: ["차단기", "MCCB", "정격전류", "In"],
     synonyms: ["MCCB", "ELB", "NFB", "breaker", "차단기 용량"],
     relatedToolIds: ["tool-three-phase-current", "tool-single-phase-current", "tool-cable-sizing"],
-    relatedArticleIds: ["art-mccb-vs-elb", "art-cable-sizing", "art-breaker-and-cable"],
+    relatedArticleIds: ["art-fault-vs-icu", "art-elb-30a-30ma", "art-mccb-vs-elb", "art-breaker-and-cable"],
     complexity: "intermediate",
     featured: false,
     recentlyAdded: true,
@@ -357,7 +439,7 @@ export const baseTools: CalculatorTool[] = [
     tags: ["UPS", "kVA", "용량", "여유율"],
     synonyms: ["UPS 용량", "UPS sizing", "무정전전원", "인버터 용량"],
     relatedToolIds: ["tool-ups-backup-time", "tool-kw-kva-hp", "tool-power-factor"],
-    relatedArticleIds: ["art-ups-vs-generator", "art-kw-vs-kva", "art-ups-sizing"],
+    relatedArticleIds: ["art-ups-on-generator", "art-ups-vs-generator", "art-ups-sizing", "art-kw-vs-kva"],
     complexity: "intermediate",
     featured: false,
     recentlyAdded: true,

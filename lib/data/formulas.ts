@@ -51,10 +51,10 @@ export const baseFormulas: FormulaDefinition[] = [
     formula: "I = P / (√3 × V × PF × η)",
     variables: [
       { symbol: "I", name: "선전류", unit: "A", description: "3상 평형 선전류" },
-      { symbol: "P", name: "유효전력", unit: "W", description: "3상 합산 유효전력" },
+      { symbol: "P", name: "유효전력", unit: "W", description: "3상 합산 전력. 전기 입력이면 그대로 넣고, 축출력이면 효율로 나눕니다." },
       { symbol: "V", name: "선간전압", unit: "V", description: "3상 선간전압 VL-L" },
       { symbol: "PF", name: "역률", unit: "—", description: "0 초과 1 이하" },
-      { symbol: "η", name: "효율", unit: "—", description: "적용 시 1 미만" },
+      { symbol: "η", name: "효율", unit: "—", description: "전기 입력이면 1. 축출력이면 명판 효율" },
     ],
     units: ["kW", "V", "A"],
     assumptions: [
@@ -74,9 +74,9 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: [
         "P = 45000 W",
         "분모 = √3 × 380 × 0.85 × 0.92",
-        "I = 45000 / 516.3 ≈ 87.2 A",
+        "I = 45000 / (√3 × 380 × 0.85 × 0.92) = 87.43 A",
       ],
-      result: "약 87.2 A",
+      result: "87.43 A",
     },
     referenceSources: [
       {
@@ -244,10 +244,10 @@ export const baseFormulas: FormulaDefinition[] = [
       given: "3상, V = 380 V, I = 80 A, L = 80 m, r = 0.727 Ω/km",
       steps: [
         "ΔV = √3 × 80 × 80 × 0.727 / 1000",
-        "ΔV ≈ 8.07 V",
-        "ΔV% = 8.07 / 380 × 100 ≈ 2.12%",
+        "ΔV = 8.06 V",
+        "ΔV% = 8.06 / 380 × 100 = 2.12%",
       ],
-      result: "약 8.07 V (2.12%)",
+      result: "8.06 V (2.12%)",
     },
     referenceSources: [
       {

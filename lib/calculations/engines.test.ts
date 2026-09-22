@@ -17,6 +17,7 @@ import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 import { searchCatalog } from "@/lib/search";
 import { calculateMotorCurrent } from "@/lib/calculations/motor";
 import { calculatePowerFactorCorrection } from "@/lib/calculations/power-quality";
+import { getCalculatorGuide } from "@/lib/data/calculator-guides";
 
 function primaryNumber(outcome: ReturnType<typeof calculateSinglePhaseCurrent>): number {
   if (!outcome.ok) throw new Error(outcome.formError ?? "fail");
@@ -62,6 +63,34 @@ describe("3상 부하전류", () => {
     );
     expect(primaryNumber(out)).toBeCloseTo(expected, 2);
   });
+
+  it("380V 30kW 역률 0.9 효율 1은 50.64A", () => {
+    const out = calculateThreePhaseCurrent(
+      { power: "30", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1" },
+      2,
+    );
+    expect(primaryNumber(out)).toBeCloseTo(50.64, 2);
+  });
+
+  it("효율 0.92면 같은 30kW는 55.05A", () => {
+    const out = calculateThreePhaseCurrent(
+      { power: "30", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "0.92" },
+      2,
+    );
+    expect(primaryNumber(out)).toBeCloseTo(55.05, 2);
+  });
+
+  it("380V 역률 0.9 효율 1 표가 계산기와 같다", () => {
+    const rows = getCalculatorGuide("three-phase-current")?.lookup?.rows ?? [];
+    expect(rows.map((row) => row[0])).toEqual(["10 kW", "20 kW", "30 kW", "50 kW", "100 kW"]);
+    for (const [power, amps] of rows) {
+      const out = calculateThreePhaseCurrent(
+        { power: power.replace(" kW", ""), powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1" },
+        2,
+      );
+      expect(`${primaryNumber(out).toFixed(2)} A`).toBe(amps);
+    }
+  });
 });
 
 describe("kW/kVA/HP", () => {
@@ -73,6 +102,19 @@ describe("kW/kVA/HP", () => {
       expect(Number(kva?.value)).toBeCloseTo(37.5, 2);
       const hp = out.metrics.find((m) => m.id === "hp");
       expect(Number(hp?.value)).toBeCloseTo(30000 / WATTS_PER_HP, 2);
+    }
+  });
+
+  it("100kW 역률 0.8은 125kVA, 반대는 100kW", () => {
+    const forward = calculateKwKvaHp({ mode: "from-kw", power: "100", powerUnit: "kW", pf: "0.8" }, 2);
+    expect(forward.ok).toBe(true);
+    if (forward.ok) {
+      expect(Number(forward.metrics.find((m) => m.id === "kva")?.value)).toBeCloseTo(125, 2);
+    }
+    const back = calculateKwKvaHp({ mode: "from-kva", kva: "125", pf: "0.8" }, 2);
+    expect(back.ok).toBe(true);
+    if (back.ok) {
+      expect(Number(back.metrics.find((m) => m.id === "kw")?.value)).toBeCloseTo(100, 2);
     }
   });
 });
@@ -97,6 +139,14 @@ describe("변압기 부하율", () => {
   it("800/1000 = 80%", () => {
     const out = calculateTransformerLoad({ ratedKva: "1000", loadMode: "kw", loadKw: "720", pf: "0.9" }, 2);
     expect(primaryNumber(out)).toBeCloseTo(80, 2);
+  });
+
+  it("500kVA에 300kW 역률 0.8은 75%", () => {
+    const out = calculateTransformerLoad({ ratedKva: "500", loadMode: "kw", loadKw: "300", pf: "0.8" }, 2);
+    expect(primaryNumber(out)).toBeCloseTo(75, 2);
+    if (out.ok) {
+      expect(Number(out.metrics.find((m) => m.id === "load")?.value)).toBeCloseTo(375, 2);
+    }
   });
 
   it("정격 초과를 자동 과부하 판정하지 않는다", () => {
@@ -125,6 +175,11 @@ describe("전압강하", () => {
       2,
     );
     expect(primaryNumber(out)).toBeCloseTo(expected, 2);
+    if (out.ok) {
+      expect(Number(out.metrics.find((m) => m.id === "dv")?.value)).toBeCloseTo(8.06, 2);
+      expect(Number(out.metrics.find((m) => m.id === "pct")?.value)).toBeCloseTo(2.12, 2);
+      expect(Number(out.metrics.find((m) => m.id === "vend")?.value)).toBeCloseTo(371.94, 2);
+    }
   });
 });
 

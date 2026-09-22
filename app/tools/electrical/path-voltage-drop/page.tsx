@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { JsonLd } from "@/components/seo/json-ld";
+import { RelatedResources } from "@/components/calculators/related-resources";
 import { PathVoltageDropClient } from "@/components/calculators/path-voltage-drop-client";
+import { getRelatedArticles } from "@/lib/data/articles";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
@@ -13,6 +15,7 @@ export const metadata: Metadata = {
 
 export default function PathVoltageDropPage() {
   const tool = getToolBySlug("path-voltage-drop");
+  const articles = getRelatedArticles(tool?.relatedArticleIds ?? []);
   return (
     <>
       <JsonLd
@@ -26,6 +29,9 @@ export default function PathVoltageDropPage() {
       <Suspense fallback={<p className="text-sm text-muted">경로 계산기를 불러오는 중입니다.</p>}>
         <PathVoltageDropClient />
       </Suspense>
+      <div className="mx-auto w-full max-w-5xl">
+        <RelatedResources related={[]} articles={articles} />
+      </div>
     </>
   );
 }

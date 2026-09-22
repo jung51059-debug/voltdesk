@@ -62,6 +62,46 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
         <p className="text-sm font-medium">결과: {formula.example.result}</p>
       </Section>
 
+      {guide.walkthrough ? (
+        <Section title={guide.walkthrough.title}>
+          {guide.walkthrough.lines.map((line) => (
+            <p key={line} className="text-sm leading-7 text-muted">
+              {line}
+            </p>
+          ))}
+        </Section>
+      ) : null}
+
+      {guide.lookup ? (
+        <Section title={guide.lookup.title}>
+          <p className="text-sm leading-6 text-muted">{guide.lookup.note}</p>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[16rem] border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  {guide.lookup.columns.map((column) => (
+                    <th key={column} className="whitespace-nowrap px-3 py-2 font-medium">
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {guide.lookup.rows.map((row) => (
+                  <tr key={row.join("|")} className="border-b border-border">
+                    {row.map((cell) => (
+                      <td key={cell} className="whitespace-nowrap px-3 py-2 text-muted">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      ) : null}
+
       <Section title="결과 해석">
         {guide.interpretation.map((paragraph) => (
           <p key={paragraph} className="text-sm leading-7 text-muted">

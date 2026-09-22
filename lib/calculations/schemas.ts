@@ -72,10 +72,10 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       efficiency: "0.92",
     },
     fields: [
-      { id: "power", label: "유효전력", kind: "number", required: true, min: 0, step: "any", unitField: "powerUnit", units: powerUnits },
+      { id: "power", label: "유효전력", kind: "number", required: true, min: 0, step: "any", unitField: "powerUnit", units: powerUnits, hint: "전기 입력 kW입니다. 모터 축출력이면 상세 조건의 효율로 나눕니다." },
       { id: "voltage", label: "선간전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits, hint: "3상 선간전압 (예: 380 V)" },
       { id: "pf", label: "역률 PF", kind: "number", min: 0, max: 1, step: "0.01" },
-      { id: "efficiency", label: "효율 η", kind: "number", min: 0, max: 1, step: "0.01", advanced: true },
+      { id: "efficiency", label: "효율 η", kind: "number", min: 0, max: 1, step: "0.01", advanced: true, hint: "전기 입력을 알고 있으면 1.0. 축출력이면 명판 효율. 기본 0.92는 45kW 펌프 예시입니다." },
     ],
   },
   "kw-kva-hp": {

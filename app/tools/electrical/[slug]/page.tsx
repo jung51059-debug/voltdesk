@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { getRelatedArticles } from "@/lib/data/articles";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getPublishedTools, getRelatedTools, getToolBySlug, isElectricalWorkspaceTool } from "@/lib/data/tools";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -19,13 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = getToolBySlug(slug);
   if (!tool || !isElectricalWorkspaceTool(tool)) return {};
-  return {
-    title: tool.name,
-    description: tool.longDescription,
-    alternates: { canonical: tool.href },
-    openGraph: { title: tool.name, description: tool.longDescription },
-    robots: tool.status === "published" ? undefined : { index: false, follow: true },
-  };
+  return toolMetadata(tool);
 }
 
 export default async function ElectricalToolPage({ params }: Props) {
@@ -43,7 +37,7 @@ export default async function ElectricalToolPage({ params }: Props) {
         data={breadcrumbJsonLd([
           { name: "홈", href: "/" },
           { name: "전기 계산기", href: "/tools/electrical" },
-          { name: tool.name, href: tool.href },
+          { name: tool.pageHeading ?? tool.name, href: tool.href },
         ])}
       />
       <JsonLd data={faqJsonLd(tool.faqs)} />

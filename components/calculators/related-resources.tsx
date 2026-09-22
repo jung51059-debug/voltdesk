@@ -23,7 +23,7 @@ export function RelatedResources({
             {related.map((item) => (
               <li key={item.id}>
                 <Link href={item.href} className="text-muted hover:text-primary">
-                  {item.name}
+                  {item.pageHeading ?? item.name}
                 </Link>
               </li>
             ))}

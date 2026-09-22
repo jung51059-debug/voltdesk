@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentArticle } from "@/components/references/track-recent-article";
-import { articles, getArticleBySlug, getRelatedToolsForArticle } from "@/lib/data/articles";
+import { articles, getArticleBySlug, getRelatedArticles, getRelatedToolsForArticle } from "@/lib/data/articles";
 import { getCategoryById } from "@/lib/data/categories";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 
@@ -31,7 +31,10 @@ export default async function ArticlePage({ params }: Props) {
   const article = getArticleBySlug(slug);
   if (!article) notFound();
   const category = getCategoryById(article.categoryId);
-  const tools = getRelatedToolsForArticle(article);
+  const tools = getRelatedToolsForArticle(article).slice(0, 5);
+  const relatedArticles = getRelatedArticles(article.relatedArticleIds ?? [])
+    .filter((item) => item.id !== article.id)
+    .slice(0, 5);
 
   return (
     <article>
@@ -115,12 +118,26 @@ export default async function ArticlePage({ params }: Props) {
                 tool ? (
                   <li key={tool.id}>
                     <Link href={tool.href} className="text-primary hover:underline">
-                      {tool.name}
+                      {tool.pageHeading ?? tool.name}
                     </Link>
                     <span className="text-muted"> — {tool.description}</span>
                   </li>
                 ) : null,
               )}
+            </ul>
+          </section>
+        ) : null}
+        {relatedArticles.length > 0 ? (
+          <section>
+            <h2 className="text-xl font-semibold">관련 실무 가이드</h2>
+            <ul className="mt-3 list-disc space-y-2 pl-5 leading-7">
+              {relatedArticles.map((item) => (
+                <li key={item.id}>
+                  <Link href={item.href} className="text-primary hover:underline">
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </section>
         ) : null}

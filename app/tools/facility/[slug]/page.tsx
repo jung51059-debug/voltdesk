@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { getRelatedArticles } from "@/lib/data/articles";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getPublishedTools, getRelatedTools, getToolBySlug, isFacilityWorkspaceTool } from "@/lib/data/tools";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -19,13 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = getToolBySlug(slug);
   if (!tool || !isFacilityWorkspaceTool(tool)) return {};
-  return {
-    title: tool.name,
-    description: tool.longDescription,
-    alternates: { canonical: tool.href },
-    openGraph: { title: tool.name, description: tool.longDescription },
-    robots: tool.status === "published" ? undefined : { index: false, follow: true },
-  };
+  return toolMetadata(tool);
 }
 
 export default async function FacilityToolPage({ params }: Props) {

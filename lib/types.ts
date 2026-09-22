@@ -42,6 +42,12 @@ export interface CalculatorTool {
   status: ToolStatus;
   updatedAt: string;
   faqs: FaqItem[];
+  /** 화면 H1. 없으면 name. 목록·즐겨찾기 이름은 name을 유지합니다. */
+  pageHeading?: string;
+  /** 문서 title. 루트 템플릿이 뒤에 사이트 이름을 붙입니다. */
+  metaTitle?: string;
+  /** 검색 설명. 없으면 longDescription을 사용합니다. */
+  metaDescription?: string;
 }
 
 export interface FormulaVariable {
@@ -92,6 +98,8 @@ export interface ReferenceArticle {
   summary: string;
   categoryId: string;
   relatedToolIds: string[];
+  /** 같은 주제의 다른 실무 가이드. 없으면 섹션을 그리지 않습니다. */
+  relatedArticleIds?: string[];
   tags: string[];
   synonyms: string[];
   updatedAt: string;

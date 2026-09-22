@@ -11,7 +11,8 @@ export const baseArticles: ReferenceArticle[] = [
     summary:
       "kW는 실제 일을 하는 유효전력이고, kVA는 전압과 전류의 곱에 해당하는 피상전력입니다. 변압기·UPS·발전기 용량은 보통 kVA로 표기됩니다.",
     categoryId: "cat-reference-basics",
-    relatedToolIds: ["tool-kw-kva-hp", "tool-power-factor", "tool-transformer-load"],
+    relatedToolIds: ["tool-kw-kva-hp", "tool-transformer-load", "tool-transformer-sizing", "tool-power-factor"],
+    relatedArticleIds: ["art-transformer-load", "art-power-factor-poor", "art-demand-vs-load-factor"],
     tags: ["kW", "kVA", "역률", "피상전력"],
     synonyms: ["킬로와트", "킬로볼트암페어", "유효전력", "피상전력", "kw vs kva"],
     updatedAt: "2026-08-20",
@@ -19,7 +20,25 @@ export const baseArticles: ReferenceArticle[] = [
       "kW = kVA × 역률입니다. 같은 일을 하더라도 역률이 낮으면 설비와 케이블이 감당해야 하는 전류(kVA)가 커집니다.",
     formula: "PF = kW / kVA,  kVA = kW / PF",
     practicalExample:
-      "720 kW 부하를 역률 0.9로 운전하면 800 kVA가 필요합니다. 역률이 0.72라면 1000 kVA가 되어 1000 kVA 변압기가 가득 찹니다.",
+      "100kW를 역률 0.8로 나누면 125kVA입니다. 반대로 125kVA에 0.8을 곱하면 100kW입니다. 역률이 1이면 둘은 같습니다.",
+    faqs: [
+      {
+        question: "100kW는 몇 kVA인가요?",
+        answer: "역률 0.8이면 100 / 0.8 = 125kVA입니다. 역률을 모르면 kVA를 정할 수 없습니다.",
+      },
+      {
+        question: "역률이 1이면 kW와 kVA는 같은가요?",
+        answer: "같습니다. kW = kVA × 역률이므로 역률이 1이면 두 숫자가 같습니다.",
+      },
+      {
+        question: "kW를 kVA로 바꿀 때 왜 역률이 필요한가요?",
+        answer: "kVA는 전압과 전류가 만드는 크기이고, kW는 그중 실제로 일이 되는 부분입니다. 역률이 그 비율입니다.",
+      },
+      {
+        question: "왜 변압기는 kVA로 표시하나요?",
+        answer: "권선이 견디는 것은 전류와 발열입니다. 같은 kW라도 역률이 낮으면 전류가 커지므로 명판은 kVA입니다.",
+      },
+    ],
     limitations: [
       "고조파가 있으면 진성 역률과 변위 역률이 달라질 수 있습니다.",
       "모터 출력 kW와 전기 입력 kW는 효율만큼 차이가 납니다.",
@@ -46,8 +65,9 @@ export const baseArticles: ReferenceArticle[] = [
       {
         heading: "실무에서 헷갈리는 지점",
         paragraphs: [
-          "발전기는 kW와 kVA를 함께 표기하는 경우가 많습니다. kW는 엔진 출력, kVA는 전기자 전류 한도와 관련이 있습니다.",
-          "UPS와 변압기는 보통 kVA입니다. IT 부하 kW만 보고 용량을 정하면 역률과 파형에 따라 과전류가 날 수 있습니다.",
+          "100kW, 역률 0.8이면 kVA = 100 / 0.8 = 125kVA입니다. 125kVA × 0.8 = 100kW로 되돌아갑니다.",
+          "720kW를 역률 0.9로 보면 800kVA입니다. 역률이 0.72면 1000kVA가 되어, 같은 일이 1000kVA 변압기를 가득 채웁니다.",
+          "발전기는 kW와 kVA를 함께 적는 경우가 많습니다. kW는 엔진이 내는 출력, kVA는 전기자가 흘릴 수 있는 전류와 연결됩니다.",
         ],
       },
     ],
@@ -103,6 +123,7 @@ export const baseArticles: ReferenceArticle[] = [
       "MCCB는 과전류·단락을 차단하는 배선용 차단기이고, ELB(누전차단기)는 지락·누전을 검출합니다. 역할이 다르므로 한쪽만으로 상대 기능을 대체할 수 없습니다.",
     categoryId: "cat-reference-dist",
     relatedToolIds: ["tool-breaker-current", "tool-three-phase-current", "tool-cable-sizing"],
+    relatedArticleIds: ["art-elb-30a-30ma", "art-fault-vs-icu", "art-breaker-and-cable"],
     tags: ["MCCB", "ELB", "RCD", "차단기"],
     synonyms: ["누전차단기", "배선용차단기", "ELCB", "RCD", "NFB", "MCCB vs ELB", "과전류 보호"],
     updatedAt: "2026-08-30",
@@ -272,6 +293,7 @@ export const baseArticles: ReferenceArticle[] = [
         ],
       },
     ],
+    relatedArticleIds: ["art-ups-on-generator", "art-ups-sizing", "art-generator-sizing"],
   },
   {
     id: "art-transformer-load",
@@ -324,14 +346,33 @@ export const baseArticles: ReferenceArticle[] = [
       "전압강하는 도체 저항과 리액턴스에 전류가 흐르며 생기는 전압 손실입니다. 간단한 실무 근사는 저항만으로 ΔV를 구하고, 정확한 설계는 케이블 임피던스표를 씁니다.",
     categoryId: "cat-cable",
     relatedToolIds: ["tool-voltage-drop", "tool-path-voltage-drop", "tool-cable-resistance", "tool-three-phase-current"],
+    relatedArticleIds: ["art-motor-start-dip", "art-voltage-drop-guide", "art-breaker-and-cable"],
     tags: ["전압강하", "케이블", "임피던스"],
     synonyms: ["voltage drop", "선로 전압강하", "VD"],
     updatedAt: "2026-08-20",
     keyConcept:
-      "단상 왕복은 2IR, 3상은 √3 × I × Z × L 형태의 관계가 기본입니다. 길이와 전류가 클수록, 단면적이 작을수록 강하가 커집니다.",
+      "단상은 2 × I × L × r, 3상은 √3 × I × L × r입니다. Ampory 계산기는 저항만 넣습니다. 길이와 전류가 클수록, 단면적이 작을수록 강하가 커집니다.",
     formula: "3상 ΔV ≈ √3 × I × L × r / 1000  (r in Ω/km, L in m, 저항만 고려)",
     practicalExample:
-      "380 V, 80 A, 80 m, r = 0.727 Ω/km이면 ΔV ≈ 8.1 V, 약 2.1%입니다. 허용 기준은 프로젝트 규정에 따릅니다.",
+      "3상 380V, 80A, 80m, r = 0.727Ω/km이면 ΔV = 8.06V, 2.12%, 말단 371.94V입니다. 전압강하 계산기의 저항 근사와 같습니다.",
+    faqs: [
+      {
+        question: "전압강하는 왜 생기나요?",
+        answer: "전선에 저항이 있고 전류가 흐르면 그 구간에서 전압이 줄어듭니다. 전류, 길이, 도체 저항이 클수록 낙폭이 커집니다.",
+      },
+      {
+        question: "거리가 길면 왜 전압이 떨어지나요?",
+        answer: "같은 전선이라도 길면 저항이 커집니다. Ampory 식에서 길이는 편도이며, 전압강하는 길이에 비례합니다.",
+      },
+      {
+        question: "단상과 3상 식이 다른 이유는 무엇인가요?",
+        answer: "단상은 왕복 도체라 ΔV = 2 × I × L × r / 1000입니다. 3상 선간은 ΔV = √3 × I × L × r / 1000입니다. 리액턴스는 넣지 않습니다.",
+      },
+      {
+        question: "결과를 %로 보는 이유는 무엇인가요?",
+        answer: "같은 8V라도 220V 회로와 380V 회로에서 체감이 다릅니다. %는 그 구간의 기준전압으로 나눈 비율입니다.",
+      },
+    ],
     limitations: [
       "리액턴스, 역률, 온도, 병렬 케이블을 무시하면 오차가 납니다.",
       "허용전류 부족과 전압강하는 별개 문제입니다.",
@@ -344,8 +385,8 @@ export const baseArticles: ReferenceArticle[] = [
       {
         heading: "저항과 리액턴스",
         paragraphs: [
-          "단면적이 작고 길이가 긴 저압 회로는 저항이 지배적인 경우가 많습니다. 큰 단면적이나 고압 장거리에서는 리액턴스 비중이 커집니다.",
-          "역률이 낮으면 리액턴스 성분의 전압강하가 더 두드러집니다.",
+          "Ampory 전압강하 계산기는 도체 저항만 씁니다. 단면적이 작고 길이가 긴 저압에서는 저항이 대부분인 경우가 많고, 굵은 전선이나 장거리에서는 리액턴스 때문에 실제 낙폭이 더 클 수 있습니다.",
+          "전류를 먼저 구하려면 3상 전류 계산기를 쓰고, 저항 숫자를 모르면 도체 저항 계산기나 제조사 표를 봅니다.",
         ],
       },
       {
@@ -399,6 +440,7 @@ export const baseArticles: ReferenceArticle[] = [
         ],
       },
     ],
+    relatedArticleIds: ["art-pfc-location", "art-power-factor", "art-kw-vs-kva"],
   },
   {
     id: "art-single-vs-three",
@@ -490,6 +532,7 @@ export const baseArticles: ReferenceArticle[] = [
         ],
       },
     ],
+    relatedArticleIds: ["art-phase-unbalance-neutral", "art-motor-kw-input"],
   },
   {
     id: "art-cable-sizing",
@@ -530,6 +573,7 @@ export const baseArticles: ReferenceArticle[] = [
         ],
       },
     ],
+    relatedArticleIds: ["art-cable-ampacity-conditions", "art-breaker-and-cable", "art-voltage-drop"],
   },
 ];
 

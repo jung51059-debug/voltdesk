@@ -406,6 +406,10 @@ describe("카탈로그 정합", () => {
       for (const id of article.relatedToolIds) {
         expect(getToolById(id), `${article.slug} → ${id}`).toBeTruthy();
       }
+      for (const id of article.relatedArticleIds ?? []) {
+        expect(getArticleById(id)?.id, `${article.slug} → ${id}`).not.toBe(article.id);
+        expect(getArticleById(id), `${article.slug} → ${id}`).toBeTruthy();
+      }
     }
   });
 

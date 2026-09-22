@@ -1,10 +1,24 @@
+import type { Metadata } from "next";
 import { articles } from "@/lib/data/articles";
 import { getHubCategories } from "@/lib/data/categories";
 import { getPublishedTools } from "@/lib/data/tools";
-import { SITE } from "@/lib/types";
+import { SITE, type CalculatorTool } from "@/lib/types";
 
 export function absoluteUrl(path: string): string {
   return new URL(path, SITE.url).toString();
+}
+
+/** 계산기 공개 페이지의 title, description, canonical, Open Graph. */
+export function toolMetadata(tool: CalculatorTool): Metadata {
+  const title = tool.metaTitle ?? tool.name;
+  const description = tool.metaDescription ?? tool.longDescription;
+  return {
+    title,
+    description,
+    alternates: { canonical: tool.href },
+    openGraph: { title, description },
+    robots: tool.status === "published" ? undefined : { index: false, follow: true },
+  };
 }
 
 export function breadcrumbJsonLd(items: { name: string; href: string }[]) {

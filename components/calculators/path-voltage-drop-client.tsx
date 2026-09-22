@@ -12,7 +12,6 @@ import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { parseHandoff } from "@/lib/calculations/handoff";
 import { getCalculatorGuide } from "@/lib/data/calculator-guides";
-import { getRelatedArticles } from "@/lib/data/articles";
 import { getRelatedTools, getToolBySlug } from "@/lib/data/tools";
 import {
   KEC_VOLTAGE_DROP_MIXED,
@@ -113,7 +112,6 @@ export function PathVoltageDropClient() {
   const basis = getStandardBasisBySlug("path-voltage-drop");
   const tool = getToolBySlug("path-voltage-drop");
   const related = tool ? getRelatedTools(tool) : [];
-  const articles = tool ? getRelatedArticles(tool.relatedArticleIds) : [];
   const [draft, setDraft] = useState<Draft>(() => store.load());
   const [hydrated, setHydrated] = useState(false);
 
@@ -381,7 +379,7 @@ export function PathVoltageDropClient() {
         </>
       ) : null}
 
-      <RelatedResources related={related} articles={articles} />
+      <RelatedResources related={related} articles={[]} />
     </div>
   );
 }

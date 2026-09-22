@@ -207,7 +207,7 @@ export function CalculatorWorkspace({
       label: tool.domain === "facility" ? "시설" : "전기",
     },
     ...(category ? [{ href: `/tools/categories/${category.slug}`, label: category.name }] : []),
-    { label: tool.name },
+    { label: tool.pageHeading ?? tool.name },
   ];
 
   const shareHref = buildHandoffHref(tool.href, values);
@@ -284,7 +284,7 @@ export function CalculatorWorkspace({
       <header className="mb-6 flex items-start justify-between gap-3">
         <div>
           {category ? <p className="text-xs font-medium text-muted">{category.name}</p> : null}
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{tool.name}</h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{tool.pageHeading ?? tool.name}</h1>
           {basis ? (
             <div className="mt-2 space-y-1.5">
               <StandardStatusBadge status={basis.standardStatus} />
