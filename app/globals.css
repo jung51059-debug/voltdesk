@@ -85,7 +85,7 @@ details summary:focus-visible {
   outline-offset: 2px;
 }
 
-/* 화면에서는 결과서를 문서 흐름 밖에 둡니다. 인쇄 때는 이 요소만 남깁니다. */
+/* 화면에서는 결과서를 1px로 가립니다. 색은 인쇄용으로 고정해 다크 모드 색이 섞이지 않습니다. */
 .ampory-result-sheet {
   position: absolute;
   width: 1px;
@@ -96,6 +96,102 @@ details summary:focus-visible {
   color: #1a2433;
   background: #fff;
   font-family: var(--font-sans);
+  font-size: 11pt;
+  line-height: 1.45;
+}
+
+.ampory-sheet-brand {
+  border-top: 2px solid #103c77;
+  padding-top: 8px;
+}
+
+.ampory-sheet-mark {
+  margin: 0;
+  color: #103c77;
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ampory-sheet-doc-title {
+  margin: 2px 0 0;
+  color: #102033;
+  font-size: 17pt;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ampory-sheet-calc {
+  margin: 10px 0 0;
+  color: #1a2433;
+  font-size: 13pt;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ampory-sheet-section {
+  margin-top: 14px;
+}
+
+.ampory-sheet-section h2 {
+  margin: 0;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #d5dee8;
+  color: #102033;
+  font-size: 11pt;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ampory-sheet-row {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 34%) minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: baseline;
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.ampory-sheet-row span:last-child {
+  white-space: pre-wrap;
+}
+
+.ampory-sheet-primary {
+  margin: 8px 0 0;
+  color: #103c77;
+  font-size: 24pt;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.ampory-sheet-primary-label {
+  margin: 2px 0 0;
+  font-size: 10.5pt;
+}
+
+.ampory-sheet-formula {
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: #f4f6f8;
+  font-family: ui-monospace, var(--font-sans);
+  font-size: 10.5pt;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ampory-sheet-meta {
+  margin-top: 16px;
+  color: #3d4a5c;
+  font-size: 10pt;
+}
+
+.ampory-sheet-note {
+  margin: 12px 0 0;
+  color: #5c6b7a;
+  font-size: 9pt;
+  line-height: 1.5;
 }
 
 @media print {
@@ -120,5 +216,9 @@ details summary:focus-visible {
     overflow: visible !important;
     clip: auto !important;
     break-after: avoid;
+    color: #1a2433 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

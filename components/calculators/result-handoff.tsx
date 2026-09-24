@@ -174,53 +174,62 @@ export function ResultHandoff({
       {mounted
         ? createPortal(
             <article id="ampory-result-sheet" className="ampory-result-sheet" aria-hidden="true">
-        <p style={{ margin: 0, fontSize: "13px", letterSpacing: "0.04em" }}>Ampory</p>
-        <p style={{ margin: "4px 0 0", fontSize: "20px", fontWeight: 600 }}>전기 실무 계산 결과</p>
-        <h1 style={{ margin: "18px 0 0", fontSize: "18px", fontWeight: 600 }}>{title}</h1>
-        {siteRows.length > 0 ? (
-          <section style={{ marginTop: "18px" }}>
-            <h2 style={{ margin: 0, fontSize: "13px" }}>[현장 정보]</h2>
-            {siteRows.map((row) => (
-              <p key={row.label} style={{ margin: "6px 0 0", whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
-                {row.label}: {row.value}
+              <header className="ampory-sheet-brand">
+                <p className="ampory-sheet-mark">AMPORY</p>
+                <p className="ampory-sheet-doc-title">전기 실무 계산 결과</p>
+              </header>
+              <h1 className="ampory-sheet-calc">{title}</h1>
+              {siteRows.length > 0 ? (
+                <section className="ampory-sheet-section">
+                  <h2>현장 정보</h2>
+                  {siteRows.map((row) => (
+                    <p key={row.label} className="ampory-sheet-row">
+                      <span>{row.label}</span>
+                      <span>{row.value}</span>
+                    </p>
+                  ))}
+                </section>
+              ) : null}
+              <section className="ampory-sheet-section">
+                <h2>입력값</h2>
+                {result.inputSummary.map((row, index) => (
+                  <p key={`${row.label}-${index}`} className="ampory-sheet-row">
+                    <span>{row.label}</span>
+                    <span>{row.value}</span>
+                  </p>
+                ))}
+              </section>
+              <section className="ampory-sheet-section">
+                <h2>계산 결과</h2>
+                {primary ? <p className="ampory-sheet-primary">{primary.value}</p> : null}
+                {primary ? <p className="ampory-sheet-primary-label">{primary.label}</p> : null}
+                {rest.map((row, index) => (
+                  <p key={`${row.label}-${index}`} className="ampory-sheet-row">
+                    <span>{row.label}</span>
+                    <span>{row.value}</span>
+                  </p>
+                ))}
+              </section>
+              {formula ? (
+                <section className="ampory-sheet-section">
+                  <h2>{formulaLabel}</h2>
+                  <p className="ampory-sheet-formula">{formula}</p>
+                </section>
+              ) : null}
+              <section className="ampory-sheet-meta">
+                <p className="ampory-sheet-row">
+                  <span>계산일시</span>
+                  <span>{job?.stamp ?? ""}</span>
+                </p>
+                <p className="ampory-sheet-row">
+                  <span>출처</span>
+                  <span>Ampory · {pageUrl}</span>
+                </p>
+              </section>
+              <p className="ampory-sheet-note">
+                Ampory의 계산 결과는 실무 참고를 위한 보조 자료입니다. 실제 설계·시공·검사 및 기기 선정 시에는 현장 조건, 관련
+                기준 및 제조사 자료 등을 함께 확인하세요.
               </p>
-            ))}
-          </section>
-        ) : null}
-        <section style={{ marginTop: "18px" }}>
-          <h2 style={{ margin: 0, fontSize: "13px" }}>[입력값]</h2>
-          {result.inputSummary.map((row, index) => (
-            <p key={`${row.label}-${index}`} style={{ margin: "6px 0 0" }}>
-              {row.label}: {row.value}
-            </p>
-          ))}
-        </section>
-        <section style={{ marginTop: "18px" }}>
-          <h2 style={{ margin: 0, fontSize: "13px" }}>[계산 결과]</h2>
-          <p style={{ margin: "8px 0 0", fontSize: "28px", fontWeight: 600 }}>{primary?.value}</p>
-          {primary ? <p style={{ margin: "4px 0 0", fontSize: "13px" }}>{primary.label}</p> : null}
-          {rest.map((row, index) => (
-            <p key={`${row.label}-${index}`} style={{ margin: "6px 0 0" }}>
-              {row.label}: {row.value}
-            </p>
-          ))}
-        </section>
-        {formula ? (
-          <section style={{ marginTop: "18px" }}>
-            <h2 style={{ margin: 0, fontSize: "13px" }}>[{formulaLabel}]</h2>
-            <p style={{ margin: "6px 0 0" }}>{formula}</p>
-          </section>
-        ) : null}
-        <p style={{ marginTop: "18px" }}>계산일시: {job?.stamp ?? ""}</p>
-        <p style={{ marginTop: "18px" }}>
-          Ampory
-          <br />
-          {pageUrl}
-        </p>
-        <p style={{ marginTop: "16px", fontSize: "12px", lineHeight: 1.6 }}>
-          Ampory의 계산 결과는 실무 참고를 위한 보조 자료입니다. 실제 설계·시공·검사 및 기기 선정 시에는 현장 조건, 관련
-          기준 및 제조사 자료 등을 함께 확인하세요.
-        </p>
             </article>,
             document.body,
           )
