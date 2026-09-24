@@ -1,9 +1,18 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import type { CalculationResult } from "@/lib/types";
 import { WarningPanel } from "@/components/calculators/warning-panel";
 import { ReviewStatusBadge } from "@/components/calculators/review-status";
 
-export function ResultPanel({ result, split = false }: { result: CalculationResult; split?: boolean }) {
+export function ResultPanel({
+  result,
+  split = false,
+  actions,
+}: {
+  result: CalculationResult;
+  split?: boolean;
+  actions?: ReactNode;
+}) {
   const primary = result.metrics.find((metric) => metric.primary) ?? result.metrics[0];
   const rest = result.metrics.filter((metric) => metric !== primary);
 
@@ -41,6 +50,8 @@ export function ResultPanel({ result, split = false }: { result: CalculationResu
           ))}
         </dl>
       ) : null}
+
+      {actions}
 
       {result.corrections && result.corrections.length > 0 ? (
         <div className="mt-4 rounded-xl bg-info px-3 py-3">

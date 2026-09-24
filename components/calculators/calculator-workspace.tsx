@@ -6,6 +6,7 @@ import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { ShareDialog } from "@/components/calculators/dialogs";
 import { RelatedResources } from "@/components/calculators/related-resources";
 import { ResultPanel } from "@/components/calculators/result-panel";
+import { ResultHandoff } from "@/components/calculators/result-handoff";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { WarningPanel } from "@/components/calculators/warning-panel";
@@ -17,6 +18,7 @@ import { buildHandoffHref, parseHandoff } from "@/lib/calculations/handoff";
 import { usePreferences } from "@/components/providers/preferences-provider";
 import { pushRecentTool } from "@/lib/storage/local";
 import type { CalculatorTool, CalculationOutcome, FormulaDefinition, ReferenceArticle } from "@/lib/types";
+import { SITE } from "@/lib/types";
 import { getCategoryById } from "@/lib/data/categories";
 import { getStandardBasisBySlug } from "@/lib/data/standard-basis";
 import { StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
@@ -265,7 +267,11 @@ export function CalculatorWorkspace({
 
   const resultBlock =
     outcome?.ok ? (
-      <ResultPanel result={outcome} split={complex} />
+      <ResultPanel
+        result={outcome}
+        split={complex}
+        actions={<ResultHandoff result={outcome} title={tool.name} pageUrl={`${SITE.url}${tool.href}`} />}
+      />
     ) : (
       <div
         className={

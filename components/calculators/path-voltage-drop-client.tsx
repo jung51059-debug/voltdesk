@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ResultPanel } from "@/components/calculators/result-panel";
+import { ResultHandoff } from "@/components/calculators/result-handoff";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { RelatedResources } from "@/components/calculators/related-resources";
@@ -13,6 +14,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { parseHandoff } from "@/lib/calculations/handoff";
 import { getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { getRelatedTools, getToolBySlug } from "@/lib/data/tools";
+import { SITE } from "@/lib/types";
 import {
   KEC_VOLTAGE_DROP_MIXED,
   KEC_VOLTAGE_DROP_START,
@@ -364,7 +366,13 @@ export function PathVoltageDropClient() {
                   ))}
                 </ol>
               </div>
-              <ResultPanel result={outcome} split />
+              <ResultPanel
+                result={outcome}
+                split
+                actions={
+                  tool ? <ResultHandoff result={outcome} title={tool.name} pageUrl={`${SITE.url}${tool.href}`} /> : undefined
+                }
+              />
             </>
           ) : (
             <p className="text-sm leading-6 text-muted">구간 입력을 확인하면 누적 결과가 여기에 표시됩니다.</p>

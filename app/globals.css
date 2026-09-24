@@ -84,3 +84,41 @@ details summary:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* 화면에서는 결과서를 문서 흐름 밖에 둡니다. 인쇄 때는 이 요소만 남깁니다. */
+.ampory-result-sheet {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  color: #1a2433;
+  background: #fff;
+  font-family: var(--font-sans);
+}
+
+@media print {
+  html.ampory-print-sheet,
+  html.ampory-print-sheet body {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  html.ampory-print-sheet body > *:not(#ampory-result-sheet) {
+    display: none !important;
+  }
+
+  html.ampory-print-sheet #ampory-result-sheet {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    break-after: avoid;
+  }
+}

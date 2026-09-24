@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ResultPanel } from "@/components/calculators/result-panel";
+import { ResultHandoff } from "@/components/calculators/result-handoff";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { analyzeTrend, parseTrendText, type TrendPoint } from "@/lib/calculations/field-verify";
@@ -11,6 +12,7 @@ import { metric, review, roundTo, warning } from "@/lib/calculations/parse";
 import { getFormulaById } from "@/lib/data/formulas";
 import { pushRecentTool } from "@/lib/storage/local";
 import type { CalculationResult } from "@/lib/types";
+import { SITE } from "@/lib/types";
 
 const SAMPLE = `# 시각,값  또는 값만 한 줄에 하나씩
 2026-08-29T08:00:00, 218
@@ -178,7 +180,17 @@ export function TrendClient() {
           {result ? (
             <>
               <TrendChart points={points} />
-              <ResultPanel result={result} split />
+              <ResultPanel
+                result={result}
+                split
+                actions={
+                  <ResultHandoff
+                    result={result}
+                    title="Trend 기초 분석"
+                    pageUrl={`${SITE.url}/tools/facility/trend-analysis`}
+                  />
+                }
+              />
             </>
           ) : (
             <p className="text-sm leading-6 text-muted">값을 넣은 뒤 통계 계산을 누르면 결과가 여기에 표시됩니다.</p>
