@@ -114,6 +114,13 @@ export default function ElectricalQrCardPage() {
             className="h-auto w-full rounded-2xl border border-border bg-card"
           />
         </a>
+        <a
+          href="/downloads/ampory-field-electrical-qr-card-a4.pdf"
+          download="Ampory_현장_전기계산_QR카드_A4.pdf"
+          className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white dark:text-ink"
+        >
+          ↓ A4 PDF 무료 다운로드
+        </a>
       </section>
 
       <section className="mt-10">
@@ -160,6 +167,9 @@ export default function ElectricalQrCardPage() {
 
       <section className="mt-10">
         <h2 className="text-xl font-semibold">이렇게 사용하세요</h2>
+        <p className="mt-4 leading-7 text-muted">
+          전기 계산 공식을 매번 검색하지 않고, 현장에서 필요한 계산기를 QR로 바로 열어 사용할 수 있도록 만든 자료입니다.
+        </p>
         <ol className="mt-4 list-decimal space-y-2 pl-5 leading-7">
           {steps.map((step) => (
             <li key={step}>{step}</li>
