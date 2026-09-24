@@ -60,6 +60,11 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link href="/resources/electrical-qr-card" className="hover:text-primary">
+                현장 QR 카드
+              </Link>
+            </li>
+            <li>
               <Link href="/privacy" className="hover:text-primary">
                 개인정보 처리방침
               </Link>

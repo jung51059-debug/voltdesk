@@ -131,6 +131,7 @@ export function sitemapEntries() {
     "/terms",
     "/contact",
     "/sources",
+    "/resources/electrical-qr-card",
   ];
   const categoryPaths = getHubCategories().map((category) => `/tools/categories/${category.slug}`);
   const toolPaths = getPublishedTools().map((tool) => tool.href);
