@@ -3,6 +3,7 @@ import { ArticleCard } from "@/components/ui/article-card";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { ToolCard } from "@/components/ui/tool-card";
 import { QuickCurrentPreview } from "@/components/home/quick-current-preview";
+import { BookmarkHint } from "@/components/home/bookmark-hint";
 import { HomeSearch } from "@/components/home/home-search";
 import { HomeLibrary } from "@/components/home/home-library";
 import { SectionHeading } from "@/components/home/section-heading";
@@ -44,6 +45,7 @@ export default function HomePage() {
           <HomeSearch />
         </div>
         <QuickCurrentPreview />
+        <BookmarkHint />
       </section>
 
       <section>
