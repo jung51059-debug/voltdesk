@@ -114,13 +114,6 @@ export default function ElectricalQrCardPage() {
             className="h-auto w-full rounded-2xl border border-border bg-card"
           />
         </a>
-        <a
-          href="/downloads/ampory-field-electrical-qr-card-a4.pdf"
-          download="Ampory_현장_전기계산_QR카드_A4.pdf"
-          className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white dark:text-ink"
-        >
-          ↓ A4 PDF 무료 다운로드
-        </a>
       </section>
 
       <section className="mt-10">
