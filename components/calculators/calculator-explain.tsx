@@ -82,14 +82,14 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
         </Section>
       ) : null}
 
-      {guide.lookup ? (
-        <Section title={guide.lookup.title}>
-          <p className="text-sm leading-6 text-muted">{guide.lookup.note}</p>
+      {(guide.lookups?.length ? guide.lookups : guide.lookup ? [guide.lookup] : []).map((table) => (
+        <Section key={table.title} title={table.title}>
+          <p className="text-sm leading-6 text-muted">{table.note}</p>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[16rem] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {guide.lookup.columns.map((column) => (
+                  {table.columns.map((column) => (
                     <th key={column} className="whitespace-nowrap px-3 py-2 font-medium">
                       {column}
                     </th>
@@ -97,7 +97,7 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
                 </tr>
               </thead>
               <tbody>
-                {guide.lookup.rows.map((row) => (
+                {table.rows.map((row) => (
                   <tr key={row.join("|")} className="border-b border-border">
                     {row.map((cell) => (
                       <td key={cell} className="whitespace-nowrap px-3 py-2 text-muted">
@@ -110,7 +110,7 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
             </table>
           </div>
         </Section>
-      ) : null}
+      ))}
 
       <Section title="결과 해석">
         {guide.interpretation.map((paragraph) => (

@@ -256,6 +256,87 @@ export const baseTools: CalculatorTool[] = [
     ],
   },
   {
+    id: "tool-amp-to-kw",
+    slug: "amp-to-kw",
+    href: "/tools/electrical/amp-to-kw",
+    categoryId: "cat-electrical-basics",
+    domain: "electrical",
+    name: "전류(A) → 예상 전력(kW) 계산기",
+    nameEn: "Current to power calculator",
+    pageHeading: "20A는 몇 kW일까? 전류(A) → 전력(kW) 계산",
+    metaTitle: "20A는 몇 kW? 220V·380V 전력 계산",
+    metaDescription:
+      "20A, 30A가 몇 kW인지 계산해보세요. 단상 220V와 3상 380V에서 전류(A)를 전력(W·kW)으로 변환하고 계산식과 예시를 함께 확인할 수 있습니다.",
+    description: "전압, 전류, 단상·3상, 역률로 전기 입력 전력(W·kW)을 계산합니다.",
+    longDescription:
+      "단상 220V, 20A, 역률 1.0이면 4,400W, 즉 4.40kW입니다. 이 값은 전력 환산이며 차단기에 그 부하를 연결해도 된다는 뜻이 아닙니다.",
+    formulaId: "formula-amp-to-kw",
+    tags: ["전류", "kW", "A", "220V", "380V"],
+    synonyms: [
+      "20A 몇 kW",
+      "20A 몇 W",
+      "220V 20A",
+      "220V 20A 몇 W",
+      "30A 몇 kW",
+      "30A 몇 W",
+      "220V 30A",
+      "380V 20A",
+      "암페어 와트 변환",
+      "A kW 계산",
+      "차단기 20A 몇 kW",
+      "차단기 30A 몇 kW",
+    ],
+    relatedToolIds: [
+      "tool-single-phase-current",
+      "tool-three-phase-current",
+      "tool-breaker-current",
+      "tool-cable-sizing",
+      "tool-kw-kva-hp",
+    ],
+    relatedArticleIds: ["art-kw-vs-kva", "art-single-vs-three", "art-breaker-and-cable"],
+    complexity: "basic",
+    featured: false,
+    recentlyAdded: true,
+    status: "published",
+    updatedAt: "2026-10-04",
+    faqs: [
+      {
+        question: "20A는 몇 kW인가요?",
+        answer:
+          "단상 220V, 역률 1.0이면 220 × 20 × 1 = 4,400W, 즉 4.40kW입니다. 전압, 단상·3상, 역률이 바뀌면 결과도 바뀝니다. 차단기 허용 부하가 아닙니다.",
+      },
+      {
+        question: "220V 20A는 몇 W인가요?",
+        answer: "단상, 역률 1.0이면 4,400W입니다. 역률이 1보다 작으면 유효전력은 더 작아집니다.",
+      },
+      {
+        question: "30A는 몇 kW인가요?",
+        answer: "단상 220V, 역률 1.0이면 6.60kW입니다. 30A 차단기의 안전 최대 부하는 아닙니다.",
+      },
+      {
+        question: "220V 30A는 몇 W인가요?",
+        answer: "단상, 역률 1.0이면 6,600W입니다.",
+      },
+      {
+        question: "380V 20A는 몇 kW인가요?",
+        answer: "3상 380V, 역률 0.9이면 약 11.85kW입니다. 단상 220V, 역률 1.0의 4.40kW와는 다릅니다.",
+      },
+      {
+        question: "차단기 20A면 4.4kW까지 사용할 수 있나요?",
+        answer:
+          "그렇게 단정할 수 없습니다. 4.40kW는 단상 220V, 역률 1.0에서 20A를 전력으로 환산한 값입니다. 부하전류, 차단기 정격, 케이블 허용전류, 설치조건, 부하 특성을 함께 확인해야 합니다.",
+      },
+      {
+        question: "A를 kW로 바꾸려면 무엇을 알아야 하나요?",
+        answer: "전압, 단상인지 3상인지, 역률이 필요합니다. 전류만으로는 kW가 하나로 정해지지 않습니다.",
+      },
+      {
+        question: "단상과 3상은 계산식이 왜 다른가요?",
+        answer: "단상은 P = V × I × PF이고, 3상은 P = √3 × V × I × PF입니다. 3상은 선간전압에 √3을 곱합니다.",
+      },
+    ],
+  },
+  {
     id: "tool-kw-kva-hp",
     slug: "kw-kva-hp",
     href: "/tools/electrical/kw-kva-hp",

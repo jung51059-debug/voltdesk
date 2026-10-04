@@ -148,6 +148,7 @@ export const standardBases: StandardBasis[] = [
   row("three-phase-current", "formula-three-phase-current", "general-engineering", ["engineering"], "engineering", "3상 평형 P = √3 V I PF 역산.", "3상 선전류", [NO_SELECT, "불평형·고조파는 포함하지 않습니다."]),
   row("contract-power-current", "formula-contract-power-current", "general-engineering", ["engineering"], "engineering", "단상·3상 부하전류와 같은 식. 계약전력 산정이 아닙니다.", "입력 kW의 예상 부하전류", [NO_SELECT, "한전 계약전력·차단기 정격을 정하지 않습니다."]),
   row("power-strip-capacity", "formula-power-strip-capacity", "general-engineering", ["engineering"], "engineering", "가정용 표시 정격의 V × A. 역률은 곱하지 않습니다.", "정격전류의 이론상 전력과 소비전력 합계 비교", [NO_SELECT, "임의 여유율을 안전 한도로 만들지 않습니다.", "연결 가능 여부를 판정하지 않습니다."]),
+  row("amp-to-kw", "formula-amp-to-kw", "general-engineering", ["engineering"], "engineering", "단상 P = V I PF, 3상 P = √3 V I PF. 효율은 넣지 않습니다.", "전류를 전기 입력 유효전력으로 환산", [NO_SELECT, "차단기 허용 부하나 안전 사용 여부를 판정하지 않습니다."]),
   row("kw-kva-hp", "formula-kw-kva-hp", "general-engineering", ["engineering"], "engineering", "단위 환산. 기계적 1 HP = 746 W.", "kW·kVA·HP 환산", ["설비 선정·과부하 판정이 아닙니다."]),
   row("power-factor", "formula-power-factor", "general-engineering", ["engineering"], "engineering", "PF = P/S, Q = √(S²−P²).", "기본파 변위 역률", ["한전 역률요금·진성 역률 측정이 아닙니다."]),
   row("transformer-load", "formula-transformer-load", "general-engineering", ["engineering"], "engineering", "부하율 = S_load / S_rated. 현장은 √3 V Iavg 근사.", "명판 대비 비율·추정 kVA", ["냉각·온도·고조파 derating을 하지 않습니다.", "IEC 60076 용량 보정은 수행하지 않습니다."]),

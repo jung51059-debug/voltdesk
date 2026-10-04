@@ -161,6 +161,41 @@ export const baseFormulas: FormulaDefinition[] = [
     ],
   },
   {
+    id: "formula-amp-to-kw",
+    title: "전류에서 전기 입력 전력",
+    formula: "단상 P = V × I × PF,  3상 P = √3 × V × I × PF",
+    variables: [
+      { symbol: "P", name: "유효전력", unit: "W", description: "전압·전류·역률로 계산한 전기 입력 전력" },
+      { symbol: "V", name: "전압", unit: "V", description: "단상은 사용 전압, 3상은 선간전압" },
+      { symbol: "I", name: "전류", unit: "A", description: "환산할 전류" },
+      { symbol: "PF", name: "역률", unit: "—", description: "0 초과 1 이하" },
+    ],
+    units: ["V", "A", "W", "kW"],
+    assumptions: [
+      "효율은 넣지 않습니다. 전기 입력 유효전력입니다.",
+      "3상은 평형 운전으로 보고 √3을 사용합니다.",
+    ],
+    warnings: [
+      "계산값이 차단기 허용 부하나 안전 사용 가능 여부가 아닙니다.",
+      "전류만으로 kW가 정해지지는 않습니다.",
+    ],
+    limitations: ["기동전류, 불평형, 고조파, 케이블 허용전류는 이 식에 없습니다."],
+    example: {
+      title: "단상 220V 20A",
+      given: "단상, V = 220 V, I = 20 A, PF = 1.0",
+      steps: ["P = 220 × 20 × 1.0", "P = 4,400 W = 4.40 kW"],
+      result: "4.40 kW",
+    },
+    referenceSources: [
+      {
+        id: "src-eng-amp-kw",
+        title: "일반 전기공학 단상·3상 전력 관계식",
+        publisher: "공학 교과서",
+        note: "단상·3상 부하전류 식의 역산이며 효율은 넣지 않습니다. 표준 표를 사용하지 않습니다.",
+      },
+    ],
+  },
+  {
     id: "formula-kw-kva-hp",
     title: "kW · kVA · HP 환산",
     formula: "kW = kVA × PF,  kVA = kW / PF,  HP = kW / 0.746",

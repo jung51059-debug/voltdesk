@@ -121,6 +121,31 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       { id: "current", label: "정격전류", kind: "number", required: true, min: 0, step: "any", hint: "제품에 표시된 정격전류입니다. 16A는 예시이며 제품마다 다를 수 있습니다." },
     ],
   },
+  "amp-to-kw": {
+    slug: "amp-to-kw",
+    layout: "simple",
+    defaults: {
+      phase: "1",
+      voltage: "220",
+      voltageUnit: "V",
+      current: "20",
+      pf: "1",
+    },
+    fields: [
+      {
+        id: "phase",
+        label: "전원 방식",
+        kind: "select",
+        options: [
+          { value: "1", label: "단상" },
+          { value: "3", label: "3상" },
+        ],
+      },
+      { id: "voltage", label: "전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits, hint: "단상은 사용 전압, 3상은 선간전압입니다. 기본은 단상 220 V, 3상 380 V입니다." },
+      { id: "current", label: "전류", kind: "number", required: true, min: 0, step: "any", hint: "환산할 전류입니다. 이 값으로 차단기 허용 부하를 정하지 않습니다." },
+      { id: "pf", label: "역률 PF", kind: "number", required: true, min: 0, max: 1, step: "0.01", hint: "기본 1.0은 단순 환산입니다. 실제 교류 부하는 역률이 1이 아닐 수 있습니다." },
+    ],
+  },
   "kw-kva-hp": {
     slug: "kw-kva-hp",
     layout: "simple",

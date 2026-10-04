@@ -24,6 +24,7 @@ import {
 
 export type { CalcInput } from "@/lib/calculations/parse";
 import type { CalcInput } from "@/lib/calculations/parse";
+import { calculateAmpToKw } from "@/lib/calculations/amp-to-kw";
 import { calculatePowerStripCapacity } from "@/lib/calculations/power-strip";
 import {
   KEC_VOLTAGE_DROP_MIXED,
@@ -1204,6 +1205,7 @@ export const engines: Record<string, (input: CalcInput, precision: number) => Ca
   "three-phase-current": calculateThreePhaseCurrent,
   "contract-power-current": calculateContractPowerCurrent,
   "power-strip-capacity": calculatePowerStripCapacity,
+  "amp-to-kw": calculateAmpToKw,
   "kw-kva-hp": calculateKwKvaHp,
   "power-factor": calculatePowerFactor,
   "transformer-load": calculateTransformerLoad,

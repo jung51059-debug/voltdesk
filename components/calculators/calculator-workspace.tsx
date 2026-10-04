@@ -187,7 +187,7 @@ export function CalculatorWorkspace({
     setDirty(true);
     setValues((current) => {
       const next = { ...current, [id]: value };
-      if (tool.slug === "contract-power-current" && id === "phase") {
+      if ((tool.slug === "contract-power-current" || tool.slug === "amp-to-kw") && id === "phase") {
         const suggested = contractPowerVoltageSuggestion(value, current.voltage ?? "", current.voltageUnit ?? "V");
         if (suggested) next.voltage = suggested;
       }
