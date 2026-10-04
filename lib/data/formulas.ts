@@ -124,6 +124,43 @@ export const baseFormulas: FormulaDefinition[] = [
     ],
   },
   {
+    id: "formula-power-strip-capacity",
+    title: "멀티탭·콘센트 표시 정격의 이론상 전력",
+    formula: "P = V × I",
+    variables: [
+      { symbol: "P", name: "이론상 전력", unit: "W", description: "전압과 정격전류를 곱한 값" },
+      { symbol: "V", name: "전압", unit: "V", description: "제품에 표시된 정격전압" },
+      { symbol: "I", name: "정격전류", unit: "A", description: "제품에 표시된 정격전류" },
+    ],
+    units: ["V", "A", "W", "kW"],
+    assumptions: [
+      "역률을 곱하지 않는 전압 × 전류입니다.",
+      "연결 기기의 소비전력은 사용자가 제품 표시에서 읽은 값을 더합니다.",
+    ],
+    warnings: [
+      "계산값이 안전한 연속 사용전력을 보장하지 않습니다.",
+      "합계와 정격의 비교만으로 연결 가능 여부를 정하지 않습니다.",
+    ],
+    limitations: [
+      "기동전류, 동시 사용, 발열, 접촉 상태, 멀티탭 연속 연결은 이 식에 없습니다.",
+      "임의 여유율을 안전 한도로 만들지 않습니다.",
+    ],
+    example: {
+      title: "220V 16A",
+      given: "V = 220 V, I = 16 A",
+      steps: ["P = 220 × 16", "P = 3,520 W = 3.52 kW"],
+      result: "3,520 W",
+    },
+    referenceSources: [
+      {
+        id: "src-eng-va",
+        title: "일반 전기공학 전압·전류·전력 관계",
+        publisher: "공학 교과서",
+        note: "P = V × I. 표준 표나 제조사 정격을 내장하지 않습니다.",
+      },
+    ],
+  },
+  {
     id: "formula-kw-kva-hp",
     title: "kW · kVA · HP 환산",
     formula: "kW = kVA × PF,  kVA = kW / PF,  HP = kW / 0.746",

@@ -1,4 +1,5 @@
 import { extraFormSchemas } from "@/lib/calculations/schemas-extra";
+import { POWER_STRIP_EMPTY_LOADS } from "@/lib/calculations/power-strip";
 
 export type SelectOption = { value: string; label: string };
 
@@ -104,6 +105,20 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       { id: "voltage", label: "전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits, hint: "단상은 사용 전압, 3상은 선간전압입니다. 기본은 단상 220 V, 3상 380 V입니다." },
       { id: "pf", label: "역률 PF", kind: "number", min: 0, max: 1, step: "0.01", hint: "저항성 부하를 단순 계산할 때는 1.0으로 볼 수 있으며, 실제 설비에서는 부하의 역률을 확인하세요." },
       { id: "efficiency", label: "효율 η", kind: "number", min: 0, max: 1, step: "0.01", advanced: true, hint: "전기 입력을 알고 있으면 1.0입니다. 모터 축출력과 입력 전력을 나눌 때 명판 효율을 넣습니다." },
+    ],
+  },
+  "power-strip-capacity": {
+    slug: "power-strip-capacity",
+    layout: "simple",
+    defaults: {
+      voltage: "220",
+      voltageUnit: "V",
+      current: "16",
+      loads: POWER_STRIP_EMPTY_LOADS,
+    },
+    fields: [
+      { id: "voltage", label: "전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits, hint: "멀티탭이나 콘센트에 표시된 정격전압입니다. 기본은 220 V입니다." },
+      { id: "current", label: "정격전류", kind: "number", required: true, min: 0, step: "any", hint: "제품에 표시된 정격전류입니다. 16A는 예시이며 제품마다 다를 수 있습니다." },
     ],
   },
   "kw-kva-hp": {

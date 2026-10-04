@@ -182,6 +182,80 @@ export const baseTools: CalculatorTool[] = [
     ],
   },
   {
+    id: "tool-power-strip-capacity",
+    slug: "power-strip-capacity",
+    href: "/tools/electrical/power-strip-capacity",
+    categoryId: "cat-electrical-basics",
+    domain: "electrical",
+    name: "콘센트·멀티탭 용량 계산기",
+    nameEn: "Power strip capacity calculator",
+    pageHeading: "멀티탭 16A면 몇 W까지 사용할 수 있을까?",
+    metaTitle: "멀티탭 16A는 몇 W? 220V 최대용량 계산",
+    metaDescription:
+      "멀티탭 16A가 몇 W인지 계산하고 여러 전기기기의 소비전력을 합산해 정격과 비교해보세요. 220V 16A 계산 예시와 멀티탭 사용 시 확인할 사항도 함께 정리합니다.",
+    description: "멀티탭·콘센트의 정격전류로 이론상 전력(W)을 계산하고, 연결 기기 소비전력 합계와 비교합니다.",
+    longDescription:
+      "220V 16A는 220 × 16 = 3,520W입니다. 이 값은 표시 정격을 곱한 단순 계산이며, 안전한 사용을 보장하지 않습니다. 전기제품의 소비전력을 더해 그 숫자와 비교할 수 있습니다.",
+    formulaId: "formula-power-strip-capacity",
+    tags: ["멀티탭", "콘센트", "16A", "소비전력", "W"],
+    synonyms: [
+      "멀티탭 16A",
+      "16A 몇 W",
+      "220V 16A",
+      "멀티탭 최대용량",
+      "멀티탭 허용전력",
+      "멀티탭 소비전력",
+      "멀티탭 과부하",
+      "콘센트 16A",
+      "220V 몇 W",
+      "전기제품 소비전력 합산",
+    ],
+    relatedToolIds: [
+      "tool-single-phase-current",
+      "tool-contract-power-current",
+      "tool-breaker-current",
+      "tool-cable-sizing",
+    ],
+    relatedArticleIds: ["art-kw-vs-kva", "art-single-vs-three", "art-breaker-and-cable"],
+    complexity: "basic",
+    featured: false,
+    recentlyAdded: true,
+    status: "published",
+    updatedAt: "2026-10-04",
+    faqs: [
+      {
+        question: "멀티탭 16A는 몇 W인가요?",
+        answer:
+          "220V라면 220 × 16 = 3,520W입니다. 전압이 다르면 결과도 달라집니다. 이 값은 단순 계산이며 안전한 사용전력을 보장하지 않습니다.",
+      },
+      {
+        question: "220V 16A는 몇 W인가요?",
+        answer: "220 × 16 = 3,520W, 즉 3.52kW입니다. 표시된 전압과 전류를 곱한 계산값입니다.",
+      },
+      {
+        question: "멀티탭에 3,520W까지 연결해도 되나요?",
+        answer: "이 계산만으로 그렇다고 말할 수 없습니다. 멀티탭과 연결 기기의 정격, 제조사 사용조건을 확인하세요.",
+      },
+      {
+        question: "전기포트와 전자레인지를 같은 멀티탭에 연결해도 되나요?",
+        answer:
+          "소비전력을 더해 표시 정격과 비교할 수는 있지만, 연결해도 되는지는 이 페이지가 정하지 않습니다. 고소비전력 제품은 벽면 콘센트 직접 연결을 요구하는 경우가 있으니 사용설명서를 확인하세요.",
+      },
+      {
+        question: "멀티탭을 여러 개 이어서 사용해도 되나요?",
+        answer: "이어 꽂으면 구멍 수만 늘고 공급할 수 있는 용량이 늘어나지는 않습니다. 멀티탭을 연속해서 연결하는 방식은 피하세요.",
+      },
+      {
+        question: "멀티탭 정격은 어디에서 확인하나요?",
+        answer: "멀티탭 본체 라벨이나 사용설명서의 정격전압·정격전류를 확인합니다. 제품마다 표시가 다릅니다.",
+      },
+      {
+        question: "소비전력은 어디에서 확인하나요?",
+        answer: "기기 라벨, 명판, 사용설명서의 소비전력(W)을 확인합니다. 이 페이지의 예시 숫자는 실제 제품과 다를 수 있습니다.",
+      },
+    ],
+  },
+  {
     id: "tool-kw-kva-hp",
     slug: "kw-kva-hp",
     href: "/tools/electrical/kw-kva-hp",

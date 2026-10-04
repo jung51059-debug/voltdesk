@@ -12,6 +12,7 @@ import { getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { WarningPanel } from "@/components/calculators/warning-panel";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { PowerStripLoadEditor } from "@/components/calculators/power-strip-loads";
 import { formSchemas, type FieldDef } from "@/lib/calculations/schemas";
 import { contractPowerVoltageSuggestion, engines } from "@/lib/calculations/engines";
 import { buildHandoffHref, parseHandoff } from "@/lib/calculations/handoff";
@@ -345,6 +346,13 @@ export function CalculatorWorkspace({
             </div>
           ) : null}
           <div className="space-y-3.5">{fieldGroup(basicFields)}</div>
+          {tool.slug === "power-strip-capacity" ? (
+            <PowerStripLoadEditor
+              raw={values.loads ?? ""}
+              errors={outcome && !outcome.ok ? outcome.fieldErrors : {}}
+              onChange={(next) => setField("loads", next)}
+            />
+          ) : null}
           {advancedFields.length > 0 ? (
             <details
               className="mt-4 rounded-xl border border-border bg-surface px-3 py-2"
