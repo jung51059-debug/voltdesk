@@ -78,6 +78,34 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       { id: "efficiency", label: "효율 η", kind: "number", min: 0, max: 1, step: "0.01", advanced: true, hint: "전기 입력을 알고 있으면 1.0. 축출력이면 명판 효율. 기본 0.92는 45kW 펌프 예시입니다." },
     ],
   },
+  "contract-power-current": {
+    slug: "contract-power-current",
+    layout: "simple",
+    defaults: {
+      power: "5",
+      powerUnit: "kW",
+      phase: "1",
+      voltage: "220",
+      voltageUnit: "V",
+      pf: "1",
+      efficiency: "1",
+    },
+    fields: [
+      { id: "power", label: "전력", kind: "number", required: true, min: 0, step: "any", unitField: "powerUnit", units: powerUnits, hint: "계약전력 또는 확인하고 싶은 부하전력입니다. 한전 계약전력을 산정하지 않습니다." },
+      {
+        id: "phase",
+        label: "전원 방식",
+        kind: "select",
+        options: [
+          { value: "1", label: "단상" },
+          { value: "3", label: "3상" },
+        ],
+      },
+      { id: "voltage", label: "전압", kind: "number", required: true, min: 0, step: "any", unitField: "voltageUnit", units: voltageUnits, hint: "단상은 사용 전압, 3상은 선간전압입니다. 기본은 단상 220 V, 3상 380 V입니다." },
+      { id: "pf", label: "역률 PF", kind: "number", min: 0, max: 1, step: "0.01", hint: "저항성 부하를 단순 계산할 때는 1.0으로 볼 수 있으며, 실제 설비에서는 부하의 역률을 확인하세요." },
+      { id: "efficiency", label: "효율 η", kind: "number", min: 0, max: 1, step: "0.01", advanced: true, hint: "전기 입력을 알고 있으면 1.0입니다. 모터 축출력과 입력 전력을 나눌 때 명판 효율을 넣습니다." },
+    ],
+  },
   "kw-kva-hp": {
     slug: "kw-kva-hp",
     layout: "simple",

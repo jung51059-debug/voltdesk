@@ -108,6 +108,80 @@ export const baseTools: CalculatorTool[] = [
     ],
   },
   {
+    id: "tool-contract-power-current",
+    slug: "contract-power-current",
+    href: "/tools/electrical/contract-power-current",
+    categoryId: "cat-electrical-basics",
+    domain: "electrical",
+    name: "계약전력 예상 전류 계산기",
+    nameEn: "Contract power to current",
+    pageHeading: "계약전력 5kW·10kW는 몇 A일까?",
+    metaTitle: "계약전력 5kW·10kW는 몇 A? 예상 전류 계산",
+    metaDescription:
+      "계약전력 또는 부하전력(kW)을 입력하면 단상 220V·3상 380V 조건에서 예상 부하전류(A)를 계산합니다. 5kW, 10kW 전류 예시와 계약전력·차단기 차이도 확인하세요.",
+    description: "입력한 전력(kW)을 단상 또는 3상 예상 부하전류(A)로 환산합니다.",
+    longDescription:
+      "계약전력 또는 부하전력을 A로 볼 때 참고하는 계산입니다. 한국전력 계약전력을 산정하거나 차단기를 선정하지 않습니다.",
+    formulaId: "formula-contract-power-current",
+    tags: ["계약전력", "kW", "전류", "단상", "3상"],
+    synonyms: [
+      "계약전력 계산",
+      "계약전력 5kW",
+      "계약전력 10kW",
+      "5kW 몇 A",
+      "10kW 몇 A",
+      "5kW 전류",
+      "10kW 전류",
+      "kW A 변환",
+      "계약전력 차단기",
+    ],
+    relatedToolIds: [
+      "tool-single-phase-current",
+      "tool-three-phase-current",
+      "tool-kw-kva-hp",
+      "tool-breaker-current",
+      "tool-cable-sizing",
+    ],
+    relatedArticleIds: ["art-kw-vs-kva", "art-single-vs-three", "art-breaker-and-cable"],
+    complexity: "basic",
+    featured: false,
+    recentlyAdded: true,
+    status: "published",
+    updatedAt: "2026-10-04",
+    faqs: [
+      {
+        question: "계약전력 5kW는 몇 A인가요?",
+        answer:
+          "단상 220V, 역률 1.0, 효율 1이면 약 22.73A입니다. 3상 380V, 역률 0.9, 효율 1이면 약 8.44A입니다. 전압·상수·역률이 바뀌면 전류도 바뀝니다.",
+      },
+      {
+        question: "계약전력 10kW는 몇 A인가요?",
+        answer:
+          "단상 220V, 역률 1.0, 효율 1이면 약 45.45A입니다. 3상 380V, 역률 0.9, 효율 1이면 약 16.88A입니다. 같은 10kW라도 조건마다 전류가 다릅니다.",
+      },
+      {
+        question: "계약전력을 넘으면 차단기가 바로 떨어지나요?",
+        answer:
+          "그렇게 단순하지 않습니다. 계약전력은 전기사용계약의 전력 기준이고, 차단기는 회로의 전류와 시간 특성으로 동작합니다. 5kW를 조금 넘는 순간 바로 차단된다고 볼 수 없습니다.",
+      },
+      {
+        question: "계약전력과 차단기 용량은 같은 건가요?",
+        answer:
+          "아닙니다. 계약전력은 kW이고 차단기 정격은 A입니다. 부하전류만으로 차단기를 고르지 않으며, 전선 허용전류, 차단기 특성, 단락전류와 설비 조건을 함께 봅니다.",
+      },
+      {
+        question: "단상 220V와 3상 380V의 전류가 왜 다른가요?",
+        answer:
+          "같은 전력이라도 전압이 높고 3상이면 전류가 작아집니다. 단상은 P/(V×PF×η), 3상은 P/(√3×V×PF×η)입니다.",
+      },
+      {
+        question: "계산 결과로 차단기 용량을 결정해도 되나요?",
+        answer:
+          "안 됩니다. 이 값은 입력한 전력의 예상 부하전류입니다. 차단기 정격, 케이블 굵기, 계약전력 변경은 별도 검토가 필요합니다.",
+      },
+    ],
+  },
+  {
     id: "tool-kw-kva-hp",
     slug: "kw-kva-hp",
     href: "/tools/electrical/kw-kva-hp",

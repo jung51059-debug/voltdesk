@@ -88,6 +88,42 @@ export const baseFormulas: FormulaDefinition[] = [
     ],
   },
   {
+    id: "formula-contract-power-current",
+    title: "계약전력 예상 부하전류",
+    formula: "단상 I = P / (V × PF × η),  3상 I = P / (√3 × V × PF × η)",
+    variables: [
+      { symbol: "I", name: "예상 부하전류", unit: "A", description: "입력 전력을 전류로 환산한 값" },
+      { symbol: "P", name: "전력", unit: "W", description: "kW 입력은 계산 전에 W로 바꿉니다" },
+      { symbol: "V", name: "전압", unit: "V", description: "단상은 사용 전압, 3상은 선간전압" },
+      { symbol: "PF", name: "역률", unit: "—", description: "0 초과 1 이하" },
+      { symbol: "η", name: "효율", unit: "—", description: "전기 입력이면 1" },
+    ],
+    units: ["kW", "V", "A"],
+    assumptions: [
+      "정현파 정상 운전과, 3상은 평형 운전을 가정합니다.",
+      "입력 kW는 전기 전력으로 보고, 기본 효율은 1입니다.",
+    ],
+    warnings: [
+      "한전 계약전력을 산정하거나 적정 계약전력을 정하는 식이 아닙니다.",
+      "계산 전류로 차단기나 케이블을 선정하지 않습니다.",
+    ],
+    limitations: ["기동전류, 동시사용, 불평형, 고조파는 이 식에 없습니다."],
+    example: {
+      title: "단상 5 kW",
+      given: "P = 5 kW, 단상 220 V, PF = 1.0, η = 1.0",
+      steps: ["P = 5000 W", "I = 5000 / (220 × 1.0 × 1.0)", "I = 22.73 A"],
+      result: "22.73 A",
+    },
+    referenceSources: [
+      {
+        id: "src-eng-contract",
+        title: "일반 전기공학 단상·3상 전력·전류 관계식",
+        publisher: "공학 교과서",
+        note: "단상·3상 부하전류 계산과 같은 식입니다. 표준 표를 사용하지 않습니다.",
+      },
+    ],
+  },
+  {
     id: "formula-kw-kva-hp",
     title: "kW · kVA · HP 환산",
     formula: "kW = kVA × PF,  kVA = kW / PF,  HP = kW / 0.746",

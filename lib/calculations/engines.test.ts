@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   calculateBreakerReference,
   calculateCableResistance,
+  calculateContractPowerCurrent,
   calculateGeneratorLoad,
   calculateKwKvaHp,
   calculateMonthlyEnergy,
@@ -12,6 +13,7 @@ import {
   calculateUpsBackup,
   calculateUpsCapacity,
   calculateVoltageDrop,
+  contractPowerVoltageSuggestion,
 } from "@/lib/calculations/engines";
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 import { searchCatalog } from "@/lib/search";
@@ -47,6 +49,97 @@ describe("단상 부하전류", () => {
       2,
     );
     expect(out.ok).toBe(false);
+  });
+});
+
+describe("계약전력 예상 부하전류", () => {
+  function amps(input: Record<string, string>) {
+    return primaryNumber(calculateContractPowerCurrent(input, 2));
+  }
+
+  it("5 kW 단상 220 V PF 1은 22.73 A이고 단상 계산기와 같다", () => {
+    const input = { power: "5", powerUnit: "kW", voltage: "220", voltageUnit: "V", pf: "1", efficiency: "1", phase: "1" };
+    expect(amps(input)).toBeCloseTo(5000 / 220, 2);
+    expect(amps(input)).toBeCloseTo(22.73, 2);
+    expect(amps(input)).toBe(primaryNumber(calculateSinglePhaseCurrent(input, 2)));
+    const out = calculateContractPowerCurrent(input, 2);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.warnings.some((item) => item.message.includes("역률과 효율을 1.0으로 가정한 단순 환산값"))).toBe(true);
+    expect(out.metrics.find((item) => item.primary)?.hint).toContain("역률과 효율을 1.0으로 가정");
+  });
+
+  it("10 kW 단상 220 V PF 1은 45.45 A", () => {
+    expect(amps({ power: "10", powerUnit: "kW", voltage: "220", voltageUnit: "V", pf: "1", efficiency: "1", phase: "1" })).toBeCloseTo(45.45, 2);
+  });
+
+  it("5·10·20 kW 3상 380 V PF 0.9 효율 1은 3상 계산기와 같다", () => {
+    for (const power of ["5", "10", "20"]) {
+      const input = { power, powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1", phase: "3" };
+      const current = amps(input);
+      expect(current).toBe(primaryNumber(calculateThreePhaseCurrent(input, 2)));
+      expect(Number.isFinite(current)).toBe(true);
+    }
+    expect(amps({ power: "5", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1", phase: "3" })).toBeCloseTo(8.44, 2);
+    expect(amps({ power: "10", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1", phase: "3" })).toBeCloseTo(16.88, 2);
+    expect(amps({ power: "20", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1", phase: "3" })).toBeCloseTo(33.76, 2);
+    const adjusted = calculateContractPowerCurrent(
+      { power: "10", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.9", efficiency: "1", phase: "3" },
+      2,
+    );
+    expect(adjusted.ok).toBe(true);
+    if (!adjusted.ok) return;
+    expect(adjusted.warnings.some((item) => item.message.includes("1.0으로 가정"))).toBe(false);
+  });
+
+  it("0·음수·빈 값·역률 범위·전압 0은 숫자가 되지 않는다", () => {
+    const base = { powerUnit: "kW", voltage: "220", voltageUnit: "V", pf: "1", efficiency: "1", phase: "1" };
+    for (const power of ["0", "-5", ""]) {
+      const out = calculateContractPowerCurrent({ ...base, power }, 2);
+      expect(out.ok).toBe(false);
+    }
+    expect(calculateContractPowerCurrent({ ...base, power: "5", pf: "0" }, 2).ok).toBe(false);
+    expect(calculateContractPowerCurrent({ ...base, power: "5", pf: "1.2" }, 2).ok).toBe(false);
+    expect(calculateContractPowerCurrent({ ...base, power: "5", voltage: "0" }, 2).ok).toBe(false);
+    const huge = calculateContractPowerCurrent({ ...base, power: "1000000" }, 2);
+    expect(huge.ok).toBe(true);
+    if (huge.ok) {
+      const value = primaryNumber(huge);
+      expect(Number.isFinite(value)).toBe(true);
+      expect(value).not.toBe(Infinity);
+    }
+  });
+
+  it("안내 표의 암페어는 계산 결과와 같다", () => {
+    const guide = getCalculatorGuide("contract-power-current");
+    const rows = guide?.lookup?.rows ?? [];
+    const cases = [
+      { row: "3 kW", phase: "1", voltage: "220", pf: "1" },
+      { row: "5 kW", phase: "1", voltage: "220", pf: "1" },
+      { row: "10 kW", phase: "1", voltage: "220", pf: "1" },
+      { row: "5 kW", phase: "3", voltage: "380", pf: "0.9" },
+      { row: "10 kW", phase: "3", voltage: "380", pf: "0.9" },
+      { row: "20 kW", phase: "3", voltage: "380", pf: "0.9" },
+    ];
+    for (const item of cases) {
+      const shown = rows.find((row) => row[1] === item.row && row[0].includes(item.phase === "1" ? "단상" : "3상"));
+      const out = calculateContractPowerCurrent(
+        { power: item.row.replace(" kW", ""), powerUnit: "kW", phase: item.phase, voltage: item.voltage, voltageUnit: "V", pf: item.pf, efficiency: "1" },
+        2,
+      );
+      expect(out.ok).toBe(true);
+      if (!out.ok) return;
+      const primary = out.metrics.find((metric) => metric.primary);
+      expect(shown?.[2]).toBe(`${primary?.value} A`);
+      expect(primary?.label).toBe("예상 부하전류");
+    }
+  });
+
+  it("기본 전압만 단상 220 V와 3상 380 V로 바꾼다", () => {
+    expect(contractPowerVoltageSuggestion("3", "220", "V")).toBe("380");
+    expect(contractPowerVoltageSuggestion("1", "380", "V")).toBe("220");
+    expect(contractPowerVoltageSuggestion("3", "400", "V")).toBeUndefined();
+    expect(contractPowerVoltageSuggestion("1", "230", "V")).toBeUndefined();
   });
 });
 

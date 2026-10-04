@@ -19,6 +19,16 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
 
   return (
     <div className="mt-10 space-y-8 border-t border-border pt-8">
+      {guide.topics?.map((topic) => (
+        <Section key={topic.title} title={topic.title}>
+          {topic.paragraphs.map((paragraph) => (
+            <p key={paragraph} className="text-sm leading-7 text-muted">
+              {paragraph}
+            </p>
+          ))}
+        </Section>
+      ))}
+
       <Section title="이 계산기는 언제 사용하는가">
         {guide.whenToUse.map((paragraph) => (
           <p key={paragraph} className="text-sm leading-7 text-muted">

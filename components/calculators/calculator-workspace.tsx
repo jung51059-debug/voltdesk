@@ -13,7 +13,7 @@ import { WarningPanel } from "@/components/calculators/warning-panel";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { formSchemas, type FieldDef } from "@/lib/calculations/schemas";
-import { engines } from "@/lib/calculations/engines";
+import { contractPowerVoltageSuggestion, engines } from "@/lib/calculations/engines";
 import { buildHandoffHref, parseHandoff } from "@/lib/calculations/handoff";
 import { usePreferences } from "@/components/providers/preferences-provider";
 import { pushRecentTool } from "@/lib/storage/local";
@@ -146,7 +146,7 @@ export function CalculatorWorkspace({
   const { prefs } = usePreferences();
   const [values, setValues] = useState<Record<string, string>>(() => {
     const defaults = { ...(schema?.defaults ?? {}) };
-    if (tool.slug.includes("current")) {
+    if (tool.slug.includes("current") && tool.slug !== "contract-power-current") {
       defaults.voltage = String(prefs.defaultVoltage);
     }
     return defaults;
@@ -184,7 +184,14 @@ export function CalculatorWorkspace({
 
   function setField(id: string, value: string) {
     setDirty(true);
-    setValues((current) => ({ ...current, [id]: value }));
+    setValues((current) => {
+      const next = { ...current, [id]: value };
+      if (tool.slug === "contract-power-current" && id === "phase") {
+        const suggested = contractPowerVoltageSuggestion(value, current.voltage ?? "", current.voltageUnit ?? "V");
+        if (suggested) next.voltage = suggested;
+      }
+      return next;
+    });
     if (id === "mode") setShowAdvanced(value === "detailed");
   }
 

@@ -146,6 +146,7 @@ const NO_SELECT = "차단기·케이블·설비 자동 선정 및 규정 적합 
 export const standardBases: StandardBasis[] = [
   row("single-phase-current", "formula-single-phase-current", "general-engineering", ["engineering"], "engineering", GENERAL, "단상 I = P/(V PF η)", [NO_SELECT, "보호·허용전류 계산이 아닙니다."]),
   row("three-phase-current", "formula-three-phase-current", "general-engineering", ["engineering"], "engineering", "3상 평형 P = √3 V I PF 역산.", "3상 선전류", [NO_SELECT, "불평형·고조파는 포함하지 않습니다."]),
+  row("contract-power-current", "formula-contract-power-current", "general-engineering", ["engineering"], "engineering", "단상·3상 부하전류와 같은 식. 계약전력 산정이 아닙니다.", "입력 kW의 예상 부하전류", [NO_SELECT, "한전 계약전력·차단기 정격을 정하지 않습니다."]),
   row("kw-kva-hp", "formula-kw-kva-hp", "general-engineering", ["engineering"], "engineering", "단위 환산. 기계적 1 HP = 746 W.", "kW·kVA·HP 환산", ["설비 선정·과부하 판정이 아닙니다."]),
   row("power-factor", "formula-power-factor", "general-engineering", ["engineering"], "engineering", "PF = P/S, Q = √(S²−P²).", "기본파 변위 역률", ["한전 역률요금·진성 역률 측정이 아닙니다."]),
   row("transformer-load", "formula-transformer-load", "general-engineering", ["engineering"], "engineering", "부하율 = S_load / S_rated. 현장은 √3 V Iavg 근사.", "명판 대비 비율·추정 kVA", ["냉각·온도·고조파 derating을 하지 않습니다.", "IEC 60076 용량 보정은 수행하지 않습니다."]),

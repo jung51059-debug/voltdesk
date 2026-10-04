@@ -205,6 +205,61 @@ export function calculateThreePhaseCurrent(input: CalcInput, precision: number):
   });
 }
 
+const CONTRACT_POWER_NOTICE =
+  "본 계산 결과는 입력한 전력을 기준으로 한 예상 부하전류입니다. 한국전력의 계약전력 산정 또는 적정 계약전력을 결정하는 기능이 아니며, 차단기·케이블 선정이나 KEC 적합 여부를 판정하지 않습니다. 실제 설계·시공 시에는 부하 특성, 수용률·동시사용 조건, 전선 허용전류, 차단기 특성, 전압강하, 단락전류, 관련 기준 및 제조사 자료 등을 함께 검토하세요.";
+
+const CONTRACT_POWER_UNITY_NOTE =
+  "역률과 효율을 1.0으로 가정한 단순 환산값입니다. 실제 모터·설비에서는 명판 또는 설계조건의 역률과 효율을 입력하세요.";
+
+/** 단상 기본 220 V, 3상 기본 380 V만 바꿉니다. 사용자가 바꾼 전압은 유지합니다. */
+export function contractPowerVoltageSuggestion(phase: string, voltage: string, voltageUnit: string): string | undefined {
+  if (voltageUnit !== "V") return undefined;
+  if (phase === "3" && voltage === "220") return "380";
+  if (phase === "1" && voltage === "380") return "220";
+  return undefined;
+}
+
+/** 계약전력(kW)을 예상 부하전류로 환산합니다. 숫자는 단상·3상 전류 계산과 같습니다. */
+export function calculateContractPowerCurrent(input: CalcInput, precision: number): CalculationOutcome {
+  const phase = input.phase === "3" ? "3" : "1";
+  const fieldErrors: Record<string, string> = {};
+
+  try {
+    const power = parseNumber(input.power, "전력");
+    if (!(power > 0)) fieldErrors.power = "전력은 0보다 커야 합니다.";
+  } catch (error) {
+    fieldErrors.power = error instanceof Error ? error.message : "전력을 확인하세요.";
+  }
+  try {
+    const voltage = parseNumber(input.voltage, "전압");
+    if (!(voltage > 0)) fieldErrors.voltage = "전압은 0보다 커야 합니다.";
+  } catch (error) {
+    fieldErrors.voltage = error instanceof Error ? error.message : "전압을 확인하세요.";
+  }
+  if (Object.keys(fieldErrors).length > 0) return fail(fieldErrors);
+
+  const out = phase === "3" ? calculateThreePhaseCurrent(input, precision) : calculateSinglePhaseCurrent(input, precision);
+  if (!out.ok) return out;
+
+  const assumedUnity =
+    out.inputSummary.some((row) => row.label === "역률" && row.value === "1") &&
+    out.inputSummary.some((row) => row.label === "효율" && row.value === "1");
+
+  return {
+    ...out,
+    metrics: out.metrics.map((item) =>
+      item.primary ? { ...item, label: "예상 부하전류", hint: assumedUnity ? CONTRACT_POWER_UNITY_NOTE : item.hint } : item,
+    ),
+    inputSummary: [{ label: "전원", value: phase === "3" ? "3상" : "단상" }, ...out.inputSummary],
+    interpretation: CONTRACT_POWER_NOTICE,
+    warnings: [
+      ...(assumedUnity ? [warning("info", "단순 환산", CONTRACT_POWER_UNITY_NOTE)] : []),
+      warning("info", "예상 부하전류", CONTRACT_POWER_NOTICE),
+      ...out.warnings,
+    ],
+  };
+}
+
 export function calculateKwKvaHp(input: CalcInput, precision: number): CalculationOutcome {
   const mode = input.mode ?? "from-kw";
   const fieldErrors: Record<string, string> = {};
@@ -1146,6 +1201,7 @@ function result(value: Omit<CalculationResult, "ok">): CalculationResult {
 export const engines: Record<string, (input: CalcInput, precision: number) => CalculationOutcome> = {
   "single-phase-current": calculateSinglePhaseCurrent,
   "three-phase-current": calculateThreePhaseCurrent,
+  "contract-power-current": calculateContractPowerCurrent,
   "kw-kva-hp": calculateKwKvaHp,
   "power-factor": calculatePowerFactor,
   "transformer-load": calculateTransformerLoad,
