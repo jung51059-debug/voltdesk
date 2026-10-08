@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_KR } from "next/font/google";
 import { AdSenseLoader } from "@/components/ads/adsense-loader";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { RecentToolsStrip } from "@/components/layout/recent-tools-strip";
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col bg-surface font-sans text-ink">
         <AdSenseLoader />
+        <GoogleAnalytics />
         <PreferencesProvider>
           <FavoriteProvider>
             <ToastProvider>

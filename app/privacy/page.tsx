@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 export const metadata: Metadata = {
   title: "개인정보 처리방침",
   description:
-    "Ampory의 개인정보 처리 안내. 계정 없이 제공되며, Google 광고·쿠키 사용과 문의 방법을 안내합니다.",
+    "Ampory의 개인정보 처리 안내. 계정 없이 제공되며, Google 광고·방문 통계 쿠키와 문의 방법을 안내합니다.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
     <div className="max-w-3xl">
       <Breadcrumb items={[{ href: "/", label: "홈" }, { label: "개인정보 처리방침" }]} />
       <h1 className="text-3xl font-semibold">개인정보 처리방침</h1>
-      <p className="mt-4 leading-7 text-muted">시행일: 2026-08-20 · 최종 수정: 2026-08-29</p>
+      <p className="mt-4 leading-7 text-muted">시행일: 2026-08-20 · 최종 수정: 2026-10-08</p>
       <div className="mt-6 space-y-6 leading-7">
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">수집하는 정보</h2>
@@ -28,10 +28,15 @@ export default function PrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold">광고·쿠키</h2>
+          <h2 className="text-xl font-semibold">광고·방문 통계·쿠키</h2>
           <p>
             본 사이트는 Google AdSense를 이용해 광고를 표시할 수 있습니다. Google을 포함한 제3자 광고 네트워크는
             쿠키, 픽셀, 기기 식별자와 같은 기술을 사용해 방문 기록과 관심사를 바탕으로 광고를 게재할 수 있습니다.
+          </p>
+          <p>
+            방문 통계를 위해 Google Analytics를 사용합니다. 본 페이지 주소, 대략적인 지역, 기기와 브라우저 정보가
+            쿠키를 통해 Google에 전달될 수 있습니다. 계산기에 입력한 값은 페이지 주소의 쿼리로 Analytics에 보내지
+            않습니다.
           </p>
           <p>
             Google이 파트너 사이트에서 데이터를 사용하는 방식은{" "}

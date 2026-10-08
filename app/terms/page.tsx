@@ -15,7 +15,7 @@ export default function TermsPage() {
     <div className="max-w-3xl">
       <Breadcrumb items={[{ href: "/", label: "홈" }, { label: "이용약관" }]} />
       <h1 className="text-3xl font-semibold">이용약관</h1>
-      <p className="mt-4 leading-7 text-muted">시행일: 2026-08-20 · 최종 수정: 2026-08-29</p>
+      <p className="mt-4 leading-7 text-muted">시행일: 2026-08-20 · 최종 수정: 2026-10-08</p>
       <div className="mt-6 space-y-6 leading-7">
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">계산 결과의 성격</h2>
@@ -32,7 +32,7 @@ export default function TermsPage() {
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">광고</h2>
           <p>
-            사이트에는 Google AdSense 등 제3자 광고가 표시될 수 있습니다. 쿠키와 광고 데이터 처리에 대한 자세한 내용은{" "}
+            사이트에는 Google AdSense 등 제3자 광고가 표시될 수 있습니다. 방문 통계, 쿠키, 광고 데이터 처리에 대한 자세한 내용은{" "}
             <Link href="/privacy" className="text-primary underline underline-offset-2">
               개인정보 처리방침
             </Link>
