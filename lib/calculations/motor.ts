@@ -58,8 +58,12 @@ export function calculateMotorCurrent(input: CalcInput, precision: number): Calc
       metric("pin", "입력전력", kWin, "kW", precision),
       metric("kva", "피상전력", kVA, "kVA", precision),
       metric("pout", "축출력", kWout, "kW", precision),
-      metric("startLow", "기동전류 하한 참고(5×FLC)", startLow, "A", precision),
-      metric("startHigh", "기동전류 상한 참고(8×FLC)", startHigh, "A", precision),
+      metric("startLow", "DOL 참고(5×정격)", startLow, "A", precision, {
+        hint: "농형 유도전동기를 직입기동할 때 자주 보는 배수입니다. 이 모터의 확정 기동전류가 아닙니다.",
+      }),
+      metric("startHigh", "DOL 참고(8×정격)", startHigh, "A", precision, {
+        hint: "실제 기동전류는 명판, 제조사 자료, 기동 방식에 따라 다릅니다.",
+      }),
       metric("cableHint", "케이블 검토용 전류 참고", I * 1.25, "A", precision, {
         hint: "연속 부하에 1.25를 곱한 실무 참고이며 규정 값이 아닙니다.",
       }),
@@ -71,10 +75,10 @@ export function calculateMotorCurrent(input: CalcInput, precision: number): Calc
       { label: "역률", value: String(roundTo(pf, 3)) },
       { label: "효율", value: String(roundTo(eta, 3)) },
     ],
-    interpretation: `${phase === "1" ? "단상" : "3상"} ${roundTo(V, 0)} V, ${roundTo(kWout, precision)} kW 모터의 정격전류는 ${roundTo(I, precision)} A입니다. 기동전류 범위는 DOL 유도전동기에서 흔히 보는 5~8배 참고 구간이며 명판·기동방식이 우선입니다.`,
+    interpretation: `${phase === "1" ? "단상" : "3상"} ${roundTo(V, 0)} V, ${roundTo(kWout, precision)} kW 모터의 정격전류는 ${roundTo(I, precision)} A입니다. 5배와 8배는 DOL 농형 유도전동기의 참고 배수이며, 이 모터의 확정 기동전류가 아닙니다. 실제 값은 명판, 제조사 자료, 기동 방식에 따라 다릅니다.`,
     warnings: [
       warning("error", "선정 승인 아님", "케이블·차단기·과부하계전기는 제조사 명판, 기동방식, 적용 배전 규정을 검토한 뒤 정해야 합니다."),
-      warning("info", "기동전류", "5~8배는 DOL 농형 유도전동기의 흔한 실무 구간입니다. 소프트스타터·VFD·권선형은 훨씬 낮을 수 있습니다."),
+      warning("info", "기동전류", "5배와 8배는 DOL 농형 유도전동기의 참고 배수입니다. 소프트스타터·인버터·권선형은 더 낮을 수 있습니다. 이 결과로 기동전류를 확정하지 않습니다."),
     ],
     formulaUsed: phase === "1" ? "I = P / (V × PF × η)" : "I = P / (√3 × V × PF × η)",
     steps,

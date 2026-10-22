@@ -23,9 +23,6 @@ export default function PrivacyPage() {
             Ampory 웹 계산기는 회원 가입 없이 제공됩니다. 즐겨찾기, 최근 도구, 환경설정은 사용자 브라우저의
             localStorage에만 저장되며 Ampory 서버로 전송되지 않습니다.
           </p>
-          <p>
-            이후 계정 동기화, 프로젝트 저장, Pro 기능을 도입할 경우 수집 항목과 보관 기간을 이 페이지에 업데이트합니다.
-          </p>
         </section>
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">광고·방문 통계·쿠키</h2>

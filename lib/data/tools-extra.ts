@@ -125,8 +125,9 @@ export const extraTools: CalculatorTool[] = [
     status: "published",
     updatedAt: "2026-08-29",
     faqs: [
-      { question: "과보상되면?", answer: "경부하에서 진상이 되면 전압 상승과 요금 문제가 날 수 있습니다. 자동 제어를 검토하세요." },
-      { question: "VFD가 많으면?", answer: "디튠드 리액터 또는 필터 없이 콘덴서만 넣지 마세요." },
+      { question: "과보상되면?", answer: "경부하에서 목표 역률이 그대로면 진상이 될 수 있습니다. 이 kvar는 그 운전 구간의 제어를 정하지 않습니다." },
+      { question: "VFD가 많으면?", answer: "필요 kvar만 나오고 고조파 공진은 보지 않습니다. 콘덴서만으로 설치를 확정하지 마세요." },
+      { question: "목표 역률이 현재보다 낮으면?", answer: "계산하지 않습니다. 이미 달린 콘덴서를 얼마나 뺄지 구하는 식이 아닙니다." },
     ],
   }),
   tool({
@@ -171,7 +172,23 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("몇 차까지 넣나요?", "계측기가 준 성분을 그대로 넣습니다. 차수 범위는 측정 표준을 따르세요."),
+    faqs: [
+      {
+        question: "고조파 칸에 5차, 7차 번호를 넣나요?",
+        answer:
+          "넣지 않습니다. 그 차수의 실효값(V 또는 A)을 넣습니다. 5, 7을 넣으면 차수가 아니라 5와 7이라는 크기로 계산됩니다.",
+      },
+      {
+        question: "8, 4, 2의 순서를 바꾸면 결과가 달라지나요?",
+        answer:
+          "달라지지 않습니다. 기본파 220 V에서 8, 4, 2 V는 제곱합의 제곱근이라 순서가 달라도 THD는 4.17%입니다.",
+      },
+      {
+        question: "이 백분율로 전압 품질 합격인가요?",
+        answer:
+          "아닙니다. 넣은 성분과 기본파의 비율만 보여 줍니다. 허용 한도, 측정 구간, 차수 범위는 계측기와 적용 조건을 따로 확인합니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-harmonic-filter",
@@ -262,7 +279,11 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("표 값이 없으면?", "제조사 카탈로그나 적용 배선 규정 표를 먼저 찾으세요. 추측값을 넣지 마세요."),
+    faqs: [
+      { question: "표 값이 없으면?", answer: "Iz와 보정계수를 비워 두지 말고 적용 표에서 찾으세요. 추측을 넣으면 그 추측이 Iz'로 나옵니다." },
+      { question: "Ib/Iz'가 1보다 크면 부적합한가요?", answer: "넣은 숫자끼리의 비교입니다. 1.299처럼 1을 넘으면 그 입력에서는 설계전류가 보정값보다 큽니다. 표준 적합 판정은 아닙니다." },
+      { question: "기타 보정을 비우면?", answer: "1을 곱합니다. 1은 보정을 넣지 않은 입력이며, 표의 계수가 1이라는 뜻은 아닙니다." },
+    ],
   }),
   tool({
     id: "tool-busbar",
@@ -328,7 +349,11 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("22.9 kV는?", "22900 V 또는 22.9 kV로 단위를 맞추세요."),
+    faqs: [
+      { question: "22.9 kV는?", answer: "22,900 V로 넣거나 단위를 kV로 바꿉니다. 22900을 kV 단위에 넣으면 전류가 달라집니다." },
+      { question: "2차 전류가 차단기 정격인가요?", answer: "아닙니다. 정격 kVA가 전부 걸릴 때의 3상 선전류입니다. 프레임 선정은 부하전류와 보호 조건을 따로 봅니다." },
+      { question: "단상 변압기에도 쓰나요?", answer: "쓰지 않습니다. 이 식은 √3로 나눕니다. 단상은 용량을 그 권선 전압으로만 나눕니다." },
+    ],
   }),
   tool({
     id: "tool-transformer-parallel",
@@ -395,8 +420,9 @@ export const extraTools: CalculatorTool[] = [
     status: "published",
     updatedAt: "2026-08-29",
     faqs: [
-      { question: "1선 지락은?", answer: "영상분 모델이 없어 제공하지 않습니다." },
-      { question: "c=1.05가 맞나요?", answer: "전압 등급별 IEC 60909 표를 확인하세요. 기본값은 입력 편의를 위한 것입니다." },
+      { question: "1선 지락도 나오나요?", answer: "나오지 않습니다. 3상 대칭만 계산하며, 그 값을 나눠 지락전류로 쓰지 않습니다." },
+      { question: "c=1.05가 그 전압의 계수인가요?", answer: "예제에 넣은 1.05일 뿐입니다. 전압 등급별 표는 확인 후 직접 바꿉니다." },
+      { question: "이 kA로 차단기를 정해도 되나요?", answer: "안 됩니다. Ik″는 넣은 임피던스의 사고전류 근사이고, 차단용량·보호협조와 같은 판정이 아닙니다." },
     ],
   }),
   tool({
@@ -762,7 +788,11 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("15분은 어떻게 넣나요?", "0.25 시간으로 넣습니다."),
+    faqs: [
+      { question: "15분은 어떻게 넣나요?", answer: "0.25 시간입니다. 2시간은 2입니다. 분 단위 칸은 없습니다." },
+      { question: "계산된 Ah면 그 시간이 보장되나요?", answer: "아닙니다. 넣은 효율·노화·DOD로 나눈 에너지 수지입니다. 방전 전류에 따른 용량 감소는 없습니다." },
+      { question: "DOD 0.5는 권장값인가요?", answer: "아닙니다. 저장 에너지 중 얼마를 쓰겠다는 입력입니다. 제조사 자료의 값을 넣으세요." },
+    ],
   }),
   tool({
     id: "tool-equipment-load",
@@ -968,9 +998,9 @@ export const extraTools: CalculatorTool[] = [
     href: "/tools/advanced/arc-flash",
     categoryId: "cat-advanced",
     domain: "electrical",
-    name: "아크플래시 검토 준비",
-    nameEn: "Arc flash review prep",
-    description: "아크플래시 검토 준비 항목을 정리합니다. IEEE 1584 계산기가 아니며 입사에너지 수치는 제공하지 않습니다.",
+    name: "아크플래시 점검 목록",
+    nameEn: "Arc flash review checklist",
+    description: "점검 목록입니다. 입사에너지와 접근 한계는 계산하지 않습니다.",
     longDescription: "IEEE 1584 계산기가 아닙니다. 관련 표준은 IEEE 1584 / IEEE 1584.2 자료 수집 안내입니다. 임의의 Incident Energy를 내지 않습니다.",
     formulaId: "formula-arc-flash",
     tags: ["아크플래시", "IEEE 1584", "PPE"],
@@ -990,9 +1020,9 @@ export const extraTools: CalculatorTool[] = [
     href: "/tools/advanced/lightning-risk",
     categoryId: "cat-advanced",
     domain: "electrical",
-    name: "낙뢰보호 검토 항목",
-    nameEn: "Lightning protection review items",
-    description: "낙뢰보호 검토 항목 안내입니다. IEC 62305 계산·전체 위험평가가 아닙니다.",
+    name: "낙뢰보호 점검 목록",
+    nameEn: "Lightning protection checklist",
+    description: "점검 목록입니다. 위험점수와 LPS 등급은 계산하지 않습니다.",
     longDescription: "관련 표준: IEC 62305. 불완전한 위험 점수를 설계 판정처럼 제공하지 않습니다.",
     formulaId: "formula-lightning",
     tags: ["낙뢰", "LPS"],
@@ -1070,7 +1100,11 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("2%면 문제인가요?", "적용 기준 문서를 확인하세요. 여기서는 비율만 계산합니다."),
+    faqs: [
+      { question: "2%면 문제인가요?", answer: "이 계산기는 문제 여부를 정하지 않습니다. 나온 %는 선간전압 평균편차이며, 적용 문서는 따로 봅니다." },
+      { question: "이 %가 IEC 불평형률인가요?", answer: "아닙니다. 선간 RMS의 평균편차입니다. 대칭분 VUF는 위상까지 있어야 하고, 선간 세 값만으로 만들지 않습니다." },
+      { question: "상전류 편차율이 중성선 전류인가요?", answer: "아닙니다. 평균 전류에서 가장 벗어난 비율입니다. 중성선 전류는 위상까지 합쳐야 합니다." },
+    ],
   }),
   tool({
     id: "tool-generator-load-test",

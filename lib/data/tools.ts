@@ -51,7 +51,7 @@ export const baseTools: CalculatorTool[] = [
     name: "3상 부하전류 계산기",
     nameEn: "Three-phase load current calculator",
     pageHeading: "3상 전류 계산기 - 380V kW를 A로 계산",
-    metaTitle: "3상 전류 계산기 | 380V kW를 A로 계산",
+    metaTitle: "3상 전류 계산기, 380V kW를 A로 계산",
     metaDescription:
       "전압, 부하전력, 역률을 입력해 3상 선전류를 계산합니다. 380V 30kW·역률 0.9·효율 1은 약 50.64A이며, 공식과 확인할 사항을 함께 제공합니다.",
     description: "선간전압, 유효전력, 역률로 3상 선전류를 계산합니다.",
@@ -345,7 +345,7 @@ export const baseTools: CalculatorTool[] = [
     name: "kW / kVA / HP 환산기",
     nameEn: "kW / kVA / HP converter",
     pageHeading: "kW·kVA 변환 계산기",
-    metaTitle: "kW kVA 변환 계산기 | 역률 반영",
+    metaTitle: "kW kVA 변환 계산기, 역률 반영",
     metaDescription:
       "역률을 반영해 kW와 kVA를 변환합니다. 100kW·역률 0.8은 125kVA이고, 둘을 같은 값으로 보면 안 되는 경우를 함께 설명합니다.",
     description: "유효전력(kW)과 피상전력(kVA)을 역률로 변환합니다. 마력(HP) 환산도 같은 화면에서 합니다.",
@@ -416,7 +416,7 @@ export const baseTools: CalculatorTool[] = [
       {
         question: "좋은 역률의 기준은 무엇인가요?",
         answer:
-          "사업장과 계약 조건에 따라 다릅니다. 많은 수전 설비에서 0.9 이상을 목표로 하며, 과보상(진상)도 문제가 됩니다.",
+          "한 숫자로 좋은 역률을 정하지 않습니다. 결과의 0.9와 0.7은 Ampory의 참고 안내 조건입니다. 같은 유효전력에서 역률이 낮으면 피상전력과 전류가 커질 수 있습니다. 한전 계약의 합격선은 약관으로 확인하세요.",
       },
     ],
   },
@@ -429,7 +429,7 @@ export const baseTools: CalculatorTool[] = [
     name: "변압기 용량·부하율 계산기",
     nameEn: "Transformer capacity and load ratio calculator",
     pageHeading: "변압기 부하율 계산기",
-    metaTitle: "변압기 부하율 계산기 | kW·kVA·역률 계산",
+    metaTitle: "변압기 부하율 계산기, kW·kVA·역률 계산",
     metaDescription:
       "부하 kW를 역률로 kVA로 바꾼 뒤 변압기 정격 대비 부하율을 계산합니다. 500kVA에 300kW·역률 0.8이면 75%입니다.",
     description: "정격 kVA와 부하(kW 또는 kVA)로 변압기 부하율을 계산합니다.",
@@ -479,7 +479,7 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "전압강하 계산기",
     nameEn: "Voltage drop calculator",
-    metaTitle: "전압강하 계산기 | 전선·거리별 전압강하 계산",
+    metaTitle: "전압강하 계산기, 전선·거리별 전압강하 계산",
     metaDescription:
       "전류, 거리, 도체 저항으로 단상·3상 전압강하를 계산합니다. 저항 근사식과 계산 예제, 결과를 볼 때 확인할 사항을 함께 제공합니다.",
     description: "전류, 편도 길이, 도체 저항으로 단상·3상 전압강하를 계산합니다.",
@@ -591,7 +591,17 @@ export const baseTools: CalculatorTool[] = [
       {
         question: "이 값으로 케이블을 선정해도 되나요?",
         answer:
-          "안 됩니다. 허용전류, 단락, 전압강하, 포설 방법, 온도를 함께 봐야 합니다. 이 계산은 저항 근사값만 제공합니다.",
+          "안 됩니다. 20°C 저항 근사만 나옵니다. 허용전류, 전압강하, 단락, 포설은 따로 봅니다.",
+      },
+      {
+        question: "km당 저항을 전압강하에 넣으면 되나요?",
+        answer:
+          "Ω/km를 전압강하 계산기의 r에 넣습니다. 단상 왕복 Ω을 그 칸에 넣으면, 단상 식의 2와 겹칩니다.",
+      },
+      {
+        question: "온도가 오르면 저항은?",
+        answer:
+          "이 계산은 20°C 근사라 더 뜨거울 때의 증가를 반영하지 않습니다. 온도 계수를 곱하는 칸은 없습니다.",
       },
     ],
   },
@@ -690,14 +700,14 @@ export const baseTools: CalculatorTool[] = [
     domain: "facility",
     name: "발전기 부하율 계산기",
     nameEn: "Generator load ratio calculator",
-    description: "발전기 정격 대비 실부하 비율과 운전 구간 해석을 제공합니다.",
+    description: "발전기 정격 대비 실부하 비율을 계산합니다.",
     longDescription:
-      "프라임 또는 스탠바이 정격 kW와 실제 부하로 부하율을 계산합니다. 저부하와 과부하 구간에 대한 실무 주의를 함께 표시합니다.",
+      "프라임 또는 스탠바이 정격 kW와 실제 부하로 부하율을 계산합니다. 30% 미만과 스탠바이 70% 초과는 참고 알림이며, 운전 허용 판정이 아닙니다.",
     formulaId: "formula-generator-load",
     tags: ["발전기", "부하율", "비상발전기", "kW"],
     synonyms: ["generator load", "비상발전기", "GEN 부하", "디젤발전기", "부하율"],
     relatedToolIds: ["tool-transformer-load", "tool-generator-load-test", "tool-generator-sizing"],
-    relatedArticleIds: ["art-ups-vs-generator", "art-transformer-load", "art-demand-vs-load-factor"],
+    relatedArticleIds: ["art-generator-sizing", "art-ups-vs-generator", "art-demand-vs-load-factor", "art-transformer-load"],
     complexity: "basic",
     featured: true,
     recentlyAdded: false,
@@ -707,7 +717,17 @@ export const baseTools: CalculatorTool[] = [
       {
         question: "스탠바이와 프라임 정격의 차이는 무엇인가요?",
         answer:
-          "스탠바이는 정전 시 제한 시간 운전용, 프라임은 변동 부하의 장시간 주전원용입니다. 정격 kW 값이 다르므로 명판 종류를 구분해 입력하세요.",
+          "스탠바이는 정전 시 제한된 비상 운전용이고, 프라임은 변동 부하의 장시간 주전원용으로 명판에 적힌 출력입니다. 두 칸의 kW가 다르므로, 지금 읽는 명판 종류와 같은 값을 넣습니다.",
+      },
+      {
+        question: "부하율 22.5%면 저부하로 불합격인가요?",
+        answer:
+          "아닙니다. 스탠바이 400 kW에 실부하 90 kW를 넣으면 22.5%입니다. 30% 미만이면 참고 알림이 나오지만, 그 30%는 운전 허용의 판정값이 아닙니다. 엔진 손상이나 시험 합격을 정하지 않습니다.",
+      },
+      {
+        question: "명판에 kVA만 있으면 어떻게 넣나요?",
+        answer:
+          "정격 입력을 kVA로 바꾸고 역률을 넣습니다. 625 kVA에 역률 0.8을 곱하면 정격 500 kW입니다. 실부하가 320 kW이면 부하율은 320 / 500 × 100 = 64%입니다.",
       },
     ],
   },
@@ -741,9 +761,19 @@ export const baseTools: CalculatorTool[] = [
     updatedAt: "2026-08-20",
     faqs: [
       {
-        question: "일수 보정은 언제 쓰나요?",
+        question: "일수가 같으면 보정을 끄나요?",
         answer:
-          "검침 주기가 28일과 31일처럼 다를 때 사용합니다. 30일 기준으로 환산해 사용 강도 비교가 쉬워집니다.",
+          "두 달 일수가 같으면 원시 검침 비교로 충분합니다. 31일과 28일처럼 다르면 30일 환산을 켜야 사용 강도를 비교합니다.",
+      },
+      {
+        question: "요금 차이가 청구서와 같나요?",
+        answer:
+          "같지 않습니다. 사용량 차이에 평균 단가만 곱합니다. 기본요금, 계절 차등, 역률 가감은 없습니다.",
+      },
+      {
+        question: "사용량이 줄면 결과가 음수인가요?",
+        answer:
+          "비교 월에서 기준 월을 빼므로, 비교 월이 더 적으면 사용량 차이와 변화율이 음수입니다.",
       },
     ],
   },

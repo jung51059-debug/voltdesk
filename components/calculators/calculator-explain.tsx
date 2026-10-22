@@ -120,6 +120,21 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
         ))}
       </Section>
 
+      {guide.links && guide.links.length > 0 ? (
+        <Section title="이어서 볼 곳">
+          <ul className="space-y-3">
+            {guide.links.map((item) => (
+              <li key={item.href} className="text-sm leading-6">
+                <Link href={item.href} className="font-medium text-primary hover:underline">
+                  {item.label}
+                </Link>
+                <p className="mt-1 text-muted">{item.text}</p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
       <Section title="주의사항과 한계">
         <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
           {guide.cautions.map((item) => (

@@ -295,7 +295,7 @@ export const baseFormulas: FormulaDefinition[] = [
       "수요율·부등률은 사용자가 이미 반영한 부하값을 입력한다고 가정합니다.",
     ],
     warnings: [
-      "상시 80% 이상 운전은 온도와 수명에 불리할 수 있습니다.",
+      "같은 부하율도 정격, 냉각 방식, 주변 온도, 부하 패턴, 제조사 운전 조건에 따라 다르게 읽습니다. 80%는 아래 예제의 계산값이며 운전 한계가 아닙니다.",
       "100%를 초과하면 과부하입니다. 제조사 과부하 내량과 지속시간을 확인하세요.",
     ],
     limitations: [
@@ -395,11 +395,11 @@ export const baseFormulas: FormulaDefinition[] = [
       title: "384 V, 100 Ah, 20 kW 부하",
       given: "V = 384 V, C = 100 Ah, η = 0.92, DOD = 0.8, P = 20 kW",
       steps: [
-        "가용 에너지 = 384 × 100 × 0.92 × 0.8 = 28262 Wh",
-        "t = 28262 / 20000 = 1.413 h",
-        "약 84.8분",
+        "가용 에너지 = 384 × 100 × 0.92 × 0.8 = 28262.4 Wh",
+        "t = 28262.4 / 20000 = 1.413 h",
+        "1.413 h × 60 = 84.79분",
       ],
-      result: "약 85분",
+      result: "84.79분",
     },
     referenceSources: [
       {
@@ -425,8 +425,8 @@ export const baseFormulas: FormulaDefinition[] = [
       "역률은 kVA 환산과 kVA 부하율 표시에만 사용합니다.",
     ],
     warnings: [
-      "디젤 발전기는 장시간 저부하(대략 30% 미만) 시 습식 적재(wet stacking) 위험이 있습니다.",
-      "스탠바이 정격을 프라임처럼 연속 사용하면 안 됩니다.",
+      "30% 미만 알림은 Ampory의 참고 조건입니다. 모든 디젤 발전기의 운전 허용 판정이 아니며, 장시간 저부하와 습식 적재 여부는 제조사 운전 조건으로 확인하세요.",
+      "스탠바이에서 70%를 넘기면 참고 알림을 냅니다. 이 70%는 제조사 공통 운전 한계가 아닙니다. 연속 운전은 정격 종류와 제조사 조건을 확인하세요.",
     ],
     limitations: [
       "발전기 세트 정격 분류와 제조사 부하 프로파일을 대체하지 않습니다.",
@@ -435,7 +435,7 @@ export const baseFormulas: FormulaDefinition[] = [
       title: "500 kW 프라임, 실제 320 kW",
       given: "P_rated = 500 kW, P_load = 320 kW",
       steps: ["부하율 = 320 / 500 × 100 = 64%"],
-      result: "64% — 일반적인 연속 운전 구간에 해당",
+      result: "64%. 320 kW는 정격 500 kW의 64%입니다. 이 비율만으로 연속 운전 적합 여부를 정하지 않습니다. 프라임·스탠바이 등 정격 종류와 제조사 운전 조건을 확인하세요.",
     },
     referenceSources: [
       {
@@ -546,8 +546,8 @@ export const baseFormulas: FormulaDefinition[] = [
     example: {
       title: "40 kW, 여유 20%, PF 0.9",
       given: "P = 40 kW, growth = 0.2, PF = 0.9",
-      steps: ["P_design = 48 kW", "S = 48 / 0.9 = 53.3 kVA"],
-      result: "약 53.3 kVA",
+      steps: ["P_design = 48 kW", "S = 48 / 0.9 = 53.33 kVA"],
+      result: "53.33 kVA",
     },
     referenceSources: [{ id: "src-eng-ups-s", title: "일반 전기공학 kVA 환산", publisher: "공학 교과서", note: "UPS 제품 선정 절차는 사용하지 않습니다." }],
   },

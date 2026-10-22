@@ -3,7 +3,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export const metadata: Metadata = {
   title: "문의",
-  description: "Ampory 도구 오류, 공식 개정 제안, 시설 도구 요청을 받는 연락 안내.",
+  description: "개인이 운영하는 Ampory의 연락 안내. 도구 오류, 공식 개정 제안, 시설 도구 요청을 받습니다.",
   alternates: { canonical: "/contact" },
 };
 
@@ -13,7 +13,8 @@ export default function ContactPage() {
       <Breadcrumb items={[{ href: "/", label: "홈" }, { label: "문의" }]} />
       <h1 className="text-3xl font-semibold">문의</h1>
       <p className="mt-4 leading-7 text-muted">
-        계산 오류 제보, 공식 가정 개선, HVAC·소방 도구 요청은 아래 채널로 보내 주세요. Ampory는{" "}
+        Ampory는 개인이 운영하는 전기설비 계산·기술정보 사이트입니다. 계산 오류 제보, 공식 가정 개선, HVAC·소방 도구
+        요청은 아래 메일로 보내 주세요. Ampory는{" "}
         <a href="/about" className="text-primary underline underline-offset-2">
           소개
         </a>

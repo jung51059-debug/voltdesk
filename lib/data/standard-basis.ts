@@ -329,10 +329,10 @@ export const standardBases: StandardBasis[] = [
   row("cable-schedule", "formula-cable-schedule", "general-engineering", ["engineering"], "engineering", "목록 관리.", "케이블 태그 목록", ["자동 굵기 선정이 아닙니다."]),
   row("panel-schedule", "formula-panel-schedule", "general-engineering", ["engineering"], "engineering", "상전류 평균편차.", "반 불평형 %", ["KEC 부하불평형률·영상분이 아닙니다."]),
   row("load-flow", "formula-load-flow", "general-engineering", ["engineering"], "approximation", "방사형 DistFlow 근사.", "모선 전압·손실", ["환상망·불평형 조류가 아닙니다."]),
-  row("arc-flash", "formula-arc-flash", "international-reference", ["ieee"], "engineering", "아크플래시 검토 준비. 입사에너지 수치 없음.", "검토 준비 항목", ["IEEE 1584 계산기·준수가 아닙니다. 입사에너지·경계 값을 내지 않습니다."], {
+  row("arc-flash", "formula-arc-flash", "international-reference", ["ieee"], "engineering", "아크플래시 점검 목록. 입사에너지 수치 없음.", "점검 목록", ["IEEE 1584 계산기·준수가 아닙니다. 입사에너지·경계 값을 내지 않습니다."], {
     relatedStandards: ["관련 표준: IEEE 1584 / IEEE 1584.2 (자료 수집 안내. 수치 계산 없음)"],
   }),
-  row("lightning-risk", "formula-lightning", "international-reference", ["iec"], "engineering", "낙뢰보호 검토 항목. 위험점수 없음.", "검토 항목 안내", ["IEC 62305 계산·전체 위험평가가 아닙니다."], {
+  row("lightning-risk", "formula-lightning", "international-reference", ["iec"], "engineering", "낙뢰보호 점검 목록. 위험점수 없음.", "점검 목록", ["IEC 62305 계산·전체 위험평가가 아닙니다."], {
     relatedStandards: ["관련 표준: IEC 62305 (범위 안내)"],
   }),
   row("sld", "formula-sld", "general-engineering", ["engineering"], "engineering", "노드·엣지 데이터 구조.", "단선도 초안", ["해석·보호협조 계산이 아닙니다."]),

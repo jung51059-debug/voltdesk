@@ -307,6 +307,32 @@ describe("고조파 THD", () => {
     expect(out.ok).toBe(true);
     expect(primaryNumber(out)).toBeCloseTo((Math.hypot(10, 10) / 100) * 100, 3);
   });
+
+  it("안내 표와 순서 변경은 계산 결과와 같다", () => {
+    const rows = getCalculatorGuide("thd")?.lookup?.rows ?? [];
+    const cases = [
+      { kind: "voltage", fundamental: "100", harmonics: "10, 10", row: "100 V" },
+      { kind: "voltage", fundamental: "380", harmonics: "11.4", row: "380 V" },
+      { kind: "current", fundamental: "85", harmonics: "12, 7, 4", row: "85 A" },
+    ];
+    for (const item of cases) {
+      const out = calculateThd(item, 2);
+      expect(out.ok).toBe(true);
+      if (!out.ok) return;
+      const primary = out.metrics.find((metric) => metric.primary);
+      expect(rows.find((row) => row[1] === item.row)?.[3]).toBe(`${primary?.value}%`);
+    }
+    const forward = calculateThd({ kind: "voltage", fundamental: "220", harmonics: "8, 4, 2" }, 2);
+    const reversed = calculateThd({ kind: "voltage", fundamental: "220", harmonics: "2, 4, 8" }, 2);
+    expect(primaryNumber(forward)).toBeCloseTo(4.17, 2);
+    expect(primaryNumber(reversed)).toBe(primaryNumber(forward));
+    const current = calculateThd({ kind: "current", fundamental: "85", harmonics: "12, 7, 4" }, 2);
+    expect(current.ok).toBe(true);
+    if (current.ok) {
+      expect(current.metrics.find((metric) => metric.id === "rss")?.value).toBe("14.46");
+      expect(current.metrics.find((metric) => metric.primary)?.value).toBe("17.01");
+    }
+  });
 });
 
 describe("루멘법", () => {
@@ -878,8 +904,8 @@ describe("KEC 표기 범위", () => {
     expect(KEC_VOLTAGE_DROP_MIXED).toContain("자동으로 고르지 않습니다");
     expect(KEC_VOLTAGE_DROP_MIXED).toContain("구현 해석");
     expect(getStandardBasisBySlug("short-circuit")?.relatedStandards?.join(" ")).toContain("참고");
-    expect(getStandardBasisBySlug("arc-flash")?.usedInCalculation).toContain("검토 준비");
-    expect(getStandardBasisBySlug("lightning-risk")?.usedInCalculation).toContain("검토 항목");
+    expect(getStandardBasisBySlug("arc-flash")?.usedInCalculation).toContain("점검 목록");
+    expect(getStandardBasisBySlug("lightning-risk")?.usedInCalculation).toContain("점검 목록");
   });
 
   it("미구현 IEEE/IEC/ISO/NEC를 계산 근거 필드에 넣지 않는다", () => {

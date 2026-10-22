@@ -105,7 +105,7 @@ export function calculateSinglePhaseCurrent(input: CalcInput, precision: number)
   const warnings = [];
   if (I > 400) {
     warnings.push(
-      warning("warning", "큰 전류", "400 A를 넘는 단상 전류입니다. 3상 공급 또는 단면적·병렬 회로를 검토하세요."),
+      warning("warning", "큰 전류", "400 A를 넘었습니다. 이 400 A는 Ampory의 참고 알림이며 단상 회로의 허용 한도가 아닙니다. 공급 방식과 도체 수는 현장 조건으로 확인하세요."),
     );
   }
   if (pf < 0.7) {
@@ -353,11 +353,21 @@ export function calculatePowerFactor(input: CalcInput, precision: number): Calcu
   const warnings = [];
   if (pf < 0.9) {
     warnings.push(
-      warning("warning", "역률 주의", "0.9 미만입니다. 수전 계약과 변압기 여유, 보상 설비를 검토하세요."),
+      warning(
+        "warning",
+        "역률 참고",
+        "역률이 0.9 미만입니다. 0.9는 Ampory의 참고 안내 조건이며 한전 계약의 합격선이 아닙니다. 같은 유효전력이라도 역률이 낮으면 피상전력과 전류가 커질 수 있습니다.",
+      ),
     );
   }
   if (pf < 0.7) {
-    warnings.push(warning("warning", "매우 낮은 역률", "전류와 손실이 크게 증가하는 구간입니다."));
+    warnings.push(
+      warning(
+        "warning",
+        "매우 낮은 역률",
+        "역률이 0.7 미만입니다. 0.7도 Ampory의 참고 안내 조건입니다. 같은 유효전력에서 피상전력과 전류가 더 커지며, 단상·3상 전류 계산기도 0.7 미만에서 그 증가를 안내합니다. 계약 합격 여부는 정하지 않습니다.",
+      ),
+    );
   }
 
   return result({
@@ -898,10 +908,10 @@ export function calculateUpsBackup(input: CalcInput, precision: number): Calcula
   const minutes = hours * 60;
   const warnings = [];
   if (minutes < 5) {
-    warnings.push(warning("warning", "매우 짧은 백업", "발전기 기동 또는 부하 축소가 필요할 수 있습니다."));
+    warnings.push(warning("warning", "매우 짧은 백업", "추정 시간이 5분 미만입니다. 이 5분은 Ampory의 참고 알림이며 필요한 백업 시간의 기준이 아닙니다. 발전기 기동 시간과 부하 구성은 현장 조건으로 확인하세요."));
   }
   if (minutes > 180) {
-    warnings.push(warning("info", "긴 추정 시간", "고율 방전과 Peukert 효과로 실제 시간은 더 짧을 수 있습니다."));
+    warnings.push(warning("info", "긴 추정 시간", "추정 시간이 180분을 넘었습니다. 이 180분은 Ampory의 참고 알림이며 백업 상한이 아닙니다. 고율 방전과 Peukert 효과로 실제 시간은 더 짧을 수 있습니다."));
   }
 
   return result({
@@ -1073,12 +1083,20 @@ export function calculateGeneratorLoad(input: CalcInput, precision: number): Cal
     warnings.push(warning("error", "과부하", "정격 출력을 초과합니다. 부하 분리 또는 용량 재검토가 필요합니다."));
   } else if (ratio < 30) {
     warnings.push(
-      warning("warning", "저부하", "디젤 엔진은 장시간 30% 미만 운전 시 습식 적재(wet stacking) 위험이 있습니다."),
+      warning(
+        "warning",
+        "저부하 참고",
+        "부하율이 30% 미만입니다. 이 30%는 Ampory의 참고 알림 조건이며 운전 허용 여부의 판정값이 아닙니다. 장시간 저부하에서 습식 적재(wet stacking)가 문제 되는지는 기종과 제조사 운전 조건으로 확인하세요.",
+      ),
     );
   }
   if (ratingType === "standby" && ratio > 70) {
     warnings.push(
-      warning("warning", "스탠바이 정격", "스탠바이 정격은 제한 시간 비상 운전용입니다. 연속 고부하는 프라임 정격을 확인하세요."),
+      warning(
+        "warning",
+        "스탠바이 참고",
+        "스탠바이 정격에서 부하율이 70%를 넘었습니다. 이 70%는 Ampory의 참고 알림 조건이며 제조사 공통 운전 한계가 아닙니다. 연속 운전 허용은 명판의 정격 종류와 제조사 운전 조건으로 확인하세요.",
+      ),
     );
   }
 
@@ -1093,7 +1111,7 @@ export function calculateGeneratorLoad(input: CalcInput, precision: number): Cal
       { label: "정격 종류", value: ratingType === "standby" ? "스탠바이" : "프라임/연속" },
       { label: "실부하", value: `${roundTo(loadKw, precision)} kW` },
     ],
-    interpretation: `발전기 부하율은 ${roundTo(ratio, precision)}%입니다. 통상 60~80% 근처를 실무에서 자주 목표로 하지만 제조사 권고가 우선입니다.`,
+    interpretation: `발전기 부하율은 ${roundTo(ratio, precision)}%입니다. 이 비율은 넣은 정격 대비 실부하입니다. 연속 운전 적합 여부는 정격 종류와 제조사 운전 조건으로 확인합니다.`,
     warnings,
     formulaUsed: "부하율(%) = (P_load / P_rated) × 100",
     followUps: [
@@ -1162,7 +1180,7 @@ export function calculateMonthlyEnergy(input: CalcInput, precision: number): Cal
     warnings.push(warning("warning", "기준 사용량 0", "변화율을 정의할 수 없습니다."));
   }
   if (Math.abs(pct) > 30 && Number.isFinite(pct)) {
-    warnings.push(warning("info", "큰 변동", "조업일수, 외기온, 설비 증설 여부를 함께 보세요."));
+    warnings.push(warning("info", "큰 변동", "변화율 절대값이 30%를 넘었습니다. 이 30%는 Ampory의 참고 알림이며 이상 사용량의 판정값이 아닙니다. 조업일수, 외기온, 설비 증설을 함께 보세요."));
   }
   warnings.push(
     warning("info", "요금 근사", "평균 단가 × 사용량 차이입니다. 기본요금·계절별 요금제를 반영하지 않습니다."),

@@ -54,7 +54,7 @@ export function ToolCard({
         {tool.description}
       </p>
       <p className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary">
-        {landing ? "계산기 열기" : "열기"}
+        {tool.slug === "arc-flash" || tool.slug === "lightning-risk" ? "목록 열기" : landing ? "계산기 열기" : "열기"}
         <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden />
         <span className="sr-only">
           {COMPLEXITY[tool.complexity]}

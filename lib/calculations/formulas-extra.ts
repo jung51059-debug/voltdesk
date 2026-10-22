@@ -261,13 +261,13 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-load-flow", "방사형 조류 (DistFlow 근사)", "V²_to ≈ V²_from − 2(RP+XQ)", [
     { symbol: "R,X", name: "선로 임피던스", unit: "Ω", description: "" },
   ], { title: "소스 380 V, 부하 50 kW", given: "방사형 2모선", steps: ["후방 전력", "전방 전압"], result: "모선 전압, 손실" }, {}),
-  f("formula-arc-flash", "아크플래시 검토 준비", "입사에너지 수치 계산 없음", [
+  f("formula-arc-flash", "아크플래시 점검 목록", "입사에너지 수치 계산 없음", [
     { symbol: "입력", name: "필요 자료", unit: "—", description: "전압, 갭, 작업거리, Ibf 등" },
   ], { title: "자료 체크리스트", given: "현장", steps: ["입력 수집"], result: "계산 보류" }, {
     criteriaNotes: [{ standard: "관련 표준: IEEE 1584 / IEEE 1584.2", appliesTo: "검토 준비 항목. IEEE 1584 계산기 아님. Incident Energy 미제공" }],
     warnings: ["검증된 전체 모델을 구현하기 전에는 입사에너지 값을 내지 않습니다."],
   }),
-  f("formula-lightning", "낙뢰보호 검토 항목", "위험점수·R1 계산 없음", [
+  f("formula-lightning", "낙뢰보호 점검 목록", "위험점수·R1 계산 없음", [
     { symbol: "위치", name: "환경 요인", unit: "—", description: "사용자 선택" },
   ], { title: "간이 검토", given: "건물 개요", steps: ["요인 확인"], result: "전문가 평가 필요" }, {
     criteriaNotes: [{ standard: "관련 표준: IEC 62305", appliesTo: "검토 항목 안내. IEC 62305 계산·전체 R1 미구현" }],

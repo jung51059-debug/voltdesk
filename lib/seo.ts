@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { articles } from "@/lib/data/articles";
-import { getCategoryById, getHubCategories } from "@/lib/data/categories";
-import { getPublishedTools } from "@/lib/data/tools";
+import { getCategoryById, getCategoryBySlug, getHubCategories } from "@/lib/data/categories";
+import { getFeaturedTools, getPublishedTools, getRecentlyAddedTools, getToolsByCategory, getToolsByDomain } from "@/lib/data/tools";
 import { SITE, type CalculatorTool, type ReferenceArticle } from "@/lib/types";
 
 export function absoluteUrl(path: string): string {
@@ -137,4 +137,43 @@ export function sitemapEntries() {
   const toolPaths = getPublishedTools().map((tool) => tool.href);
   const articlePaths = articles.map((article) => article.href);
   return [...staticPaths, ...categoryPaths, ...toolPaths, ...articlePaths];
+}
+
+/** 페이지에 적힌 날짜만 씁니다. 출처가 없으면 기존 사이트맵 기준일인 2026-08-20을 유지합니다. */
+const SITEMAP_FALLBACK_DATE = "2026-08-20";
+
+const STATIC_SITEMAP_DATES: Record<string, string> = {
+  "/privacy": "2026-10-08",
+  "/terms": "2026-10-08",
+};
+
+function latestConfirmedDate(dates: string[]): string {
+  const confirmed = dates.filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date));
+  if (confirmed.length === 0) return SITEMAP_FALLBACK_DATE;
+  return confirmed.sort().at(-1) ?? SITEMAP_FALLBACK_DATE;
+}
+
+/** 사이트맵 lastmod. 도구·글의 updatedAt, 목록은 그 목록에 나오는 항목의 최신일, 약관은 화면에 적힌 최종 수정일입니다. */
+export function sitemapLastModified(path: string): string {
+  const tool = getPublishedTools().find((item) => item.href === path);
+  if (tool) return tool.updatedAt;
+  const article = articles.find((item) => item.href === path);
+  if (article) return article.updatedAt;
+  if (STATIC_SITEMAP_DATES[path]) return STATIC_SITEMAP_DATES[path];
+  if (path.startsWith("/tools/categories/")) {
+    const category = getCategoryBySlug(path.slice("/tools/categories/".length));
+    return latestConfirmedDate(category ? getToolsByCategory(category.id).map((item) => item.updatedAt) : []);
+  }
+  if (path === "/tools/electrical") return latestConfirmedDate(getToolsByDomain("electrical").map((item) => item.updatedAt));
+  if (path === "/tools/facility") return latestConfirmedDate(getToolsByDomain("facility").map((item) => item.updatedAt));
+  if (path === "/tools") return latestConfirmedDate(getPublishedTools().map((item) => item.updatedAt));
+  if (path === "/references") return latestConfirmedDate(articles.map((item) => item.updatedAt));
+  if (path === "/") {
+    return latestConfirmedDate([
+      ...getFeaturedTools().slice(0, 9).map((item) => item.updatedAt),
+      ...getRecentlyAddedTools().slice(0, 4).map((item) => item.updatedAt),
+      ...articles.slice(0, 6).map((item) => item.updatedAt),
+    ]);
+  }
+  return SITEMAP_FALLBACK_DATE;
 }

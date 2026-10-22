@@ -162,7 +162,7 @@ export function calculateTransformerParallel(input: CalcInput, precision: number
     warning("warning", "기본 검토", "전압비, 위상, 임피던스 전압, 극성이 맞아야 병렬이 가능합니다. 이 계산은 부하 분담만 봅니다."),
   ];
   if (zDiff > 10) {
-    warnings.push(warning("warning", "%Z 차이", "임피던스 전압 차이가 큽니다. 순환전류·편부하 위험이 있습니다."));
+    warnings.push(warning("warning", "%Z 차이", "상대차가 10%를 넘었습니다. 이 10%는 Ampory의 참고 알림이며 병렬 적합 기준이 아닙니다. 순환전류와 편부하는 전압비, 위상, 제조사 조건으로 확인하세요."));
   }
 
   return ok({
@@ -185,7 +185,7 @@ export function calculateTransformerParallel(input: CalcInput, precision: number
       `S1 = ${load} × Y1 / (Y1+Y2) = ${roundTo(p1, precision)} kVA`,
       `S2 = ${load} × Y2 / (Y1+Y2) = ${roundTo(p2, precision)} kVA`,
     ],
-    reviewStatus: zDiff > 10 ? review("caution", "%Z 차이가 큽니다.") : review("check", "전압비·위상 확인이 남아 있습니다."),
+    reviewStatus: zDiff > 10 ? review("caution", "상대차 10%는 참고 알림입니다. 병렬 적합 판정이 아닙니다.") : review("check", "전압비·위상 확인이 남아 있습니다."),
   });
 }
 

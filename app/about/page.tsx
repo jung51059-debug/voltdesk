@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Ampory 소개",
-  description: "전기·시설 실무를 조금 더 빠르고 편리하게. 계산, 결과 해석, 실무 참고를 한곳에서 제공합니다.",
+  title: { absolute: "Ampory 소개" },
+  description: "개인이 운영하는 전기설비 계산·기술정보 사이트 Ampory의 소개입니다. 계산, 결과 해석, 실무 참고를 제공합니다.",
+  openGraph: { title: "Ampory 소개" },
   alternates: { canonical: "/about" },
 };
 
@@ -15,8 +16,8 @@ export default function AboutPage() {
       <h1 className="text-3xl font-semibold tracking-tight">Ampory 소개</h1>
       <p className="mt-2 text-lg leading-7 text-muted">전기·시설 실무를 조금 더 빠르고 편리하게</p>
       <p className="mt-4 leading-7 text-muted">
-        Ampory는 한국 전기·시설관리 실무자가 현장에서 바로 쓰는 계산과, 그 숫자를 어떻게 읽어야 하는지를 한곳에 둔
-        도구입니다. 회원가입 없이 브라우저에서 계산합니다.
+        Ampory는 개인이 운영하는 전기설비 계산·기술정보 사이트입니다. 현장에서 쓰는 계산과, 그 숫자를 어떻게 읽어야
+        하는지를 한곳에 둡니다. 회원가입 없이 브라우저에서 계산합니다.
       </p>
 
       <div className="mt-8 space-y-8 leading-7">
@@ -73,13 +74,17 @@ export default function AboutPage() {
 
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">운영 안내</h2>
+          <p>
+            Ampory는 회사나 자격 단체가 아니라 개인이 운영합니다. 설계 대행을 하지 않고, 자격·면허를 사칭하지 않으며,
+            특정 제조사와 무관합니다.
+          </p>
           <p>즐겨찾기와 환경설정은 현재 사용 중인 브라우저에 저장됩니다.</p>
           <p>
             공식 오류나 가정 개선은{" "}
             <Link href="/contact" className="font-medium text-primary hover:underline">
               문의
             </Link>
-            로 보내 주세요. 자격·면허를 사칭하지 않으며, 특정 제조사와 무관한 독립 도구입니다.
+            로 보내 주세요. 연락 메일은 문의 페이지에 있습니다.
           </p>
         </section>
 
