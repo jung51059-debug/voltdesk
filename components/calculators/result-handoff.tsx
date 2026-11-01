@@ -11,6 +11,7 @@ import {
   resultPdfFilename,
   type SiteNotes,
 } from "@/lib/calculators/result-sheet";
+import { GA_EVENT, trackGaEvent } from "@/lib/analytics/ga-events";
 import type { CalculationResult } from "@/lib/types";
 
 type PrintJob = SiteNotes & { id: number; stamp: string; filename: string };
@@ -20,10 +21,14 @@ export function ResultHandoff({
   result,
   title,
   pageUrl,
+  toolSlug,
+  category,
 }: {
   result: CalculationResult;
   title: string;
   pageUrl: string;
+  toolSlug?: string;
+  category?: string;
 }) {
   const { push } = useToast();
   const titleId = useId();
@@ -71,6 +76,12 @@ export function ResultHandoff({
     try {
       if (!navigator.clipboard?.writeText) throw new Error("clipboard");
       await navigator.clipboard.writeText(copyTextFromResult(result, title, pageUrl));
+      if (toolSlug) {
+        trackGaEvent(GA_EVENT.resultCopy, {
+          tool_slug: toolSlug,
+          ...(category ? { category } : {}),
+        });
+      }
       push("계산 결과를 복사했습니다.");
     } catch {
       push("계산 결과를 복사하지 못했습니다.");

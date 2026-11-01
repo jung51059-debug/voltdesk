@@ -23,6 +23,8 @@ import { SITE } from "@/lib/types";
 import { getCategoryById } from "@/lib/data/categories";
 import { getStandardBasisBySlug } from "@/lib/data/standard-basis";
 import { StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
+import { TrackCalculatorView } from "@/components/analytics/track-calculator-view";
+import { GA_EVENT, trackGaEvent } from "@/lib/analytics/ga-events";
 
 function visible(field: FieldDef, values: Record<string, string>) {
   if (!field.visibleWhen) return true;
@@ -199,7 +201,14 @@ export function CalculatorWorkspace({
   function calculate() {
     const engine = engines[tool.slug];
     if (!engine) return;
-    setOutcome(engine(values, prefs.precision));
+    const next = engine(values, prefs.precision);
+    setOutcome(next);
+    if (next.ok) {
+      trackGaEvent(GA_EVENT.calculationRun, {
+        tool_slug: tool.slug,
+        ...(category ? { category: category.slug } : {}),
+      });
+    }
   }
 
   function reset() {
@@ -278,7 +287,15 @@ export function CalculatorWorkspace({
       <ResultPanel
         result={outcome}
         split={complex}
-        actions={<ResultHandoff result={outcome} title={tool.name} pageUrl={`${SITE.url}${tool.href}`} />}
+        actions={
+          <ResultHandoff
+            result={outcome}
+            title={tool.name}
+            pageUrl={`${SITE.url}${tool.href}`}
+            toolSlug={tool.slug}
+            category={category?.slug}
+          />
+        }
       />
     ) : (
       <div
@@ -294,6 +311,7 @@ export function CalculatorWorkspace({
 
   return (
     <div className={complex ? "mx-auto w-full max-w-5xl" : "mx-auto w-full max-w-[840px]"}>
+      <TrackCalculatorView toolSlug={tool.slug} category={category?.slug} />
       <Breadcrumb items={crumbs} compact />
       <header className="mb-6 flex items-start justify-between gap-3">
         <div>
@@ -395,6 +413,8 @@ export function CalculatorWorkspace({
       <RelatedResources
         related={related}
         articles={articles}
+        sourceToolSlug={tool.slug}
+        category={category?.slug}
         share={
           <button type="button" className="text-muted hover:text-primary" onClick={() => setShareOpen(true)}>
             공유

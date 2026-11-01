@@ -9,8 +9,10 @@ import { TechnicalDisclosure } from "@/components/calculators/technical-disclosu
 import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { RelatedResources } from "@/components/calculators/related-resources";
 import { StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
+import { TrackCalculatorView } from "@/components/analytics/track-calculator-view";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { getCategoryById } from "@/lib/data/categories";
 import { parseHandoff } from "@/lib/calculations/handoff";
 import { getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { getRelatedTools, getToolBySlug } from "@/lib/data/tools";
@@ -113,6 +115,7 @@ export function PathVoltageDropClient() {
   const formula = getFormulaById("formula-path-voltage-drop");
   const basis = getStandardBasisBySlug("path-voltage-drop");
   const tool = getToolBySlug("path-voltage-drop");
+  const category = tool ? getCategoryById(tool.categoryId) : undefined;
   const related = tool ? getRelatedTools(tool) : [];
   const [draft, setDraft] = useState<Draft>(() => store.load());
   const [hydrated, setHydrated] = useState(false);
@@ -151,6 +154,7 @@ export function PathVoltageDropClient() {
 
   return (
     <div className="mx-auto w-full max-w-5xl">
+      <TrackCalculatorView toolSlug="path-voltage-drop" category={category?.slug} />
       <Breadcrumb
         items={[
           { href: "/", label: "홈" },
@@ -370,7 +374,15 @@ export function PathVoltageDropClient() {
                 result={outcome}
                 split
                 actions={
-                  tool ? <ResultHandoff result={outcome} title={tool.name} pageUrl={`${SITE.url}${tool.href}`} /> : undefined
+                  tool ? (
+                    <ResultHandoff
+                      result={outcome}
+                      title={tool.name}
+                      pageUrl={`${SITE.url}${tool.href}`}
+                      toolSlug={tool.slug}
+                      category={category?.slug}
+                    />
+                  ) : undefined
                 }
               />
             </>
@@ -387,7 +399,12 @@ export function PathVoltageDropClient() {
         </>
       ) : null}
 
-      <RelatedResources related={related} articles={[]} />
+      <RelatedResources
+        related={related}
+        articles={[]}
+        sourceToolSlug="path-voltage-drop"
+        category={category?.slug}
+      />
     </div>
   );
 }

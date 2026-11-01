@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import sitemap from "@/app/sitemap";
 import { buildArticleRss } from "@/lib/rss";
-import { sitemapEntries, sitemapLastModified } from "@/lib/seo";
+import { absoluteUrl, sitemapEntries, sitemapLastModified } from "@/lib/seo";
 
 describe("사이트맵", () => {
   it("즐겨찾기와 설정은 제외한다", () => {
@@ -28,6 +29,22 @@ describe("사이트맵", () => {
     const dates = sitemapEntries().map((path) => sitemapLastModified(path));
     expect(dates).not.toContain("2026-10-22");
     expect(dates.every((date) => /^\d{4}-\d{2}-\d{2}$/.test(date))).toBe(true);
+  });
+
+  it("MetadataRoute.sitemap 항목이 절대 URL·유효 lastmod·고유하다", () => {
+    const entries = sitemap();
+    expect(entries).toHaveLength(129);
+    const urls = entries.map((entry) => entry.url);
+    expect(new Set(urls).size).toBe(urls.length);
+    for (const entry of entries) {
+      expect(entry.url.startsWith("https://ampory.vercel.app")).toBe(true);
+      expect(entry.lastModified).toBeInstanceOf(Date);
+      expect(Number.isNaN((entry.lastModified as Date).getTime())).toBe(false);
+    }
+    expect(urls).toContain(absoluteUrl("/"));
+    expect(urls).toContain(absoluteUrl("/tools/electrical/cable-parallel"));
+    expect(urls).toContain(absoluteUrl("/tools/advanced/arc-flash"));
+    expect(urls).not.toContain(absoluteUrl("/tools/electrical/motor-start-vd"));
   });
 });
 

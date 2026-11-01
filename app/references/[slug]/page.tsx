@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentArticle } from "@/components/references/track-recent-article";
+import { ArticleToolLinks } from "@/components/references/article-tool-links";
 import { articles, getArticleBySlug, getRelatedArticles, getRelatedToolsForArticle } from "@/lib/data/articles";
 import { getCategoryById } from "@/lib/data/categories";
 import { articleBreadcrumbItems, articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
@@ -105,23 +106,7 @@ export default async function ArticlePage({ params }: Props) {
             </dl>
           </section>
         ) : null}
-        {tools.length > 0 ? (
-          <section>
-            <h2 className="text-xl font-semibold">관련 Ampory 계산기</h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 leading-7">
-              {tools.map((tool) =>
-                tool ? (
-                  <li key={tool.id}>
-                    <Link href={tool.href} className="text-primary hover:underline">
-                      {tool.pageHeading ?? tool.name}
-                    </Link>
-                    <span className="text-muted"> — {tool.description}</span>
-                  </li>
-                ) : null,
-              )}
-            </ul>
-          </section>
-        ) : null}
+        {tools.length > 0 ? <ArticleToolLinks articleSlug={article.slug} tools={tools} /> : null}
         {relatedArticles.length > 0 ? (
           <section>
             <h2 className="text-xl font-semibold">관련 실무 가이드</h2>
