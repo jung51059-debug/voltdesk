@@ -53,7 +53,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-motor-acceleration", "가속시간", "t = J ω / T_acc, ω = 2πn/60", [
     { symbol: "J", name: "관성", unit: "kg·m²", description: "축 환산" },
     { symbol: "T_acc", name: "가속 토크", unit: "N·m", description: "평균값 가정" },
-  ], { title: "J=2.5, 1450 r/min, T=80 N·m", given: "일정 토크", steps: ["ω=151.8 rad/s", "t=Jω/T"], result: "약 4.7 s" }, {}),
+  ], { title: "J=2.5, 1450 r/min, T=80 N·m", given: "일정 토크", steps: ["ω=151.84 rad/s", "t=Jω/T=4.75 s"], result: "4.75 s" }, {}),
   f("formula-motor-slip", "동기속도·슬립", "Ns = 120 f / P,  s = (Ns − Nr) / Ns × 100", [
     { symbol: "f", name: "주파수", unit: "Hz", description: "전원 또는 인버터 출력 주파수" },
     { symbol: "P", name: "극수", unit: "—", description: "2, 4, 6, 8, 10, 12" },

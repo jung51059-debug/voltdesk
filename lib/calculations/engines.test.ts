@@ -17,16 +17,20 @@ import {
 } from "@/lib/calculations/engines";
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 import { searchCatalog } from "@/lib/search";
-import { calculateMotorCurrent, calculateMotorSlip } from "@/lib/calculations/motor";
-import { calculatePowerFactorCorrection } from "@/lib/calculations/power-quality";
+import { calculateMotorAcceleration, calculateMotorCurrent, calculateMotorSlip } from "@/lib/calculations/motor";
+import { calculatePowerFactorCorrection, calculatePowerTriangle } from "@/lib/calculations/power-quality";
 import { calculateShortCircuit } from "@/lib/calculations/short-circuit";
 import { calculateCableAmpacityReview } from "@/lib/calculations/cable-tools";
-import { calculateTransformerCurrents, calculateTransformerParallel } from "@/lib/calculations/transformer-tools";
+import {
+  calculateTransformerCurrents,
+  calculateTransformerLoss,
+  calculateTransformerParallel,
+} from "@/lib/calculations/transformer-tools";
 import { calculateBatteryAh } from "@/lib/calculations/facility-extra";
 import { calculatePhaseUnbalance } from "@/lib/calculations/field-verify";
-import { getCalculatorGuide } from "@/lib/data/calculator-guides";
+import { calculatorGuides, getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { getArticleById, getArticleBySlug } from "@/lib/data/articles";
-import { calculateCtRatio } from "@/lib/calculations/protection";
+import { calculateCtRatio, calculateVfdSizing } from "@/lib/calculations/protection";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 import { sitemapEntries } from "@/lib/seo";
@@ -1061,6 +1065,82 @@ describe("전동기 슬립·동기속도", () => {
     if (!short.ok) return;
     expect(Number(String(short.metrics.find((m) => m.id === "ik")?.value).replace(/,/g, ""))).toBe(17726);
     expect(Number(String(short.metrics.find((m) => m.id === "ip")?.value).replace(/,/g, ""))).toBe(42454);
+  });
+});
+
+describe("Phase 2A 가이드·SEO", () => {
+  const phase2a = [
+    "motor-acceleration",
+    "power-triangle",
+    "ct-ratio",
+    "transformer-loss",
+    "vfd-sizing",
+  ] as const;
+
+  it("5개 도구에 고유 가이드·메타·FAQ가 있다", () => {
+    const paths = new Set(sitemapEntries());
+    const firstLines = new Set(calculatorGuides.map((g) => g.whenToUse[0]));
+    expect(firstLines.size).toBe(calculatorGuides.length);
+
+    for (const slug of phase2a) {
+      const guide = getCalculatorGuide(slug);
+      const tool = getToolBySlug(slug);
+      expect(guide, slug).toBeTruthy();
+      expect(tool?.metaTitle, slug).toBeTruthy();
+      expect(tool?.metaDescription, slug).toBeTruthy();
+      expect(tool?.metaTitle).not.toContain("|");
+      expect(tool?.faqs.length).toBeGreaterThanOrEqual(2);
+      expect(tool?.faqs.length).toBeLessThanOrEqual(3);
+      expect(guide?.walkthrough?.lines.length).toBeGreaterThanOrEqual(3);
+      expect(guide?.lookup?.rows.length).toBeGreaterThanOrEqual(3);
+      expect(guide?.links?.length).toBeGreaterThanOrEqual(3);
+      for (const link of guide?.links ?? []) {
+        expect(paths.has(link.href), `${slug} → ${link.href}`).toBe(true);
+      }
+    }
+  });
+
+  it("가이드 예시 숫자가 엔진 출력과 같다", () => {
+    const acc = calculateMotorAcceleration({ inertia: "2.5", rpm: "1450", torque: "80" }, 2);
+    expect(acc.ok).toBe(true);
+    if (acc.ok) {
+      expect(Number(acc.metrics.find((m) => m.id === "time")?.value)).toBe(4.75);
+    }
+    expect(JSON.stringify(getCalculatorGuide("motor-acceleration"))).toContain("4.75 s");
+
+    const pt = calculatePowerTriangle({ mode: "ps", kw: "80", kva: "100" }, 2);
+    expect(pt.ok).toBe(true);
+    if (pt.ok) {
+      expect(Number(pt.metrics.find((m) => m.id === "q")?.value)).toBe(60);
+      expect(Number(pt.metrics.find((m) => m.id === "pf")?.value)).toBe(0.8);
+    }
+
+    const ct = calculateCtRatio({ loadCurrent: "80", primary: "100", secondary: "5" }, 2);
+    expect(ct.ok).toBe(true);
+    if (ct.ok) {
+      expect(Number(ct.metrics.find((m) => m.id === "i2")?.value)).toBe(4);
+    }
+    expect(JSON.stringify(getCalculatorGuide("ct-ratio"))).toContain("3.75 A");
+
+    const loss80 = calculateTransformerLoss(
+      { ratedKva: "1000", noLoadKw: "1.2", loadLossKw: "10.5", loadKva: "800", pf: "0.9" },
+      2,
+    );
+    expect(loss80.ok).toBe(true);
+    if (loss80.ok) {
+      expect(Number(loss80.metrics.find((m) => m.id === "ploss")?.value)).toBe(7.92);
+      expect(Number(loss80.metrics.find((m) => m.id === "eta")?.value)).toBe(98.91);
+    }
+
+    const vfd = calculateVfdSizing(
+      { motorKw: "30", motorA: "60", voltage: "380", margin: "0.1", derate: "1" },
+      2,
+    );
+    expect(vfd.ok).toBe(true);
+    if (vfd.ok) {
+      expect(Number(vfd.metrics.find((m) => m.id === "s")?.value)).toBe(43.44);
+    }
+    expect(JSON.stringify(getCalculatorGuide("vfd-sizing"))).toContain("43.44 kVA");
   });
 });
 
