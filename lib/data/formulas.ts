@@ -34,7 +34,7 @@ export const baseFormulas: FormulaDefinition[] = [
         "I = 3000 / (220 × 1.0 × 1.0)",
         "I = 13.64 A",
       ],
-      result: "약 13.64 A",
+      result: "13.64 A",
     },
     referenceSources: [
       {
@@ -69,14 +69,14 @@ export const baseFormulas: FormulaDefinition[] = [
       "이 공식은 수학적 부하전류이며 보호협조나 케이블 허용전류 계산이 아닙니다.",
     ],
     example: {
-      title: "3상 45 kW 펌프",
+      title: "3상 45 kW 펌프 (화면 기본 입력과 동일)",
       given: "P = 45 kW, V = 380 V, PF = 0.85, η = 0.92",
       steps: [
         "P = 45000 W",
         "분모 = √3 × 380 × 0.85 × 0.92",
         "I = 45000 / (√3 × 380 × 0.85 × 0.92) = 87.43 A",
       ],
-      result: "87.43 A",
+      result: "87.43 A (FAQ·워크스루의 30 kW·PF0.9·η1 → 50.64 A와 조건이 다름)",
     },
     referenceSources: [
       {
@@ -504,8 +504,8 @@ export const baseFormulas: FormulaDefinition[] = [
     example: {
       title: "구리 35 mm², 100 m",
       given: "ρ = 0.0175, L = 100, A = 35",
-      steps: ["R = 0.0175 × 100 / 35 ≈ 0.050 Ω", "r = 0.0175 × 1000 / 35 ≈ 0.50 Ω/km"],
-      result: "약 0.050 Ω (0.50 Ω/km)",
+      steps: ["R = 0.0175 × 100 / 35 = 0.05 Ω", "r = 0.0175 × 1000 / 35 = 0.5 Ω/km"],
+      result: "0.05 Ω (0.5 Ω/km)",
     },
     referenceSources: [{ id: "src-eng-r", title: "일반 전기공학 도체 저항", publisher: "공학 교과서", note: "R = ρL/A. 도체 저항표를 내장하지 않습니다." }],
   },
@@ -531,8 +531,8 @@ export const baseFormulas: FormulaDefinition[] = [
     example: {
       title: "87 A, 여유 1.25",
       given: "I = 87 A, k = 1.25",
-      steps: ["I_ref = 108.75 A", "상용 스케일 참고 125 A"],
-      result: "참고 108.8 A",
+      steps: ["I_ref = 87 × 1.25 = 108.75 A", "상용 스케일 참고 125 A"],
+      result: "참고 108.75 A (선정 확정 아님)",
     },
     referenceSources: [{ id: "src-eng-brk", title: "임의 여유율 참고", publisher: "공학 교과서", note: "I×k. 차단기 선정·KEC 적합 판정이 아닙니다." }],
   },

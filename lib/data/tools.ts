@@ -418,7 +418,7 @@ export const baseTools: CalculatorTool[] = [
     formulaId: "formula-power-factor",
     tags: ["역률", "PF", "무효전력", "kvar"],
     synonyms: ["power factor", "cosφ", "코사인파이", "역률개선", "무효전력"],
-    relatedToolIds: ["tool-power-triangle", "tool-kw-kva-hp", "tool-transformer-load", "tool-three-phase-current"],
+    relatedToolIds: ["tool-power-triangle", "tool-pfc", "tool-kw-kva-hp", "tool-transformer-load", "tool-three-phase-current"],
     relatedArticleIds: ["art-pfc-location", "art-power-factor-poor", "art-kw-vs-kva"],
     complexity: "basic",
     featured: true,
@@ -427,9 +427,9 @@ export const baseTools: CalculatorTool[] = [
     updatedAt: "2026-11-01",
     faqs: [
       {
-        question: "전력 삼각형 계산기와 무엇이 다른가요?",
+        question: "전력 삼각형·역률 개선과 무엇이 다른가요?",
         answer:
-          "이 화면은 주로 P·S(또는 V·I)로 PF와 Q를 구합니다. 전력 삼각형은 P·Q, P·PF 등 조합을 바꿔 S·Q를 맞출 때 씁니다.",
+          "이 화면은 P·S(또는 V·I)로 현재 PF와 Q를 구합니다. 전력 삼각형은 P·Q·S 조합을 바꿀 때, 역률 개선 콘덴서는 현재·목표 역률로 필요 kvar를 볼 때 씁니다.",
       },
       {
         question: "좋은 역률의 기준은 무엇인가요?",
@@ -451,12 +451,12 @@ export const baseTools: CalculatorTool[] = [
     name: "변압기 용량·부하율 계산기",
     nameEn: "Transformer capacity and load ratio calculator",
     pageHeading: "변압기 부하율 계산기",
-    metaTitle: "변압기 부하율 계산기, kW·kVA·역률 계산",
+    metaTitle: "변압기 부하율 계산기, 운전 kVA÷정격",
     metaDescription:
-      "부하 kW를 역률로 kVA로 바꾼 뒤 변압기 정격 대비 부하율을 계산합니다. 500kVA에 300kW·역률 0.8이면 75%입니다.",
+      "이미 있는 변압기 정격 대비 운전 부하율을 계산합니다. 500kVA에 300kW·역률 0.8이면 75%입니다. 필요 용량 산정은 변압기 용량 산정 계산기를 쓰세요.",
     description: "정격 kVA와 부하(kW 또는 kVA)로 변압기 부하율을 계산합니다.",
     longDescription:
-      "부하가 kW이면 역률로 kVA를 만든 다음 정격으로 나눕니다. 500kVA, 300kW, 역률 0.8은 375kVA, 부하율 75%입니다. 전압·전류 측정도 가능하고, 온도·고조파 보정은 하지 않습니다.",
+      "부하가 kW이면 역률로 kVA를 만든 다음 정격으로 나눕니다. 500kVA, 300kW, 역률 0.8은 375kVA, 부하율 75%입니다. 전압·전류 측정도 가능하고, 온도·고조파 보정은 하지 않습니다. 수요에서 필요 kVA를 만드는 것은 변압기 용량 산정입니다.",
     formulaId: "formula-transformer-load",
     tags: ["변압기", "부하율", "kVA", "TR"],
     synonyms: ["변압기 부하율", "transformer load", "변압기용량", "TR 부하", "부하율 계산"],
@@ -501,12 +501,12 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "전압강하 계산기",
     nameEn: "Voltage drop calculator",
-    metaTitle: "전압강하 계산기, 전선·거리별 전압강하 계산",
+    metaTitle: "전압강하 계산기, 한 구간 전선·거리 ΔV",
     metaDescription:
-      "전류, 거리, 도체 저항으로 단상·3상 전압강하를 계산합니다. 저항 근사식과 계산 예제, 결과를 볼 때 확인할 사항을 함께 제공합니다.",
-    description: "전류, 편도 길이, 도체 저항으로 단상·3상 전압강하를 계산합니다.",
+      "한 케이블 구간의 전류·거리·도체 저항으로 단상·3상 전압강하를 계산합니다. 80A·80m·0.727Ω/km·380V면 8.06V(2.12%)입니다. 여러 구간 합산은 경로 전압강하를 쓰세요.",
+    description: "전류, 편도 길이, 도체 저항으로 단상·3상 한 구간 전압강하를 계산합니다.",
     longDescription:
-      "3상은 √3 × I × L × r / 1000, 단상은 2 × I × L × r / 1000입니다. 80A·80m·0.727Ω/km·380V 3상은 8.06V(2.12%)입니다. 리액턴스는 포함하지 않습니다.",
+      "3상은 √3 × I × L × r / 1000, 단상은 2 × I × L × r / 1000입니다. 80A·80m·0.727Ω/km·380V 3상은 8.06V(2.12%)입니다. 리액턴스는 포함하지 않습니다. 인입~부하 여러 구간은 경로 전압강하 계산기입니다.",
     formulaId: "formula-voltage-drop",
     tags: ["전압강하", "케이블", "VD", "전선"],
     synonyms: ["voltage drop", "전압 강하", "선로전압강하", "케이블 전압강하", "VD%"],
@@ -751,6 +751,10 @@ export const baseTools: CalculatorTool[] = [
     domain: "facility",
     name: "발전기 부하율 계산기",
     nameEn: "Generator load ratio calculator",
+    pageHeading: "발전기 부하율 계산기",
+    metaTitle: "발전기 부하율 계산기, 정격 대비 실부하 %",
+    metaDescription:
+      "이미 있는 발전기 정격 kW 대비 실부하 비율을 계산합니다. 필요 용량 합산은 비상발전기 용량 산정, 기동 ΔV는 발전기 기동 전압강하를 쓰세요.",
     description: "발전기 정격 대비 실부하 비율을 계산합니다.",
     longDescription:
       "프라임 또는 스탠바이 정격 kW와 실제 부하로 부하율을 계산합니다. 30% 미만과 스탠바이 70% 초과는 참고 알림이며, 운전 허용 판정이 아닙니다.",

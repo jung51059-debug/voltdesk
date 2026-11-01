@@ -32,8 +32,8 @@ export const extraFormulas: FormulaDefinition[] = [
   ], {
     title: "380V 3상 30kW 모터",
     given: "P = 30 kW, V = 380 V, PF = 0.85, η = 0.92",
-    steps: ["P = 30000 W", "분모 = √3 × 380 × 0.85 × 0.92", "I ≈ 58.1 A"],
-    result: "약 58.1 A",
+    steps: ["P = 30000 W", "분모 = √3 × 380 × 0.85 × 0.92", "I = 58.29 A"],
+    result: "58.29 A",
   }, {
     criteriaNotes: [{ standard: "일반 공식", appliesTo: "명판 P, PF, η로 전류 환산. 모터 명판 절차 전체를 수행하지 않음" }],
     referenceSources: [{ id: "src-eng-motor", title: "일반 전기공학 전력·전류 관계식", publisher: "공학 교과서", note: "3상 I = P/(√3 V PF η)" }],
@@ -47,7 +47,12 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-motor-start-vd", "모터 기동 전압강하", "ΔV = k_phase × I_start × L × r", [
     { symbol: "I_start", name: "기동전류", unit: "A", description: "k × FLC" },
     { symbol: "r", name: "도체 저항", unit: "Ω/km", description: "편도 도체" },
-  ], { title: "60 A × 6배, 80 m, 0.524 Ω/km", given: "3상, V=380 V", steps: ["I_start=360 A", "ΔV = √3 × 360 × 0.08 × 0.524"], result: "전압강하와 말단전압" }, {
+  ], {
+    title: "60 A × 6배, 80 m, 0.524 Ω/km",
+    given: "3상, V=380 V",
+    steps: ["I_start = 360 A", "ΔV = √3 × 360 × 0.08 × 0.524 = 26.14 V", "ΔV% = 6.88%"],
+    result: "26.14 V (6.88%)",
+  }, {
     limitations: ["계통·변압기 임피던스는 미포함"],
   }),
   f("formula-motor-acceleration", "가속시간", "t = J ω / T_acc, ω = 2πn/60", [
@@ -89,7 +94,12 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-pfc", "역률 개선 용량", "Qc = P (tanφ1 − tanφ2)", [
     { symbol: "P", name: "유효전력", unit: "kW", description: "보상 전후 일정" },
     { symbol: "φ", name: "위상각", unit: "rad", description: "arccos(PF)" },
-  ], { title: "320 kW, 0.78 → 0.95", given: "P=320 kW", steps: ["tanφ1, tanφ2 계산", "Qc = P Δtan"], result: "필요 kvar" }, {
+  ], {
+    title: "320 kW, 0.78 → 0.95",
+    given: "P=320 kW",
+    steps: ["φ1=arccos(0.78), φ2=arccos(0.95)", "Qc = 320 × (tanφ1 − tanφ2) = 151.55 kvar"],
+    result: "필요 151.55 kvar",
+  }, {
     warnings: ["고조파 부하에서는 디튠드 리액터를 검토하세요."],
     criteriaNotes: [{ standard: "전력 삼각형 (공개 공학식)", appliesTo: "필요 보상용량 Qc 산정. 수전계약 역률 요금은 미연동" }],
   }),
@@ -106,13 +116,18 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-harmonic-filter", "디튠 공진 차수 근사", "n ≈ 1/√p, p = XL/XC", [
     { symbol: "p", name: "리액터 퍼센트", unit: "%", description: "사용자 입력" },
-  ], { title: "7% 리액터", given: "p=0.07", steps: ["n=1/√0.07≈3.78"], result: "약 3.8차 (5고조파 디튠 근방)" }, {
+  ], { title: "7% 리액터", given: "p=0.07", steps: ["n = 1/√0.07 = 3.78"], result: "3.78차 (5고조파 디튠 근방)" }, {
     warnings: ["필터 설계가 아닙니다."],
   }),
   f("formula-cable-sizing", "LV 케이블 1차 검토", "Ib = P/(√3 V PF η), A_VD = k I ρ L / ΔV", [
     { symbol: "Ib", name: "설계전류", unit: "A", description: "부하전류" },
     { symbol: "A_VD", name: "전압강하 최소 단면적", unit: "mm²", description: "허용전류 선정 아님" },
-  ], { title: "3상 45 kW, 380 V, 80 m, 허용 3%", given: "Cu, PF 0.85", steps: ["Ib 계산", "ΔV_allow", "A_VD"], result: "설계전류와 전압강하 최소 단면적" }, {
+  ], {
+    title: "3상 45 kW, 380 V, 80 m, 허용 3%",
+    given: "Cu, PF 0.85, η=1",
+    steps: ["Ib = 80.44 A", "허용 ΔV = 3% → amin = 17.11 mm²", "amin은 전압강하 하한이며 표준 전선 굵기 선정이 아님"],
+    result: "Ib 80.44 A, 전압강하 하한 amin 17.11 mm²",
+  }, {
     criteriaNotes: [
       { standard: "일반 공식", appliesTo: "Ib, ΔV, A_VD" },
       { standard: "KEC 232.5.2", appliesTo: "국내 적용 관련. 표 수치는 사용자가 입력" },
@@ -139,12 +154,22 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-transformer-sizing", "변압기 필요 kVA", "S = [P(1+손실)/PF](1+설계)(1+증설)", [
     { symbol: "P", name: "최대수요", unit: "kW", description: "" },
-  ], { title: "720 kW, PF 0.9, 여유 10%+15%, 손실 3%", given: "수요 720 kW", steps: ["P'=741.6", "S_load=824", "S_need≈1042"], result: "상용 후보 1500 kVA 등" }, {
+  ], {
+    title: "720 kW, PF 0.9, 여유 10%+15%, 손실 3%",
+    given: "수요 720 kW · detailed 모드",
+    steps: ["P' = 720×1.03 = 741.6 kW", "S_load = 741.6/0.9 = 824 kVA", "S_need = 824×1.10×1.15 = 1,042.36 kVA"],
+    result: "필요 1,042.36 kVA · 상용 후보 1,500 kVA (필요 용량 ≠ 선정 정격)",
+  }, {
     criteriaNotes: [{ standard: "일반 공식", appliesTo: "수요를 kVA로 환산. 냉각 보정은 하지 않음" }],
   }),
   f("formula-transformer-current", "변압기 정격전류", "I = S / (√3 V)", [
     { symbol: "S", name: "용량", unit: "kVA", description: "명판" },
-  ], { title: "1000 kVA, 22.9 kV / 380 V", given: "3상", steps: ["I2 = 1000e3/(√3×380)≈1519 A"], result: "2차 약 1519 A" }, {}),
+  ], {
+    title: "1000 kVA, 22.9 kV / 380 V",
+    given: "3상",
+    steps: ["I2 = 1000×1000 / (√3 × 380) = 1,519.34 A", "I1 = 1000×1000 / (√3 × 22900) = 25.21 A"],
+    result: "2차 1,519.34 A · 1차 25.21 A",
+  }, {}),
   f("formula-transformer-parallel", "병렬 변압기 분담", "Si = S (Si/zi) / Σ(Sj/zj)", [
     { symbol: "z", name: "%Z", unit: "%", description: "명판 임피던스 전압" },
   ], { title: "1000 kVA 6% + 1000 kVA 6.5%, 부하 1500 kVA", given: "두 대", steps: ["Y=S/z", "분담"], result: "부하 분담 kVA" }, {}),
@@ -178,7 +203,7 @@ export const extraFormulas: FormulaDefinition[] = [
   f("formula-pt-ratio", "PT 변성비", "n = V1 / V2", [
     { symbol: "V1", name: "1차", unit: "V", description: "" },
     { symbol: "V2", name: "2차", unit: "V", description: "흔히 110 V" },
-  ], { title: "22900 / 110 V", given: "PT", steps: ["n=208.18"], result: "약 208.2" }, {
+  ], { title: "22900 / 110 V", given: "PT", steps: ["n = 22900 / 110 = 208.18"], result: "208.18" }, {
     criteriaNotes: [{ standard: "일반 공식", appliesTo: "n = V1/V2" }],
   }),
   f("formula-vfd", "VFD 용량 검토", "S = max(P(1+m)/k, √3 V I (1+m)/1000/k)", [
@@ -188,7 +213,12 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-soft-starter", "소프트스타터 간이 듀티", "I_start=k FLC, 지표=k² (t/3600) n", [
     { symbol: "n", name: "시간당 기동", unit: "1/h", description: "" },
-  ], { title: "FLC 60 A, 3.5배, 8 s, 4회/h", given: "사용자 설정", steps: ["I_start=210 A", "지표"], result: "간이 지표" }, {}),
+  ], {
+    title: "FLC 60 A, 3.5배, 8 s, 4회/h",
+    given: "사용자 설정",
+    steps: ["I_start = 3.5 × 60 = 210 A", "열적 듀티 지표 = k² × (t/3600) × n"],
+    result: "I_start 210 A (간이 듀티 지표는 화면 결과)",
+  }, {}),
   f("formula-relay", "IEC 반한시 동작시간", "t = TMS × A / ((I/Is)^p − 1)", [
     { symbol: "A,p", name: "곡선 상수", unit: "—", description: "SI/VI/EI/LTI" },
     { symbol: "TMS", name: "Time multiplier", unit: "—", description: "" },
@@ -199,7 +229,12 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "E", name: "목표 조도", unit: "lx", description: "" },
     { symbol: "UF", name: "이용률", unit: "—", description: "등기구·실 반사" },
     { symbol: "MF", name: "유지율", unit: "—", description: "오염·광속 감소" },
-  ], { title: "12×8 m, 300 lx, 3200 lm, UF 0.55, MF 0.8", given: "사무실 예", steps: ["A=96", "ΣΦ", "N"], result: "등기구 개수" }, {}),
+  ], {
+    title: "12×8 m, 300 lx, 3200 lm, UF 0.55, MF 0.8",
+    given: "사무실 예",
+    steps: ["A = 96 m²", "필요 광속 = E·A/(UF·MF)", "N = 21"],
+    result: "등기구 21 개",
+  }, {}),
   f("formula-lpd", "조명 전력밀도", "LPD = P / A", [
     { symbol: "P", name: "전력", unit: "W", description: "" },
   ], { title: "960 W / 96 m²", given: "LED", steps: ["LPD=10 W/m²"], result: "10 W/m²" }, {}),
@@ -220,7 +255,12 @@ export const extraFormulas: FormulaDefinition[] = [
   ], { title: "a=5 m, R=3.2 Ω", given: "4극", steps: ["ρ=2π×5×3.2"], result: "약 100.5 Ω·m" }, {}),
   f("formula-earth-conductor", "접지도체 단열식", "S = (I/k) √t", [
     { symbol: "k", name: "재질 계수", unit: "A√s/mm²", description: "표준 표를 사용자가 입력" },
-  ], { title: "5 kA, 0.5 s, k=143", given: "사용자 k", steps: ["S=(5000/143)√0.5"], result: "mm²" }, {
+  ], {
+    title: "5 kA, 0.5 s, k=143",
+    given: "사용자 k · t ≤ 5 s · 단열식 적용",
+    steps: ["S = (5000/143) × √0.5 = 24.72 mm²", "t>5 s이면 단열식 결과 숨김", "표준 표 선정·적합 판정 아님"],
+    result: "24.72 mm² (열적 참고 · 규격 적합성 비보증)",
+  }, {
     criteriaNotes: [{ standard: "KEC 142.3.2 계산식·설치조건 / KS C IEC 60364-5-54", appliesTo: "나(단열식 t≤5 s)와 다(별도 보호도체 기계적 최소)만. 가(표 142.3-1)는 시행본 전체 확인 전 미구현. 16/35/S/2 미내장" }],
   }),
   f("formula-spd", "SPD 간이 체크", "공식 선정 없음 — 위치·Uc·In 확인", [
@@ -275,10 +315,14 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "ΣΔV%", name: "누적 전압강하율", unit: "%", description: "기준점부터 최종 기기까지 구간 %의 합" },
     { symbol: "L_path", name: "전체 경로 길이", unit: "m", description: "해당 배선구간 길이의 합. 표 232.3-1 가산에 사용" },
   ], {
-    title: "계량기 2차 → MDB → DB → 부하, 160 m",
-    given: "저압 기타, 3상 380 V, 각 구간 저항 근사",
-    steps: ["구간 ΔV% 합산", "경로 160 m → 가산 0.3%", "허용 참고 5.3%와 수치관계만 비교"],
-    result: "누적 %와 전체 경로 허용 참고값",
+    title: "3구간 예 — 80A 40m + 60A 60m + 40A 60m · 0.727 Ω/km",
+    given: "저압 기타, 3상 380 V, 저항 근사, 경로 160 m",
+    steps: [
+      "구간 ΔV 합산 → 누적 11.58 V (3.05%)",
+      "한 구간만 80 A·80 m·0.727이면 8.06 V (2.12%) — 전압강하 계산기와 동일",
+      "KEC 표 비교는 선택이며 적합 판정이 아님",
+    ],
+    result: "누적 11.58 V (3.05%) · 한 구간 단독은 8.06 V (2.12%)",
   }, {
     criteriaNotes: [{
       standard: "KEC 232.3.9 / 표 232.3-1 (협회 공개 Q&A)",
