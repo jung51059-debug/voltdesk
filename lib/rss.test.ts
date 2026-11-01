@@ -12,7 +12,8 @@ describe("사이트맵", () => {
     expect(paths).toContain("/about");
     expect(paths).toContain("/references");
     expect(new Set(paths).size).toBe(paths.length);
-    expect(paths).toHaveLength(128);
+    expect(paths).toHaveLength(129);
+    expect(paths).toContain("/tools/electrical/motor-slip");
     expect(paths).toContain("/tools/electrical/contract-power-current");
     expect(paths).not.toContain("/tools/electrical/motor-start-vd");
     expect(paths.every((path) => path.startsWith("/"))).toBe(true);

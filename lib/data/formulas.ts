@@ -520,8 +520,14 @@ export const baseFormulas: FormulaDefinition[] = [
     ],
     units: ["A"],
     assumptions: ["연속 부하에 단순 배율만 적용", "단락·기동·선택차단 없음"],
-    warnings: ["이 결과는 차단기 선정이 아닙니다."],
-    limitations: ["차단기 제품표준·제조사 카탈로그를 대체하지 않습니다. KEC 적합 판정이 아닙니다."],
+    warnings: [
+      "이 결과는 차단기 선정이 아닙니다.",
+      "Icu/Ics와 단락전류를 넣어도 자동 선정·안전 적합 확정이 아닙니다. 입력값 비교만 합니다.",
+    ],
+    limitations: [
+      "차단기 제품표준·제조사 카탈로그를 대체하지 않습니다. KEC 적합 판정이 아닙니다.",
+      "Ics, 직류 성분, 적용 카테고리, 선택차단은 다루지 않습니다.",
+    ],
     example: {
       title: "87 A, 여유 1.25",
       given: "I = 87 A, k = 1.25",

@@ -5,7 +5,13 @@ import { parseNumber } from "@/lib/math/validate";
 import { roundTo } from "@/lib/math/round";
 import { review } from "@/lib/calculations/parse";
 import { followUp } from "@/lib/calculations/handoff";
-import { calculateMotorAcceleration, calculateMotorCurrent, calculateMotorStartingReview, calculateMotorStartVoltageDrop } from "@/lib/calculations/motor";
+import {
+  calculateMotorAcceleration,
+  calculateMotorCurrent,
+  calculateMotorSlip,
+  calculateMotorStartingReview,
+  calculateMotorStartVoltageDrop,
+} from "@/lib/calculations/motor";
 import { calculateHarmonicFilterReview, calculatePowerFactorCorrection, calculatePowerTriangle, calculateThd } from "@/lib/calculations/power-quality";
 import { calculateBusbar, calculateCableAmpacityReview, calculateCableParallel, calculateCableSizing } from "@/lib/calculations/cable-tools";
 import { calculateTransformerCurrents, calculateTransformerLoss, calculateTransformerParallel, calculateTransformerSizing } from "@/lib/calculations/transformer-tools";
@@ -1238,6 +1244,7 @@ export const engines: Record<string, (input: CalcInput, precision: number) => Ca
   "motor-starting": calculateMotorStartingReview,
   "motor-start-vd": calculateMotorStartVoltageDrop,
   "motor-acceleration": calculateMotorAcceleration,
+  "motor-slip": calculateMotorSlip,
   "power-factor-correction": calculatePowerFactorCorrection,
   "power-triangle": calculatePowerTriangle,
   "thd": calculateThd,

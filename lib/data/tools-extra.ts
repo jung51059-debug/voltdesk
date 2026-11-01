@@ -21,7 +21,13 @@ export const extraTools: CalculatorTool[] = [
     formulaId: "formula-motor-current",
     tags: ["모터", "FLC", "정격전류", "HP"],
     synonyms: ["motor current", "full load current", "전동기 전류", "FLC", "모터전류"],
-    relatedToolIds: ["tool-motor-starting", "tool-field-compare", "tool-cable-sizing", "tool-breaker-current"],
+    relatedToolIds: [
+      "tool-motor-slip",
+      "tool-motor-starting",
+      "tool-field-compare",
+      "tool-cable-sizing",
+      "tool-breaker-current",
+    ],
     relatedArticleIds: ["art-motor-kw-input", "art-motor-current", "art-motor-start-dip"],
     complexity: "basic",
     featured: true,
@@ -31,6 +37,70 @@ export const extraTools: CalculatorTool[] = [
     faqs: [
       { question: "HP로 넣어도 되나요?", answer: "출력 단위에서 HP를 고르면 746 W/HP로 환산합니다. 명판 출력과 전기 입력은 효율만큼 다릅니다." },
       { question: "이 전류로 차단기를 골라도 되나요?", answer: "안 됩니다. 기동방식, 트립 곡선, 케이블 허용전류를 함께 봐야 합니다." },
+    ],
+  }),
+  tool({
+    id: "tool-motor-slip",
+    slug: "motor-slip",
+    href: "/tools/electrical/motor-slip",
+    categoryId: "cat-motor",
+    domain: "electrical",
+    name: "전동기 슬립·동기속도 계산기",
+    nameEn: "Motor slip and synchronous speed",
+    pageHeading: "전동기 슬립·동기속도 계산기",
+    metaTitle: "전동기 슬립·동기속도 계산기, Ns와 슬립률",
+    metaDescription:
+      "주파수와 극수로 동기속도 Ns를 구하고, 실제 RPM 또는 슬립률로 유도전동기 슬립을 계산합니다. 4극 60Hz 1750RPM 예시를 제공합니다.",
+    description: "주파수·극수로 동기속도를 구하고, 실제 회전수 또는 슬립률로 유도전동기 슬립을 계산합니다.",
+    longDescription:
+      "Ns = 120 f / P, s = (Ns − Nr) / Ns × 100입니다. 슬립률을 넣으면 실제 회전수를 역산합니다. 동기전동기에는 슬립이 없으며, 음수 슬립은 회생·과동기 등 일반 전동 운전과 구분해 안내합니다.",
+    formulaId: "formula-motor-slip",
+    tags: ["슬립", "동기속도", "RPM", "유도전동기", "극수"],
+    synonyms: [
+      "motor slip",
+      "synchronous speed",
+      "슬립 계산",
+      "동기속도",
+      "Ns",
+      "1750 RPM",
+      "4극 60Hz",
+      "전동기 회전수",
+    ],
+    relatedToolIds: ["tool-motor-current", "tool-motor-starting", "tool-motor-acceleration", "tool-vfd-sizing"],
+    relatedArticleIds: ["art-motor-current", "art-motor-kw-input", "art-motor-start-dip"],
+    complexity: "basic",
+    featured: true,
+    recentlyAdded: true,
+    status: "published",
+    updatedAt: "2026-11-01",
+    faqs: [
+      {
+        question: "4극 60 Hz에서 동기속도는 얼마인가요?",
+        answer: "Ns = 120 × 60 / 4 = 1800 r/min입니다. 실제 운전은 보통 이보다 조금 낮고, 그 차이가 슬립입니다.",
+      },
+      {
+        question: "1750 r/min이면 슬립은?",
+        answer: "4극 60 Hz 기준 (1800 − 1750) / 1800 × 100 ≈ 2.78%입니다. 이 화면 기본 예시와 같습니다.",
+      },
+      {
+        question: "슬립이 음수면 고장인가요?",
+        answer:
+          "반드시 고장은 아닙니다. 실제속도가 동기속도보다 크면 음수 슬립이 나오며, 유도기가 발전(회생)하거나 측정이 틀린 경우입니다. 일반 전동 부하 운전의 슬립으로 읽지 마세요.",
+      },
+      {
+        question: "인버터로 주파수를 바꾸면?",
+        answer:
+          "동기속도는 주파수에 비례해 바뀝니다. 직접 입력에서 출력 주파수를 넣으세요. 저속·약여자 구간 토크·냉각은 이 계산이 다루지 않습니다.",
+      },
+      {
+        question: "동기전동기에도 쓰나요?",
+        answer: "쓰지 않습니다. 동기기는 정상 운전에서 슬립이 0에 가깝고, 이 도구의 유도기 슬립 해석과 다릅니다.",
+      },
+      {
+        question: "회전속도계로 어떻게 재나요?",
+        answer:
+          "접촉식·비접촉식 모두 축 또는 커플링에서 측정합니다. 운전 중 회전체에 손을 대지 말고, 가드·잠금·허가 절차를 지키세요. 측정값은 이 계산의 Nr 칸에 넣습니다.",
+      },
     ],
   }),
   tool({
@@ -47,7 +117,13 @@ export const extraTools: CalculatorTool[] = [
     formulaId: "formula-motor-starting",
     tags: ["기동전류", "기동 전압강하", "DOL", "Y-Δ", "VFD"],
     synonyms: ["starting current", "inrush", "직입 기동", "스타델타", "모터 기동전류", "모터 기동 전압강하", "기동 VD"],
-    relatedToolIds: ["tool-motor-current", "tool-voltage-drop", "tool-soft-starter", "tool-vfd-sizing"],
+    relatedToolIds: [
+      "tool-motor-current",
+      "tool-motor-slip",
+      "tool-voltage-drop",
+      "tool-soft-starter",
+      "tool-vfd-sizing",
+    ],
     relatedArticleIds: ["art-motor-start-dip", "art-motor-current", "art-voltage-drop"],
     complexity: "intermediate",
     featured: false,
@@ -95,7 +171,7 @@ export const extraTools: CalculatorTool[] = [
     formulaId: "formula-motor-acceleration",
     tags: ["가속", "관성", "J"],
     synonyms: ["acceleration time", "관성 기동"],
-    relatedToolIds: ["tool-motor-current", "tool-motor-starting"],
+    relatedToolIds: ["tool-motor-current", "tool-motor-starting", "tool-motor-slip"],
     relatedArticleIds: ["art-motor-current"],
     complexity: "advanced",
     featured: false,
@@ -342,8 +418,14 @@ export const extraTools: CalculatorTool[] = [
     formulaId: "formula-transformer-current",
     tags: ["변압기", "정격전류"],
     synonyms: ["transformer current", "1차전류", "2차전류"],
-    relatedToolIds: ["tool-transformer-sizing", "tool-transformer-load"],
-    relatedArticleIds: ["art-transformer-sizing"],
+    relatedToolIds: [
+      "tool-transformer-sizing",
+      "tool-transformer-load",
+      "tool-cable-resistance",
+      "tool-short-circuit",
+      "tool-breaker-current",
+    ],
+    relatedArticleIds: ["art-transformer-sizing", "art-fault-vs-icu"],
     complexity: "basic",
     featured: false,
     recentlyAdded: true,
@@ -407,12 +489,18 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "3상 단락전류 계산기",
     nameEn: "Three-phase short circuit",
-    description: "변압기·계통·케이블·발전기·모터 기여로 초기 대칭 단락전류와 첨두를 근사합니다.",
-    longDescription: "IEC 60909 참고. Ik″·κ 일부 근사만 사용하며 보정계수 K 전체와 불평형 사고는 구현하지 않습니다. IEC 60909 계산·준수가 아닙니다. 지락전류를 추정값으로 제공하지 않습니다.",
+    pageHeading: "3상 단락전류 계산기",
+    metaTitle: "3상 단락전류 계산기, Ik″ 근사 · 차단기 선정 아님",
+    metaDescription:
+      "변압기·케이블 등으로 3상 초기 대칭 단락전류 Ik″와 첨두를 근사합니다. 차단기 차단용량을 자동 선정하거나 안전 적합을 확정하지 않습니다. Icu 비교는 차단기 정격 참고 계산기에서 사용자가 넣은 값만 봅니다.",
+    description:
+      "변압기·계통·케이블·발전기·모터 기여로 초기 대칭 단락전류와 첨두를 근사합니다. 차단기 선정·적합 판정이 아닙니다.",
+    longDescription:
+      "IEC 60909 참고. Ik″·κ 일부 근사만 사용하며 보정계수 K 전체와 불평형 사고는 구현하지 않습니다. IEC 60909 계산·준수가 아닙니다. 지락전류를 추정값으로 제공하지 않습니다. 나온 kA는 사고전류 참고이며, Icu/Ics와 비교·기기 선정은 차단기 정격 참고 계산기와 제조사 자료에서 사용자가 확인합니다.",
     formulaId: "formula-short-circuit",
-    tags: ["단락", "Ik", "fault", "MVA"],
-    synonyms: ["short circuit", "fault current", "단락전류", "고장전류", "3상 단락"],
-    relatedToolIds: ["tool-transformer-sizing", "tool-breaker-current", "tool-cable-sizing"],
+    tags: ["단락", "Ik", "fault", "MVA", "차단용량"],
+    synonyms: ["short circuit", "fault current", "단락전류", "고장전류", "3상 단락", "Icu", "차단용량"],
+    relatedToolIds: ["tool-breaker-current", "tool-transformer-sizing", "tool-cable-sizing", "tool-earth-conductor"],
     relatedArticleIds: ["art-fault-vs-icu", "art-short-circuit"],
     complexity: "advanced",
     featured: true,
@@ -422,7 +510,11 @@ export const extraTools: CalculatorTool[] = [
     faqs: [
       { question: "1선 지락도 나오나요?", answer: "나오지 않습니다. 3상 대칭만 계산하며, 그 값을 나눠 지락전류로 쓰지 않습니다." },
       { question: "c=1.05가 그 전압의 계수인가요?", answer: "예제에 넣은 1.05일 뿐입니다. 전압 등급별 표는 확인 후 직접 바꿉니다." },
-      { question: "이 kA로 차단기를 정해도 되나요?", answer: "안 됩니다. Ik″는 넣은 임피던스의 사고전류 근사이고, 차단용량·보호협조와 같은 판정이 아닙니다." },
+      {
+        question: "이 kA로 차단기를 정해도 되나요?",
+        answer:
+          "안 됩니다. Ik″는 계통 쪽 사고전류 근사이고, Icu는 차단기가 끊을 수 있다고 표시한 능력의 한 종류입니다. Ics 등 다른 정격은 별도입니다. 이 화면은 차단용량 자동 선정·보호협조·안전 적합 확정을 하지 않으며, 숫자 비교는 차단기 정격 참고 계산기에서 사용자가 넣은 값만 합니다.",
+      },
     ],
   }),
   tool({

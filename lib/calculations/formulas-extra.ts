@@ -54,6 +54,38 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "J", name: "관성", unit: "kg·m²", description: "축 환산" },
     { symbol: "T_acc", name: "가속 토크", unit: "N·m", description: "평균값 가정" },
   ], { title: "J=2.5, 1450 r/min, T=80 N·m", given: "일정 토크", steps: ["ω=151.8 rad/s", "t=Jω/T"], result: "약 4.7 s" }, {}),
+  f("formula-motor-slip", "동기속도·슬립", "Ns = 120 f / P,  s = (Ns − Nr) / Ns × 100", [
+    { symbol: "f", name: "주파수", unit: "Hz", description: "전원 또는 인버터 출력 주파수" },
+    { symbol: "P", name: "극수", unit: "—", description: "2, 4, 6, 8, 10, 12" },
+    { symbol: "Ns", name: "동기속도", unit: "r/min", description: "회전자가 이상적으로 맞춰 도는 속도" },
+    { symbol: "Nr", name: "실제속도", unit: "r/min", description: "측정 또는 명판 회전수" },
+    { symbol: "s", name: "슬립", unit: "%", description: "동기속도 대비 상대 차이" },
+  ], {
+    title: "4극 60 Hz, 1750 r/min",
+    given: "f = 60 Hz, P = 4, Nr = 1750 r/min",
+    steps: [
+      "Ns = 120 × 60 / 4 = 1800 r/min",
+      "s = (1800 − 1750) / 1800 × 100 = 2.777… %",
+      "표시는 정밀도에 따라 2.78 %",
+    ],
+    result: "동기속도 1800 r/min, 슬립 약 2.78 %",
+  }, {
+    assumptions: ["유도전동기, 일정 주파수·고정 극수", "슬립은 속도를 말할 뿐 토크·전류를 직접 주지 않음"],
+    warnings: [
+      "동기전동기에는 슬립이 없습니다.",
+      "실제속도가 동기속도보다 크면 음수 슬립(회생·과동기)일 수 있으며 일반 전동 운전으로 보지 마세요.",
+    ],
+    limitations: ["정격 슬립·허용 운전 범위·인버터 토크 한계는 명판·제조사 자료입니다."],
+    criteriaNotes: [{ standard: "일반 전기공학 동기속도·슬립 관계식", appliesTo: "Ns·s·Nr 환산. 명판 적합 판정 아님" }],
+    referenceSources: [
+      {
+        id: "src-eng-slip",
+        title: "일반 전기공학 동기속도·슬립 관계식",
+        publisher: "공학 교과서",
+        note: "Ns = 120 f / P, s = (Ns − Nr) / Ns",
+      },
+    ],
+  }),
   f("formula-pfc", "역률 개선 용량", "Qc = P (tanφ1 − tanφ2)", [
     { symbol: "P", name: "유효전력", unit: "kW", description: "보상 전후 일정" },
     { symbol: "φ", name: "위상각", unit: "rad", description: "arccos(PF)" },
@@ -128,7 +160,14 @@ export const extraFormulas: FormulaDefinition[] = [
     criteriaNotes: [
       { standard: "IEC 60909-0 참고", appliesTo: "Ik″·κ 일부 근사. IEC 60909 계산·준수 아님. K 보정·불평형 단락 미구현" },
     ],
-    limitations: ["불평형 사고(지락)는 제공하지 않습니다."],
+    warnings: [
+      "결과는 초기 검토용이며 최종 설계값이 아닙니다.",
+      "나온 kA로 차단기 차단용량을 자동 선정하거나 안전 적합을 확정하지 않습니다. Icu/Ics 비교는 별도입니다.",
+    ],
+    limitations: [
+      "불평형 사고(지락)는 제공하지 않습니다.",
+      "차단기 Icu·Ics 선정과 보호협조를 대체하지 않습니다.",
+    ],
   }),
   f("formula-ct-ratio", "변류비", "n = Ip / Is, I2 = I1 / n", [
     { symbol: "Ip", name: "1차 정격", unit: "A", description: "100/5A의 100" },

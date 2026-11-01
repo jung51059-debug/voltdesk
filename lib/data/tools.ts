@@ -580,7 +580,12 @@ export const baseTools: CalculatorTool[] = [
     formulaId: "formula-cable-resistance",
     tags: ["케이블", "저항", "단면적", "구리", "알루미늄"],
     synonyms: ["전선 저항", "conductor resistance", "Ω/km", "케이블 사이즈"],
-    relatedToolIds: ["tool-voltage-drop", "tool-three-phase-current"],
+    relatedToolIds: [
+      "tool-voltage-drop",
+      "tool-three-phase-current",
+      "tool-transformer-current",
+      "tool-cable-sizing",
+    ],
     relatedArticleIds: ["art-cable-sizing", "art-voltage-drop"],
     complexity: "basic",
     featured: false,
@@ -613,13 +618,23 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "차단기 정격 참고 계산기",
     nameEn: "Breaker rating reference calculator",
-    description: "임의 여유율 참고값과, 선택 입력 시 Ib / In / Iz / I₂ 숫자만 보여 줍니다.",
+    pageHeading: "차단기 정격 참고 계산기",
+    metaTitle: "차단기 정격 참고 계산기, Icu 비교는 입력값만",
+    metaDescription:
+      "부하전류 여유율과 Ib·In·Iz 숫자 관계를 참고로 봅니다. 차단기 차단용량을 자동 선정하거나 안전 적합을 확정하지 않습니다. Icu와 단락전류는 사용자가 넣은 값만 나란히 비교합니다.",
+    description:
+      "부하전류 여유율과 선택 입력 시 Ib·In·Iz·I₂·Icu 숫자를 참고로 보여 줍니다. 차단용량 자동 선정이 아닙니다.",
     longDescription:
-      "기본은 부하전류 × 임의 여유율입니다. KEC 적합 판정이 아닙니다. In·Iz를 넣으면 숫자만 나란히 표시합니다. I₂는 제조사 기술사양 또는 제품표준에서 확인한 값만 받으며, 없으면 I₂ 조건은 미검토입니다.",
+      "기본은 부하전류 × 임의 여유율입니다. KEC 적합 판정이 아닙니다. In·Iz를 넣으면 숫자만 나란히 표시합니다. I₂는 제조사 기술사양 또는 제품표준에서 확인한 값만 받으며, 없으면 I₂ 조건은 미검토입니다. 단락전류 kA와 Icu kA를 넣으면 두 입력만 비교하며, Ics·카테고리·보호협조·기기 선정을 확정하지 않습니다.",
     formulaId: "formula-breaker-ref",
-    tags: ["차단기", "MCCB", "정격전류", "In"],
-    synonyms: ["MCCB", "ELB", "NFB", "breaker", "차단기 용량"],
-    relatedToolIds: ["tool-three-phase-current", "tool-single-phase-current", "tool-cable-sizing"],
+    tags: ["차단기", "MCCB", "정격전류", "In", "Icu"],
+    synonyms: ["MCCB", "ELB", "NFB", "breaker", "차단기 용량", "차단용량", "Icu", "Ics"],
+    relatedToolIds: [
+      "tool-short-circuit",
+      "tool-three-phase-current",
+      "tool-single-phase-current",
+      "tool-cable-sizing",
+    ],
     relatedArticleIds: ["art-fault-vs-icu", "art-elb-30a-30ma", "art-mccb-vs-elb", "art-breaker-and-cable"],
     complexity: "intermediate",
     featured: false,
@@ -631,6 +646,16 @@ export const baseTools: CalculatorTool[] = [
         question: "계산 결과의 차단기를 그대로 선정해도 되나요?",
         answer:
           "아니요. 임의 여유율은 KEC 212.4.1 협조 조건이 아닙니다. 단락전류, 선택차단, Iz, 제조사 특성곡선을 확인하세요.",
+      },
+      {
+        question: "Icu를 넣으면 차단용량이 합격인가요?",
+        answer:
+          "아닙니다. 넣은 단락전류 kA와 Icu kA를 같은 단위로 나란히 볼 뿐입니다. Ics, 직류 성분, 적용 카테고리, 설치 조건은 검토하지 않으며 자동 선정·적합 확정이 아닙니다.",
+      },
+      {
+        question: "단락전류는 어디서 구하나요?",
+        answer:
+          "3상 단락전류 계산기에서 예상 Ik″를 근사한 뒤, 그 kA를 이 화면의 단락전류 칸에 넣을 수 있습니다. 그 근사만으로 차단기를 정하지 않습니다.",
       },
     ],
   },

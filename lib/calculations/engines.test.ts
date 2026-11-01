@@ -17,7 +17,7 @@ import {
 } from "@/lib/calculations/engines";
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 import { searchCatalog } from "@/lib/search";
-import { calculateMotorCurrent } from "@/lib/calculations/motor";
+import { calculateMotorCurrent, calculateMotorSlip } from "@/lib/calculations/motor";
 import { calculatePowerFactorCorrection } from "@/lib/calculations/power-quality";
 import { calculateShortCircuit } from "@/lib/calculations/short-circuit";
 import { calculateCableAmpacityReview } from "@/lib/calculations/cable-tools";
@@ -879,6 +879,191 @@ describe("남은 참고 알림", () => {
   });
 });
 
+describe("전동기 슬립·동기속도", () => {
+  it("4극 60Hz 1750RPM 기본 예시로 슬립을 계산한다", () => {
+    const out = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "60", poles: "4", rpm: "1750" },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(Number(String(out.metrics.find((m) => m.id === "ns")?.value).replace(/,/g, ""))).toBe(1800);
+    expect(Number(String(out.metrics.find((m) => m.id === "slip")?.value).replace(/,/g, ""))).toBeCloseTo(2.78, 2);
+    expect(out.interpretation).toContain("1800");
+    expect(getCalculatorGuide("motor-slip")?.lookup?.rows.some((row) => row[0] === "4극")).toBe(true);
+    expect(getToolBySlug("motor-slip")?.href).toBe("/tools/electrical/motor-slip");
+    expect(getToolBySlug("motor-slip")?.metaTitle).toContain("슬립");
+    expect(getFormulaById("formula-motor-slip")?.example.result).toContain("2.78");
+  });
+
+  it("슬립률 입력으로 실제 회전수를 역산한다", () => {
+    const out = calculateMotorSlip(
+      { calcMode: "from-slip", freqPreset: "50", poles: "4", slipPct: "3" },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(Number(String(out.metrics.find((m) => m.id === "ns")?.value).replace(/,/g, ""))).toBe(1500);
+    expect(Number(String(out.metrics.find((m) => m.id === "rpm")?.value).replace(/,/g, ""))).toBeCloseTo(1455, 2);
+  });
+
+  it("잘못된 극수와 빈 회전수를 거절한다", () => {
+    const badPoles = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "60", poles: "3", rpm: "1750" },
+      2,
+    );
+    const emptyRpm = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "60", poles: "4", rpm: "" },
+      2,
+    );
+    expect(badPoles.ok).toBe(false);
+    expect(emptyRpm.ok).toBe(false);
+    if (!badPoles.ok) expect(badPoles.fieldErrors?.poles).toBeTruthy();
+    if (!emptyRpm.ok) expect(emptyRpm.fieldErrors?.rpm || emptyRpm.formError).toBeTruthy();
+  });
+
+  it("과동기·음수 슬립에 별도 안내를 붙인다", () => {
+    const out = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "60", poles: "4", rpm: "1850" },
+      2,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(Number(String(out.metrics.find((m) => m.id === "slip")?.value).replace(/,/g, ""))).toBeLessThan(0);
+    expect(out.warnings.some((w) => w.message.includes("과동기") || w.message.includes("발전"))).toBe(true);
+  });
+
+  it("50·60Hz와 2~12극 동기속도가 120f/P와 같다", () => {
+    const poles = [2, 4, 6, 8, 10, 12];
+    for (const p of poles) {
+      for (const freq of [50, 60] as const) {
+        const out = calculateMotorSlip(
+          { calcMode: "from-rpm", freqPreset: String(freq), poles: String(p), rpm: String((120 * freq) / p) },
+          2,
+        );
+        expect(out.ok, `${freq}Hz ${p}극`).toBe(true);
+        if (!out.ok) return;
+        expect(Number(String(out.metrics.find((m) => m.id === "ns")?.value).replace(/,/g, ""))).toBe(
+          (120 * freq) / p,
+        );
+        expect(Number(String(out.metrics.find((m) => m.id === "slip")?.value).replace(/,/g, ""))).toBeCloseTo(0, 2);
+      }
+    }
+  });
+
+  it("직접 주파수 입력과 정지·역산 음수 회전수를 처리한다", () => {
+    const custom = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "custom", frequency: "45", poles: "4", rpm: "1300" },
+      2,
+    );
+    expect(custom.ok).toBe(true);
+    if (custom.ok) {
+      expect(Number(String(custom.metrics.find((m) => m.id === "ns")?.value).replace(/,/g, ""))).toBe(1350);
+      expect(Number(String(custom.metrics.find((m) => m.id === "slip")?.value).replace(/,/g, ""))).toBeCloseTo(
+        ((1350 - 1300) / 1350) * 100,
+        2,
+      );
+    }
+
+    const stall = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "60", poles: "4", rpm: "0" },
+      2,
+    );
+    expect(stall.ok).toBe(true);
+    if (stall.ok) {
+      expect(Number(String(stall.metrics.find((m) => m.id === "slip")?.value).replace(/,/g, ""))).toBeCloseTo(100, 2);
+      expect(stall.warnings.some((w) => w.title.includes("정지") || w.message.includes("스톨"))).toBe(true);
+    }
+
+    const overSlip = calculateMotorSlip(
+      { calcMode: "from-slip", freqPreset: "60", poles: "4", slipPct: "120" },
+      2,
+    );
+    expect(overSlip.ok).toBe(true);
+    if (overSlip.ok) {
+      expect(Number(String(overSlip.metrics.find((m) => m.id === "rpm")?.value).replace(/,/g, ""))).toBeLessThan(0);
+      expect(overSlip.warnings.some((w) => w.message.includes("음수") || w.message.includes("100%"))).toBe(true);
+    }
+
+    const badFreq = calculateMotorSlip(
+      { calcMode: "from-rpm", freqPreset: "custom", frequency: "0", poles: "4", rpm: "1750" },
+      2,
+    );
+    expect(badFreq.ok).toBe(false);
+  });
+
+  it("사이트맵·SEO·상호 링크가 Phase 1 범위를 만족한다", () => {
+    const paths = sitemapEntries();
+    expect(paths).toContain("/tools/electrical/motor-slip");
+    expect(paths).toHaveLength(129);
+
+    const slip = getToolBySlug("motor-slip");
+    expect(slip?.metaTitle).toContain("슬립");
+    expect(slip?.metaDescription).toContain("동기속도");
+    expect(slip?.relatedToolIds).toEqual(
+      expect.arrayContaining(["tool-motor-current", "tool-motor-starting", "tool-vfd-sizing"]),
+    );
+    expect(slip?.relatedArticleIds).toEqual(
+      expect.arrayContaining(["art-motor-current", "art-motor-kw-input"]),
+    );
+
+    const breaker = getToolBySlug("breaker-current");
+    const short = getToolBySlug("short-circuit");
+    expect(breaker?.relatedToolIds).toContain("tool-short-circuit");
+    expect(short?.relatedToolIds).toContain("tool-breaker-current");
+    expect(breaker?.metaDescription).toContain("자동 선정");
+    expect(short?.metaDescription).toContain("차단기");
+    expect(short?.metaTitle).toContain("선정 아님");
+    expect(getCalculatorGuide("breaker-current")?.cautions.some((c) => c.includes("자동 선정"))).toBe(true);
+    expect(getCalculatorGuide("short-circuit")?.interpretation.some((p) => p.includes("자동 선정"))).toBe(true);
+    expect(getCalculatorGuide("breaker-current")?.links?.some((l) => l.href === "/tools/electrical/short-circuit")).toBe(
+      true,
+    );
+    expect(getCalculatorGuide("short-circuit")?.links?.some((l) => l.href === "/tools/electrical/breaker-current")).toBe(
+      true,
+    );
+    expect(getArticleBySlug("motor-current")?.relatedToolIds).toContain("tool-motor-slip");
+  });
+
+  it("차단기·단락 엔진 숫자는 Phase 1 이전과 같다", () => {
+    const breaker = calculateBreakerReference({ current: "87", margin: "1.25" }, 2);
+    expect(breaker.ok).toBe(true);
+    if (!breaker.ok) return;
+    expect(primaryNumber(breaker)).toBeCloseTo(108.75, 2);
+    expect(Number(String(breaker.metrics.find((m) => m.id === "near")?.value))).toBe(125);
+
+    const withIcu = calculateBreakerReference(
+      { current: "87", margin: "1.25", iscKa: "25", icuKa: "36" },
+      2,
+    );
+    expect(withIcu.ok).toBe(true);
+    if (withIcu.ok) {
+      expect(Number(String(withIcu.metrics.find((m) => m.id === "isc")?.value))).toBe(25);
+      expect(Number(String(withIcu.metrics.find((m) => m.id === "icu")?.value))).toBe(36);
+    }
+
+    const short = calculateShortCircuit(
+      {
+        voltage: "380",
+        cFactor: "1.05",
+        includeTr: "yes",
+        trKva: "500",
+        trZpct: "4.5",
+        trXr: "8",
+        includeCable: "no",
+        includeSource: "no",
+        includeGen: "no",
+        includeMotor: "no",
+      },
+      2,
+    );
+    expect(short.ok).toBe(true);
+    if (!short.ok) return;
+    expect(Number(String(short.metrics.find((m) => m.id === "ik")?.value).replace(/,/g, ""))).toBe(17726);
+    expect(Number(String(short.metrics.find((m) => m.id === "ip")?.value).replace(/,/g, ""))).toBe(42454);
+  });
+});
+
 describe("검색", () => {
   it("한글·영문·약어를 찾는다", () => {
     expect(searchCatalog("전압강하").some((h) => h.href.includes("voltage-drop"))).toBe(true);
@@ -894,5 +1079,7 @@ describe("검색", () => {
     expect(searchCatalog("조명").some((h) => h.href.includes("lux"))).toBe(true);
     expect(searchCatalog("태양광").some((h) => h.href.includes("solar"))).toBe(true);
     expect(searchCatalog("모터").some((h) => h.href.includes("motor"))).toBe(true);
+    expect(searchCatalog("슬립").some((h) => h.href.includes("motor-slip"))).toBe(true);
+    expect(searchCatalog("동기속도").some((h) => h.href.includes("motor-slip"))).toBe(true);
   });
 });

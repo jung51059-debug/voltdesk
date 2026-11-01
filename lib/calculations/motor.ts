@@ -356,3 +356,158 @@ export function calculateMotorAcceleration(input: CalcInput, precision: number):
     reviewStatus: review("check", "명판·부하 관성 데이터가 있으면 그 값을 우선하세요."),
   });
 }
+
+const SLIP_POLES = new Set([2, 4, 6, 8, 10, 12]);
+
+function resolveSlipFrequencyHz(input: CalcInput, fields: FieldBag): number {
+  const preset = input.freqPreset ?? "60";
+  if (preset === "custom") {
+    const f = fields.num("frequency", "주파수");
+    fields.requirePositive("frequency", "주파수", f);
+    return f;
+  }
+  if (preset === "50") return 50;
+  return 60;
+}
+
+/** Ns = 120 f / P, s = (Ns − Nr) / Ns × 100. 슬립 입력 시 Nr = Ns (1 − s/100). */
+export function calculateMotorSlip(input: CalcInput, precision: number): CalculationOutcome {
+  const fields = new FieldBag(input);
+  const mode = input.calcMode ?? "from-rpm";
+  const polesRaw = fields.num("poles", "극수");
+  const poles = Math.round(polesRaw);
+  if (!Number.isFinite(polesRaw) || poles !== polesRaw || !SLIP_POLES.has(poles)) {
+    fields.errors.poles = "극수는 2, 4, 6, 8, 10, 12 중 하나로 넣으세요.";
+  }
+  const f = resolveSlipFrequencyHz(input, fields);
+  if (fields.failed()) return fields.fail();
+
+  const ns = (120 * f) / poles;
+  let nr = NaN;
+  let slipPct = NaN;
+  const steps: string[] = [
+    `동기속도 Ns = 120 × f / P = 120 × ${roundTo(f, precision)} / ${poles} = ${roundTo(ns, precision)} r/min`,
+  ];
+
+  if (mode === "from-slip") {
+    slipPct = fields.num("slipPct", "슬립률 %");
+    if (!Number.isFinite(slipPct)) {
+      fields.errors.slipPct = "슬립률을 숫자로 넣으세요.";
+    }
+    if (fields.failed()) return fields.fail();
+    nr = ns * (1 - slipPct / 100);
+    steps.push(
+      `슬립률 s = ${roundTo(slipPct, precision)} %`,
+      `실제속도 Nr = Ns × (1 − s/100) = ${roundTo(ns, precision)} × (1 − ${roundTo(slipPct, precision)}/100) = ${roundTo(nr, Math.max(precision, 2))} r/min`,
+    );
+  } else {
+    nr = fields.num("rpm", "실제 회전속도");
+    if (!Number.isFinite(nr)) {
+      fields.errors.rpm = "실제 회전속도를 숫자로 넣으세요.";
+    }
+    if (fields.failed()) return fields.fail();
+    if (ns === 0) return fields.fail("동기속도가 0이라 슬립을 나눌 수 없습니다.");
+    slipPct = ((ns - nr) / ns) * 100;
+    steps.push(
+      `실제속도 Nr = ${roundTo(nr, precision)} r/min`,
+      `슬립 s = (Ns − Nr) / Ns × 100 = (${roundTo(ns, precision)} − ${roundTo(nr, precision)}) / ${roundTo(ns, precision)} × 100 = ${roundTo(slipPct, Math.max(precision, 2))} %`,
+    );
+  }
+
+  const warnings = [
+    warning(
+      "info",
+      "유도전동기 참고",
+      "동기속도·슬립은 유도전동기 관계식입니다. 동기전동기·영구자석 동기기에는 슬립이 없습니다.",
+    ),
+  ];
+
+  if (nr < 0) {
+    warnings.push(
+      warning(
+        "warning",
+        "음수 회전수",
+        "계산된 실제속도가 음수입니다. 입력한 슬립률이 100%를 넘었거나 회전 방향 부호를 확인하세요. 일반적인 정방향 운전 범위가 아닙니다.",
+      ),
+    );
+  } else if (nr > ns + 1e-9) {
+    warnings.push(
+      warning(
+        "warning",
+        "과동기·발전 운전 참고",
+        "실제속도가 동기속도보다 큽니다. 슬립이 음수이며, 유도기가 발전(회생) 운전하거나 측정·입력이 잘못된 경우입니다. 일반 전동 운전의 슬립으로 읽지 마세요.",
+      ),
+    );
+  } else if (Math.abs(nr) < 1e-9) {
+    warnings.push(
+      warning(
+        "warning",
+        "정지(스톨) 참고",
+        "실제속도가 0입니다. 기동 직전·구속 상태의 슬립 100%에 가깝습니다. 정격 운전 슬립이 아닙니다.",
+      ),
+    );
+  }
+
+  if (slipPct > 20 && slipPct <= 100) {
+    warnings.push(
+      warning(
+        "info",
+        "큰 슬립",
+        "슬립이 비교적 큽니다. 기동 중·과부하·구속 근처일 수 있습니다. 정격 슬립은 명판을 확인하세요.",
+      ),
+    );
+  }
+  if (slipPct > 100) {
+    warnings.push(
+      warning(
+        "warning",
+        "슬립 100% 초과",
+        "슬립이 100%를 넘습니다. 역회전·입력 오류·일반적인 유도전동 운전 밖일 수 있습니다.",
+      ),
+    );
+  }
+
+  const slipRounded = roundTo(slipPct, Math.max(precision, 2));
+  const nrRounded = roundTo(nr, Math.max(precision, 2));
+
+  return ok({
+    metrics: [
+      metric("ns", "동기속도 Ns", ns, "r/min", precision),
+      metric("rpm", "실제속도 Nr", nr, "r/min", Math.max(precision, 2), {
+        primary: mode === "from-slip",
+      }),
+      metric("slip", "슬립 s", slipPct, "%", Math.max(precision, 2), {
+        primary: mode !== "from-slip",
+      }),
+      metric("freq", "주파수", f, "Hz", precision),
+      metric("poles", "극수", poles, "극", 0),
+    ],
+    inputSummary: [
+      { label: "계산", value: mode === "from-slip" ? "슬립 → 회전수" : "회전수 → 슬립" },
+      { label: "주파수", value: `${roundTo(f, precision)} Hz` },
+      { label: "극수", value: `${poles} 극` },
+      ...(mode === "from-slip"
+        ? [{ label: "입력 슬립", value: `${roundTo(slipPct, precision)} %` }]
+        : [{ label: "입력 회전수", value: `${roundTo(nr, precision)} r/min` }]),
+    ],
+    interpretation:
+      mode === "from-slip"
+        ? `${poles}극 ${roundTo(f, 0)} Hz에서 동기속도는 ${roundTo(ns, precision)} r/min입니다. 슬립 ${slipRounded}%이면 실제속도는 약 ${nrRounded} r/min입니다. 명판 정격 속도와 비교하세요.`
+        : `${poles}극 ${roundTo(f, 0)} Hz에서 동기속도는 ${roundTo(ns, precision)} r/min입니다. 실제속도 ${nrRounded} r/min이면 슬립은 약 ${slipRounded}%입니다. 정격 슬립·허용 범위는 명판과 제조사 자료를 확인하세요.`,
+    warnings,
+    formulaUsed: "Ns = 120 f / P,  s = (Ns − Nr) / Ns × 100,  Nr = Ns (1 − s/100)",
+    steps,
+    assumptionsUsed: [
+      "전원 주파수가 일정하고 극수가 고정된 유도전동기를 가정합니다.",
+      "슬립은 동기속도 대비 상대 속도로, 토크·전류를 직접 주지 않습니다.",
+    ],
+    reviewStatus: review(
+      "check",
+      "동기속도·슬립 관계식 결과입니다. 정격 슬립·허용 운전 범위·인버터 설정은 명판과 제조사 자료를 확인하세요.",
+    ),
+    followUps: [
+      followUp("모터 정격전류", "/tools/electrical/motor-current", {}),
+      followUp("모터 기동 검토", "/tools/electrical/motor-starting", {}),
+    ],
+  });
+}
