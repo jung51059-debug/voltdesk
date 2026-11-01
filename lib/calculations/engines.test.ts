@@ -18,9 +18,13 @@ import {
 import { SQRT_3, WATTS_PER_HP } from "@/lib/math/units";
 import { searchCatalog } from "@/lib/search";
 import { calculateMotorAcceleration, calculateMotorCurrent, calculateMotorSlip } from "@/lib/calculations/motor";
-import { calculatePowerFactorCorrection, calculatePowerTriangle } from "@/lib/calculations/power-quality";
+import {
+  calculateHarmonicFilterReview,
+  calculatePowerFactorCorrection,
+  calculatePowerTriangle,
+} from "@/lib/calculations/power-quality";
 import { calculateShortCircuit } from "@/lib/calculations/short-circuit";
-import { calculateCableAmpacityReview } from "@/lib/calculations/cable-tools";
+import { calculateBusbar, calculateCableAmpacityReview, calculateCableParallel } from "@/lib/calculations/cable-tools";
 import {
   calculateTransformerCurrents,
   calculateTransformerLoss,
@@ -30,7 +34,7 @@ import { calculateBatteryAh } from "@/lib/calculations/facility-extra";
 import { calculatePhaseUnbalance } from "@/lib/calculations/field-verify";
 import { calculatorGuides, getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { getArticleById, getArticleBySlug } from "@/lib/data/articles";
-import { calculateCtRatio, calculateVfdSizing } from "@/lib/calculations/protection";
+import { calculateCtRatio, calculateRelayIec, calculateVfdSizing } from "@/lib/calculations/protection";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 import { sitemapEntries } from "@/lib/seo";
@@ -1141,6 +1145,100 @@ describe("Phase 2A 가이드·SEO", () => {
       expect(Number(vfd.metrics.find((m) => m.id === "s")?.value)).toBe(43.44);
     }
     expect(JSON.stringify(getCalculatorGuide("vfd-sizing"))).toContain("43.44 kVA");
+  });
+});
+
+describe("Phase 2B 가이드·SEO", () => {
+  const phase2b = [
+    "cable-parallel",
+    "transformer-parallel",
+    "busbar",
+    "protection-relay",
+    "harmonic-filter",
+  ] as const;
+
+  it("5개 도구에 고유 가이드·메타·FAQ가 있다", () => {
+    const paths = new Set(sitemapEntries());
+    const firstLines = new Set(calculatorGuides.map((g) => g.whenToUse[0]));
+    expect(firstLines.size).toBe(calculatorGuides.length);
+
+    for (const slug of phase2b) {
+      const guide = getCalculatorGuide(slug);
+      const tool = getToolBySlug(slug);
+      expect(guide, slug).toBeTruthy();
+      expect(tool?.metaTitle, slug).toBeTruthy();
+      expect(tool?.metaDescription, slug).toBeTruthy();
+      expect(tool?.metaTitle).not.toContain("|");
+      expect(tool?.faqs.length).toBeGreaterThanOrEqual(2);
+      expect(tool?.faqs.length).toBeLessThanOrEqual(3);
+      expect(guide?.walkthrough?.lines.length).toBeGreaterThanOrEqual(3);
+      expect(guide?.lookup?.rows.length).toBeGreaterThanOrEqual(3);
+      expect(guide?.links?.length).toBeGreaterThanOrEqual(3);
+      for (const link of guide?.links ?? []) {
+        expect(paths.has(link.href), `${slug} → ${link.href}`).toBe(true);
+      }
+      for (const id of tool?.relatedArticleIds ?? []) {
+        expect(getArticleById(id), `${slug} article ${id}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("가이드 예시 숫자가 엔진 출력과 같다", () => {
+    const cable = calculateCableParallel(
+      { current: "240", parallel: "2", area: "95", length: "60", lengthUnit: "m", material: "cu" },
+      2,
+    );
+    expect(cable.ok).toBe(true);
+    if (cable.ok) {
+      expect(Number(cable.metrics.find((m) => m.id === "ieach")?.value)).toBe(120);
+      expect(Number(cable.metrics.find((m) => m.id === "req")?.value)).toBe(0.0055);
+    }
+    expect(JSON.stringify(getCalculatorGuide("cable-parallel"))).toContain("120 A");
+
+    const tr = calculateTransformerParallel(
+      { s1: "1000", z1: "6", s2: "1000", z2: "6.5", loadKva: "1500" },
+      2,
+    );
+    expect(tr.ok).toBe(true);
+    if (tr.ok) {
+      expect(Number(tr.metrics.find((m) => m.id === "p1")?.value)).toBe(780);
+      expect(Number(tr.metrics.find((m) => m.id === "p2")?.value)).toBe(720);
+    }
+    expect(JSON.stringify(getCalculatorGuide("transformer-parallel"))).toContain("780 kVA");
+
+    const bb = calculateBusbar(
+      { current: "800", width: "80", thickness: "10", bars: "2", jAllow: "1.6", isc: "25", tsc: "1", material: "cu" },
+      2,
+    );
+    expect(bb.ok).toBe(true);
+    if (bb.ok) {
+      const num = (id: string) => Number(String(bb.metrics.find((m) => m.id === id)?.value).replace(/,/g, ""));
+      expect(num("area")).toBe(1600);
+      expect(num("j")).toBe(0.5);
+      expect(num("i2t")).toBe(625000000);
+    }
+    expect(JSON.stringify(getCalculatorGuide("busbar"))).toContain("0.5 A/mm²");
+
+    const relay = calculateRelayIec(
+      { pickup: "100", faultCurrent: "800", tms: "0.15", curve: "SI" },
+      2,
+    );
+    expect(relay.ok).toBe(true);
+    if (relay.ok) {
+      expect(Number(relay.metrics.find((m) => m.id === "t")?.value)).toBe(0.495);
+    }
+    expect(JSON.stringify(getCalculatorGuide("protection-relay"))).toContain("0.495 s");
+
+    const harm = calculateHarmonicFilterReview(
+      { qc: "100", voltage: "380", voltageUnit: "V", reactorPct: "7" },
+      2,
+    );
+    expect(harm.ok).toBe(true);
+    if (harm.ok) {
+      expect(Number(harm.metrics.find((m) => m.id === "n")?.value)).toBe(3.78);
+      expect(Number(harm.metrics.find((m) => m.id === "ic")?.value)).toBe(151.93);
+    }
+    expect(JSON.stringify(getCalculatorGuide("harmonic-filter"))).toContain("3.78");
   });
 });
 
