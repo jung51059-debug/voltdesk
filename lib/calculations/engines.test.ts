@@ -24,17 +24,20 @@ import {
   calculatePowerTriangle,
 } from "@/lib/calculations/power-quality";
 import { calculateShortCircuit } from "@/lib/calculations/short-circuit";
-import { calculateBusbar, calculateCableAmpacityReview, calculateCableParallel } from "@/lib/calculations/cable-tools";
+import { calculateBusbar, calculateCableAmpacityReview, calculateCableParallel, calculateCableSizing } from "@/lib/calculations/cable-tools";
 import {
   calculateTransformerCurrents,
   calculateTransformerLoss,
   calculateTransformerParallel,
+  calculateTransformerSizing,
 } from "@/lib/calculations/transformer-tools";
 import { calculateBatteryAh } from "@/lib/calculations/facility-extra";
 import { calculatePhaseUnbalance } from "@/lib/calculations/field-verify";
+import { calculatePathVoltageDrop, emptyPathSegment } from "@/lib/calculations/path-voltage-drop";
+import { calculateEarthConductor, calculateLux } from "@/lib/calculations/site-tools";
 import { calculatorGuides, getCalculatorGuide } from "@/lib/data/calculator-guides";
 import { getArticleById, getArticleBySlug } from "@/lib/data/articles";
-import { calculateCtRatio, calculateRelayIec, calculateVfdSizing } from "@/lib/calculations/protection";
+import { calculateCtRatio, calculatePtRatio, calculateRelayIec, calculateSoftStarter, calculateVfdSizing } from "@/lib/calculations/protection";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 import { sitemapEntries } from "@/lib/seo";
@@ -1239,6 +1242,158 @@ describe("Phase 2B 가이드·SEO", () => {
       expect(Number(harm.metrics.find((m) => m.id === "ic")?.value)).toBe(151.93);
     }
     expect(JSON.stringify(getCalculatorGuide("harmonic-filter"))).toContain("3.78");
+  });
+});
+
+describe("Phase 3A-2 가이드·SEO", () => {
+  const phase3a2 = [
+    "motor-current",
+    "single-phase-current",
+    "cable-sizing",
+    "path-voltage-drop",
+    "power-factor",
+    "transformer-sizing",
+    "lux",
+    "soft-starter",
+    "pt-ratio",
+    "earth-conductor",
+  ] as const;
+
+  it("10개 도구에 고유 가이드·메타·FAQ가 있다", () => {
+    const paths = new Set(sitemapEntries());
+    const firstLines = new Set(calculatorGuides.map((g) => g.whenToUse[0]));
+    expect(firstLines.size).toBe(calculatorGuides.length);
+
+    for (const slug of phase3a2) {
+      const guide = getCalculatorGuide(slug);
+      const tool = getToolBySlug(slug);
+      expect(guide, slug).toBeTruthy();
+      expect(tool?.metaTitle, slug).toBeTruthy();
+      expect(tool?.metaDescription, slug).toBeTruthy();
+      expect(tool?.metaTitle).not.toContain("|");
+      expect(tool?.faqs.length).toBeGreaterThanOrEqual(2);
+      expect(tool?.faqs.length).toBeLessThanOrEqual(3);
+      expect(guide?.walkthrough?.lines.length).toBeGreaterThanOrEqual(3);
+      expect(guide?.lookup?.rows.length).toBeGreaterThanOrEqual(3);
+      expect(guide?.links?.length).toBeGreaterThanOrEqual(3);
+      for (const link of guide?.links ?? []) {
+        expect(paths.has(link.href), `${slug} → ${link.href}`).toBe(true);
+      }
+      for (const id of tool?.relatedArticleIds ?? []) {
+        expect(getArticleById(id), `${slug} article ${id}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("가이드 예시 숫자가 엔진 출력과 같다", () => {
+    const motor = calculateMotorCurrent(
+      { phase: "3", power: "30", powerUnit: "kW", voltage: "380", voltageUnit: "V", pf: "0.85", efficiency: "0.92" },
+      2,
+    );
+    expect(motor.ok).toBe(true);
+    if (motor.ok) expect(Number(motor.metrics.find((m) => m.id === "flc")?.value)).toBe(58.29);
+    expect(JSON.stringify(getCalculatorGuide("motor-current"))).toContain("58.29 A");
+
+    const single = calculateSinglePhaseCurrent(
+      { power: "3", powerUnit: "kW", voltage: "220", voltageUnit: "V", pf: "1", efficiency: "1" },
+      2,
+    );
+    expect(single.ok).toBe(true);
+    if (single.ok) expect(Number(single.metrics.find((m) => m.id === "current")?.value)).toBe(13.64);
+    expect(JSON.stringify(getCalculatorGuide("single-phase-current"))).toContain("13.64 A");
+
+    const cable = calculateCableSizing(
+      {
+        mode: "basic",
+        phase: "3",
+        power: "45",
+        powerUnit: "kW",
+        voltage: "380",
+        pf: "0.85",
+        efficiency: "1",
+        demand: "1",
+        length: "80",
+        allowPct: "3",
+        material: "cu",
+      },
+      2,
+    );
+    expect(cable.ok).toBe(true);
+    if (cable.ok) {
+      expect(Number(cable.metrics.find((m) => m.id === "ib")?.value)).toBe(80.44);
+      expect(Number(cable.metrics.find((m) => m.id === "amin")?.value)).toBe(17.11);
+    }
+    expect(JSON.stringify(getCalculatorGuide("cable-sizing"))).toContain("80.44 A");
+
+    const path = calculatePathVoltageDrop(
+      {
+        startKind: "meter-2nd",
+        startLabel: "계량기 2차",
+        kecReview: false,
+        kecScope: "utility",
+        kecSupply: "lv",
+        kecLoad: "other",
+        kecDuty: "normal",
+        segments: [
+          {
+            ...emptyPathSegment(0),
+            lengthM: 80,
+            currentA: 80,
+            resistanceOhmKm: 0.727,
+            phase: "3",
+            voltageV: 380,
+          },
+        ],
+      },
+      2,
+    );
+    expect(path.ok).toBe(true);
+    if (path.ok) {
+      expect(Number(path.metrics.find((m) => m.id === "dv")?.value)).toBe(8.06);
+      expect(Number(path.metrics.find((m) => m.id === "pct")?.value)).toBe(2.12);
+    }
+    expect(JSON.stringify(getCalculatorGuide("path-voltage-drop"))).toContain("8.06 V");
+
+    const pf = calculatePowerFactor({ mode: "from-power", kw: "80", kva: "100" }, 2);
+    expect(pf.ok).toBe(true);
+    if (pf.ok) {
+      expect(Number(pf.metrics.find((m) => m.id === "pf")?.value)).toBe(0.8);
+      expect(Number(pf.metrics.find((m) => m.id === "q")?.value)).toBe(60);
+    }
+    expect(JSON.stringify(getCalculatorGuide("power-factor"))).toContain("60 kvar");
+
+    const trBasic = calculateTransformerSizing({ demandKw: "720", pf: "0.9", mode: "basic" }, 2);
+    expect(trBasic.ok).toBe(true);
+    if (trBasic.ok) expect(Number(String(trBasic.metrics.find((m) => m.id === "need")?.value).replace(/,/g, ""))).toBe(800);
+    const trDetail = calculateTransformerSizing(
+      { demandKw: "720", pf: "0.9", designMargin: "0.1", futureMargin: "0.15", distLoss: "0.03", mode: "detailed" },
+      2,
+    );
+    expect(trDetail.ok).toBe(true);
+    if (trDetail.ok) {
+      expect(Number(String(trDetail.metrics.find((m) => m.id === "need")?.value).replace(/,/g, ""))).toBe(1042.36);
+    }
+    expect(JSON.stringify(getCalculatorGuide("transformer-sizing"))).toContain("1,042.36 kVA");
+
+    const lux = calculateLux({ length: "12", width: "8", lux: "300", lumens: "3200", uf: "0.55", mf: "0.8" }, 2);
+    expect(lux.ok).toBe(true);
+    if (lux.ok) expect(Number(lux.metrics.find((m) => m.id === "n")?.value)).toBe(21);
+    expect(JSON.stringify(getCalculatorGuide("lux"))).toContain("21 개");
+
+    const soft = calculateSoftStarter({ flc: "60", startMult: "3.5", startSec: "8", startsPerHour: "4" }, 2);
+    expect(soft.ok).toBe(true);
+    if (soft.ok) expect(Number(soft.metrics.find((m) => m.id === "istart")?.value)).toBe(210);
+    expect(JSON.stringify(getCalculatorGuide("soft-starter"))).toContain("210 A");
+
+    const pt = calculatePtRatio({ vPrimary: "22900", vPrimaryUnit: "V", vSecondary: "110", vSecondaryUnit: "V" }, 2);
+    expect(pt.ok).toBe(true);
+    if (pt.ok) expect(Number(pt.metrics.find((m) => m.id === "n")?.value)).toBe(208.18);
+    expect(JSON.stringify(getCalculatorGuide("pt-ratio"))).toContain("208.18");
+
+    const earth = calculateEarthConductor({ faultA: "5000", time: "0.5", kFactor: "143" }, 2);
+    expect(earth.ok).toBe(true);
+    if (earth.ok) expect(Number(earth.metrics.find((m) => m.id === "s")?.value)).toBe(24.72);
+    expect(JSON.stringify(getCalculatorGuide("earth-conductor"))).toContain("24.72 mm²");
   });
 });
 

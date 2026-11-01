@@ -11,12 +11,16 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "단상 부하전류 계산기",
     nameEn: "Single-phase load current calculator",
+    pageHeading: "단상 부하전류 계산기",
+    metaTitle: "단상 전류 계산기, 220V kW를 A로 계산",
+    metaDescription:
+      "단상 I=P/(V·PF·η)로 220V 전열·조명·소형 동력 전류를 계산합니다. 3kW·220V·PF1이면 13.64A입니다. 3상 선전류와 식을 구분합니다.",
     description: "단상 유효전력, 전압, 역률, 효율로 부하전류를 계산합니다.",
     longDescription:
-      "단상 전열, 조명, 소형 동력의 정상 운전 전류를 산정합니다. 결과는 참고용 부하전류이며 차단기나 케이블 선정의 최종 기준이 아닙니다.",
+      "단상 전열, 조명, 소형 동력의 정상 운전 전류를 산정합니다. 결과는 참고용 부하전류이며 차단기나 케이블 선정의 최종 기준이 아닙니다. 3상은 √3가 들어가는 3상 전류 계산기를 쓰세요.",
     formulaId: "formula-single-phase-current",
     tags: ["단상", "전류", "부하", "A", "kW"],
-    synonyms: ["단상전류", "single phase current", "1상 전류", "load current", "I=P/V"],
+    synonyms: ["단상전류", "single phase current", "1상 전류", "load current", "I=P/V", "220V 전류"],
     relatedToolIds: [
       "tool-three-phase-current",
       "tool-power-factor",
@@ -28,8 +32,13 @@ export const baseTools: CalculatorTool[] = [
     featured: true,
     recentlyAdded: false,
     status: "published",
-    updatedAt: "2026-08-20",
+    updatedAt: "2026-11-01",
     faqs: [
+      {
+        question: "3상 전류 계산기와 무엇이 다른가요?",
+        answer:
+          "단상은 I=P/(V·PF·η), 3상은 I=P/(√3·V·PF·η)입니다. 380V 3상 선전류가 필요하면 3상 전류 계산기를 쓰세요.",
+      },
       {
         question: "역률을 모르면 어떻게 하나요?",
         answer:
@@ -399,24 +408,37 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "역률 계산기",
     nameEn: "Power factor calculator",
+    pageHeading: "역률 계산기",
+    metaTitle: "역률 계산기, kW·kVA로 PF와 kvar",
+    metaDescription:
+      "kW와 kVA 또는 전압·전류로 역률과 무효전력을 계산합니다. 80kW·100kVA면 PF 0.80, Q 60kvar입니다. 전력 삼각형과 역할을 구분합니다.",
     description: "kW와 kVA, 또는 전압·전류로부터 역률과 무효전력을 구합니다.",
     longDescription:
-      "유효전력과 피상전력의 비로 역률을 계산하고, 무효전력 크기를 함께 표시합니다. 전력량계 값 또는 전압·전류 측정값으로 계산할 수 있습니다.",
+      "유효전력과 피상전력의 비로 역률을 계산하고, 무효전력 크기를 함께 표시합니다. P·Q·S 조합을 바꿔 가며 맞추려면 전력 삼각형 계산기를 쓰세요.",
     formulaId: "formula-power-factor",
     tags: ["역률", "PF", "무효전력", "kvar"],
     synonyms: ["power factor", "cosφ", "코사인파이", "역률개선", "무효전력"],
-    relatedToolIds: ["tool-kw-kva-hp", "tool-transformer-load", "tool-three-phase-current"],
+    relatedToolIds: ["tool-power-triangle", "tool-kw-kva-hp", "tool-transformer-load", "tool-three-phase-current"],
     relatedArticleIds: ["art-pfc-location", "art-power-factor-poor", "art-kw-vs-kva"],
     complexity: "basic",
     featured: true,
     recentlyAdded: false,
     status: "published",
-    updatedAt: "2026-08-20",
+    updatedAt: "2026-11-01",
     faqs: [
+      {
+        question: "전력 삼각형 계산기와 무엇이 다른가요?",
+        answer:
+          "이 화면은 주로 P·S(또는 V·I)로 PF와 Q를 구합니다. 전력 삼각형은 P·Q, P·PF 등 조합을 바꿔 S·Q를 맞출 때 씁니다.",
+      },
       {
         question: "좋은 역률의 기준은 무엇인가요?",
         answer:
-          "한 숫자로 좋은 역률을 정하지 않습니다. 결과의 0.9와 0.7은 Ampory의 참고 안내 조건입니다. 같은 유효전력에서 역률이 낮으면 피상전력과 전류가 커질 수 있습니다. 한전 계약의 합격선은 약관으로 확인하세요.",
+          "한 숫자로 좋은 역률을 정하지 않습니다. 같은 유효전력에서 역률이 낮으면 피상전력과 전류가 커질 수 있습니다. 한전 계약의 합격선은 약관으로 확인하세요.",
+      },
+      {
+        question: "필요 kvar도 나오나요?",
+        answer: "현재 Q 크기만 보여 줍니다. 목표 역률까지 필요한 콘덴서 kvar는 역률 개선 콘덴서 계산기에서 봅니다.",
       },
     ],
   },
@@ -529,9 +551,13 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "경로 전압강하 계산기",
     nameEn: "Path voltage drop calculator",
+    pageHeading: "경로 전압강하 계산기",
+    metaTitle: "경로 전압강하 계산기, 구간 누적 ΔV",
+    metaDescription:
+      "인입부터 부하까지 여러 구간 전압강하를 합산합니다. 80A·80m·0.727Ω/km 한 구간은 8.06V(2.12%)입니다. 한 구간 전용 계산기와 역할을 구분합니다.",
     description: "인입구부터 최종 부하까지 여러 배선 구간의 누적 전압강하를 검토합니다.",
     longDescription:
-      "KEC 232.3.9 관련 검토를 위해 기준점부터 최종 기기까지 구간 ΔV를 합산합니다. 변압기는 필수 구간이 아니며, 표 232.3-1 비교는 누적값과 전체 경로 길이에 적용합니다. 적합 판정이 아닙니다.",
+      "KEC 232.3.9 관련 검토를 위해 기준점부터 최종 기기까지 구간 ΔV를 합산합니다. 한 케이블만 보면 전압강하 계산기를 쓰세요. 표 비교는 선택이며 적합 판정이 아닙니다.",
     formulaId: "formula-path-voltage-drop",
     tags: ["전압강하", "경로", "KEC", "누적", "VD"],
     synonyms: [
@@ -547,7 +573,7 @@ export const baseTools: CalculatorTool[] = [
     featured: true,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-30",
+    updatedAt: "2026-11-01",
     faqs: [
       {
         question: "기존 전압강하 계산기와 무엇이 다른가요?",

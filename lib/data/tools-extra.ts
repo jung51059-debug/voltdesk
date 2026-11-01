@@ -15,9 +15,13 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "모터 정격전류 계산기",
     nameEn: "Motor full load current",
+    pageHeading: "모터 정격전류 계산기",
+    metaTitle: "모터 정격전류 계산기, FLC·kW·HP",
+    metaDescription:
+      "축출력·전압·역률·효율로 모터 FLC를 계산합니다. 3상 30kW·380V·PF0.85·η0.92면 58.29A입니다. 기동전류는 모터 기동 계산기에서 봅니다.",
     description: "단상·3상 모터 출력과 전압·역률·효율로 정격전류(FLC)를 계산합니다.",
     longDescription:
-      "축출력을 기준으로 3상 I = P/(√3 V PF η), 단상 I = P/(V PF η)를 적용합니다. 기동전류 5~8배는 DOL 참고 구간이며 명판이 우선입니다.",
+      "축출력을 기준으로 3상 I = P/(√3 V PF η), 단상 I = P/(V PF η)를 적용합니다. 기동전류·기동 전압강하는 모터 기동 계산기에서 다룹니다. 참고용 5~8배는 DOL 구간이며 명판이 우선입니다.",
     formulaId: "formula-motor-current",
     tags: ["모터", "FLC", "정격전류", "HP"],
     synonyms: ["motor current", "full load current", "전동기 전류", "FLC", "모터전류"],
@@ -33,8 +37,12 @@ export const extraTools: CalculatorTool[] = [
     featured: true,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
+    updatedAt: "2026-11-01",
     faqs: [
+      {
+        question: "모터 기동 계산기와 무엇이 다른가요?",
+        answer: "이 화면은 정상 운전 FLC입니다. 기동배수·기동 전압강하는 모터 기동 계산기에서 봅니다.",
+      },
       { question: "HP로 넣어도 되나요?", answer: "출력 단위에서 HP를 고르면 746 W/HP로 환산합니다. 명판 출력과 전기 입력은 효율만큼 다릅니다." },
       { question: "이 전류로 차단기를 골라도 되나요?", answer: "안 됩니다. 기동방식, 트립 곡선, 케이블 허용전류를 함께 봐야 합니다." },
     ],
@@ -346,8 +354,13 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "LV 케이블 굵기 검토",
     nameEn: "LV cable sizing review",
+    pageHeading: "LV 케이블 굵기 검토",
+    metaTitle: "케이블 굵기 검토, 설계전류·전압강하",
+    metaDescription:
+      "부하로 Ib를 만들고 허용 전압강하로 단면 하한을 역산합니다. 45kW·380V·80m·3%면 Ib 80.44A, amin 17.11mm²입니다. 허용전류표는 내장하지 않습니다.",
     description: "설계전류와 전압강하 기준 최소 단면적을 계산합니다. 허용전류표는 내장하지 않습니다.",
-    longDescription: "기본/상세 모드를 나눕니다. 상세 모드의 보정계수는 사용자가 표준 표에서 넣습니다. 선택 단면적의 전압강하를 함께 검토합니다.",
+    longDescription:
+      "기본/상세 모드를 나눕니다. 결과가 KEC 적합·선정 굵기를 보증하지 않습니다. 표 Iz·보정은 케이블 허용전류 검토에서 사용자가 넣습니다.",
     formulaId: "formula-cable-sizing",
     tags: ["케이블", "전선", "굵기", "단면적"],
     synonyms: ["cable sizing", "전선 굵기", "케이블 사이즈", "wire", "배선"],
@@ -357,9 +370,14 @@ export const extraTools: CalculatorTool[] = [
     featured: true,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
+    updatedAt: "2026-11-01",
     faqs: [
-      { question: "결과가 곧 선정 굵기인가요?", answer: "아닙니다. 허용전류·단락내량·보호협조가 빠졌습니다." },
+      {
+        question: "허용전류 계산기와 무엇이 다른가요?",
+        answer:
+          "이 화면은 Ib·전압강하로 단면 하한을 봅니다. 허용전류 검토는 표 Iz와 보정계수로 Ib/Iz'를 비교합니다. 표를 내장하지 않습니다.",
+      },
+      { question: "결과가 곧 선정 굵기인가요?", answer: "아닙니다. 허용전류·단락내량·보호협조·포설 조건이 빠졌습니다. KEC 적합을 보증하지 않습니다." },
       { question: "포설방식을 고르면 보정이 되나요?", answer: "기록만 합니다. 보정계수는 표 값을 직접 입력해야 합니다." },
     ],
   }),
@@ -475,8 +493,13 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "변압기 용량 산정",
     nameEn: "Transformer sizing",
+    pageHeading: "변압기 용량 산정",
+    metaTitle: "변압기 용량 산정, 수요 kW→필요 kVA",
+    metaDescription:
+      "최대수요·역률·여유·손실로 필요 kVA와 상용 후보를 봅니다. 720kW·PF0.9 기본은 800kVA, 상세 여유 시 약 1042kVA입니다. 운전 부하율과는 다릅니다.",
     description: "최대수요, 역률, 여유, 손실로 필요 kVA와 상용 용량 후보를 제시합니다.",
-    longDescription: "1·2차 정격전류와 명판 %Z가 있으면 2차 단락전류 근사도 표시합니다. 상용 눈금은 의무 용량표가 아닙니다.",
+    longDescription:
+      "기본 모드는 여유·손실을 넣지 않습니다. 상세에서 설계·증설 여유와 배전손실을 곱합니다. 이미 설치된 변압기 부하율은 부하율 계산기를 쓰세요.",
     formulaId: "formula-transformer-sizing",
     tags: ["변압기", "kVA", "용량"],
     synonyms: ["transformer sizing", "변압기 용량", "TR 용량", "필요 kVA"],
@@ -486,8 +509,21 @@ export const extraTools: CalculatorTool[] = [
     featured: true,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
-    faqs: faq("%Z는 어디서 보나요?", "변압기 명판 또는 시험성적서의 임피던스 전압입니다. 없으면 단락 근사를 끄세요."),
+    updatedAt: "2026-11-01",
+    faqs: [
+      {
+        question: "변압기 부하율 계산기와 무엇이 다른가요?",
+        answer: "이 화면은 수요에서 필요 kVA를 역산합니다. 부하율 계산기는 이미 있는 명판 대비 운전 %를 봅니다.",
+      },
+      {
+        question: "여유율은 어디에 넣나요?",
+        answer: "상세 모드의 설계·증설 여유와 배전손실에 넣습니다. Ampory가 표준 여유율을 정하지 않습니다.",
+      },
+      {
+        question: "%Z는 어디서 보나요?",
+        answer: "변압기 명판 또는 시험성적서의 임피던스 전압입니다. 없으면 단락 근사를 끄세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-transformer-current",
@@ -677,8 +713,13 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "PT / VT 변성비",
     nameEn: "PT VT ratio",
+    pageHeading: "PT / VT 변성비",
+    metaTitle: "PT·VT 변성비 계산기, 22.9kV/110V",
+    metaDescription:
+      "1차·2차 전압으로 PT/VT 변성비 n=V1/V2를 계산합니다. 22.9kV/110V면 n=208.18입니다. CT 변류비와 역할을 구분합니다.",
     description: "1차·2차 전압으로 변성비를 계산합니다.",
-    longDescription: "계기용 변압기의 부담·계급은 포함하지 않습니다.",
+    longDescription:
+      "계기용 변압기의 부담·계급·과도 특성은 포함하지 않습니다. 전류 변류비는 CT 계산기를 쓰세요.",
     formulaId: "formula-pt-ratio",
     tags: ["PT", "VT", "변성기"],
     synonyms: ["potential transformer", "voltage transformer", "PT비", "계기용 변압기"],
@@ -688,8 +729,18 @@ export const extraTools: CalculatorTool[] = [
     featured: false,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
-    faqs: faq("2차가 110 V인 이유?", "계기·계전기 입력 정격과 맞추기 위한 관례입니다."),
+    updatedAt: "2026-11-01",
+    faqs: [
+      {
+        question: "CT 변류비 계산기와 무엇이 다른가요?",
+        answer: "PT는 전압 변성비, CT는 전류 변류비입니다. 2차 전류·부담 환산은 CT 화면에서 봅니다.",
+      },
+      { question: "2차가 110 V인 이유?", answer: "계기·계전기 입력 정격과 맞추기 위한 관례입니다." },
+      {
+        question: "이 비로 PT를 선정해도 되나요?",
+        answer: "변성비 숫자만 계산합니다. 오차 계급·부담·퓨즈는 제조사 자료로 선정하세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-vfd-sizing",
@@ -738,19 +789,34 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "소프트스타터 간이 검토",
     nameEn: "Soft starter review",
+    pageHeading: "소프트스타터 간이 검토",
+    metaTitle: "소프트스타터 검토, 기동전류·듀티",
+    metaDescription:
+      "FLC·기동배수·시간·횟수로 기동전류와 열적 듀티 지표를 봅니다. 60A·3.5배면 I_start 210A입니다. VFD 용량 검토와 목적이 다릅니다.",
     description: "FLC, 기동배수, 시간, 시간당 횟수로 열적 듀티 지표를 만듭니다.",
-    longDescription: "제조사 열모델이 아닙니다. 카탈로그의 기동 횟수 제한이 우선입니다.",
+    longDescription:
+      "제조사 열모델이 아닙니다. 카탈로그의 기동 횟수 제한이 우선입니다. 운전 중 주파수 제어는 VFD 용량 검토를 쓰세요.",
     formulaId: "formula-soft-starter",
     tags: ["소프트스타터", "기동"],
     synonyms: ["soft starter", "소프트 스타터"],
-    relatedToolIds: ["tool-motor-starting", "tool-vfd-sizing"],
+    relatedToolIds: ["tool-motor-starting", "tool-vfd-sizing", "tool-motor-current"],
     relatedArticleIds: ["art-vfd"],
     complexity: "intermediate",
     featured: false,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
-    faqs: faq("지표의 단위는?", "상대 비교용 무차원에 가깝습니다. 합격선이 없습니다."),
+    updatedAt: "2026-11-01",
+    faqs: [
+      {
+        question: "VFD 용량 검토와 무엇이 다른가요?",
+        answer: "소프트스타터는 기동 완화·듀티 지표용입니다. VFD는 운전 중 주파수·용량 하한을 봅니다.",
+      },
+      { question: "지표의 단위는?", answer: "상대 비교용 무차원에 가깝습니다. 합격선이 없습니다." },
+      {
+        question: "기동 전압강하도 나오나요?",
+        answer: "나오지 않습니다. 배선 기동 전압강하는 모터 기동 계산기에서 봅니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-protection-relay",
@@ -799,8 +865,13 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "조도(루멘법) 계산기",
     nameEn: "Lumen method lux",
+    pageHeading: "조도(루멘법) 계산기",
+    metaTitle: "조도·루멘법 계산기, 등기구 수",
+    metaDescription:
+      "면적·목표 조도·광속·이용률·유지율로 등기구 수를 산정합니다. 12×8m·300lx·3200lm이면 21개입니다. 배광·균제도는 포함하지 않습니다.",
     description: "공간 크기와 목표 조도, 광속, 이용률·유지율로 등기구 수를 산정합니다.",
-    longDescription: "평균조도 1차 산정입니다. 균제도·글레어는 포함하지 않습니다.",
+    longDescription:
+      "평균조도 1차 산정입니다. 실제 배광·유지율·설치 환경에 따라 현장 조도가 달라질 수 있습니다. 균제도·글레어는 포함하지 않습니다.",
     formulaId: "formula-lux",
     tags: ["조도", "lux", "조명", "루멘"],
     synonyms: ["lux calculator", "조도 계산", "루멘법", "조명계산"],
@@ -810,8 +881,18 @@ export const extraTools: CalculatorTool[] = [
     featured: true,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
-    faqs: faq("사무실 300 lx가 규정인가요?", "작업면 권장 범위의 예입니다. 해당 장소 기준을 확인하세요."),
+    updatedAt: "2026-11-01",
+    faqs: [
+      { question: "사무실 300 lx가 규정인가요?", answer: "작업면 권장 범위의 예입니다. 해당 장소 기준을 확인하세요." },
+      {
+        question: "계산 수량대로 달면 되나요?",
+        answer: "평균조도 1차 수량입니다. 배치·균제도·눈부심·배광은 별도 설계가 필요합니다.",
+      },
+      {
+        question: "이용률·유지율은 어디서 얻나요?",
+        answer: "방 형상·반사율·배광 표와 유지관리 계수표에서 넣습니다. Ampory가 표를 내장하지 않습니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-lighting-density",
@@ -909,8 +990,13 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "접지도체 굵기 (단열식)",
     nameEn: "Earthing conductor adiabatic",
+    pageHeading: "접지도체 굵기 (단열식)",
+    metaTitle: "접지도체 굵기 계산기, 단열식 S=(I/k)√t",
+    metaDescription:
+      "고장전류·차단시간과 사용자 k로 PE 단열식 단면을 봅니다. 5kA·0.5s·k143이면 24.72mm²입니다. 적용 기준·보호장치 조건을 확인하세요.",
     description: "KEC 142.3.2 단열식과 별도 보호도체의 설치조건 최소단면적을 분리해 검토합니다. k는 사용자가 넣습니다.",
-    longDescription: "국내 적용 관련: KEC 142.3.2 보호도체 최소 단면적. 관련 표준: KS C IEC 60364-5-54. 단열식은 차단시간 5초 이하에만 적용합니다. 별도 보호도체이면 기계적 최소(Cu 2.5/4, Al 16)를 따로 보여 줍니다. 표 142.3-1은 시행본 전체를 확인하기 전에는 내장하지 않습니다.",
+    longDescription:
+      "국내 적용 관련: KEC 142.3.2 보호도체 최소 단면적. 관련 표준: KS C IEC 60364-5-54. 단열식은 차단시간 5초 이하에만 적용합니다. 접지저항 Ω 추정은 접지봉 계산기를 쓰세요.",
     formulaId: "formula-earth-conductor",
     tags: ["접지도체", "PE", "굵기"],
     synonyms: ["earth conductor", "접지선 굵기", "PE선"],
@@ -920,7 +1006,7 @@ export const extraTools: CalculatorTool[] = [
     featured: false,
     recentlyAdded: true,
     status: "published",
-    updatedAt: "2026-08-29",
+    updatedAt: "2026-11-01",
     faqs: [
       {
         question: "k를 모르면 어떻게 하나요?",
