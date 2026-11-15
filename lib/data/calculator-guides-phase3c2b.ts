@@ -230,7 +230,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "nodes", text: "utility·transformer·bus 등 종류와 이름, 연결할 계산기 href." },
+      { label: "nodes", text: "전원·변압기·모선 등 설비 종류와 이름, 연결할 계산기 주소." },
       { label: "edges", text: "출발→도착 연결과 케이블·모선 등의 연결 종류입니다. 임피던스·길이는 저장만 하고 계산하지 않습니다." },
     ],
     walkthroughs: [

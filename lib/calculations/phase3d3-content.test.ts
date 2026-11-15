@@ -10,12 +10,16 @@ import { getPublishedTools, getToolBySlug } from "@/lib/data/tools";
 import { formulaSectionTitle, getToolContentProfile, shouldShowFormulaBlock, uniqueContentLines } from "@/lib/data/tool-content-profile";
 import { calculateDutyCycle, parseTrendText, analyzeTrend } from "@/lib/calculations/field-verify";
 
-const internalNames = /unitLabel|denominator|parseTrendText|analyzeTrend|calculate[A-Z]\w*|rowPowers|summarizeLoads|phaseImbalance|phaseAnalysis|SLD_KIND_LINKS|calculatorHref|\b\w+\.test\b|\b\w+\.ts\b|voltdesk:|\bSAMPLE\b|\bprecision\b|\binterpretation\b|runHours|intervalHours|periodHours|onHours|offHours|baselineKw|proposedKw|capitalCost|spanMin|spanMax|thisKwh|lastKwh/;
+const internalNames = /\b(?:href|slug|nodeId|edgeId|fromNodeId|toNodeId|formulaId|toolId)\b|unitLabel|denominator|parseTrendText|analyzeTrend|calculate[A-Z]\w*|rowPowers|summarizeLoads|phaseImbalance|phaseAnalysis|SLD_KIND_LINKS|calculatorHref|\b\w+\.test\b|\b\w+\.ts\b|voltdesk:|\bSAMPLE\b|\bprecision\b|\binterpretation\b|runHours|intervalHours|periodHours|onHours|offHours|baselineKw|proposedKw|capitalCost|spanMin|spanMax|thisKwh|lastKwh/;
+// 표시 문장만 검사하며 링크 주소·식별자·HTML 속성·JSON-LD 키는 제외합니다.
 function strings(value: unknown): string[] {
   if (typeof value === "string") return [value];
-  if (value && typeof value === "object") return Object.values(value).flatMap(strings);
+  if (value && typeof value === "object") {
+    return Object.entries(value).filter(([key]) => key !== "href" && key !== "slug").flatMap(([, item]) => strings(item));
+  }
   return [];
 }
+const withoutAddresses = (text: string) => text.replace(/https?:\/\/[^\s<>"']+|\/(?:tools|references)\/[^\s<>"']+/g, "");
 const escapeHtml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
 
 describe("Phase 3D-3 공개 도구 68종 콘텐츠 렌더링", () => {
@@ -24,7 +28,7 @@ describe("Phase 3D-3 공개 도구 68종 콘텐츠 렌더링", () => {
     const formula = getFormulaById(tool.formulaId)!;
     expect(guide, tool.slug).toBeTruthy();
     const content = strings(guide).concat(strings(tool.faqs));
-    for (const value of content) expect(value, tool.slug).not.toMatch(internalNames);
+    for (const value of content) expect(withoutAddresses(value), tool.slug).not.toMatch(internalNames);
     const explain = renderToStaticMarkup(createElement(CalculatorExplain, { slug: tool.slug, formula }));
     const disclosure = renderToStaticMarkup(createElement(TechnicalDisclosure, { slug: tool.slug, formula, variant: "compact" }));
     const html = explain + disclosure;
@@ -47,6 +51,28 @@ describe("Phase 3D-3 공개 도구 68종 콘텐츠 렌더링", () => {
 });
 
 describe("Phase 3D-3 개별 콘텐츠 회귀", () => {
+  it("SLD 저장 범위의 두 문장을 사용자 용어로 표시한다", () => {
+    const guide = getCalculatorGuide("sld")!;
+    expect(guide.inputMeaning.some((item) => item.text === "전원·변압기·모선 등 설비 종류와 이름, 연결할 계산기 주소.")).toBe(true);
+    expect(getToolBySlug("sld")!.faqs.some((faq) => faq.answer === "지원하지 않습니다. 설비와 연결 관계 목록, 관련 계산기 주소만 저장합니다. 캔버스에서 직접 편집하는 기능은 제공하지 않습니다.")).toBe(true);
+    expect(strings(guide).concat(strings(getToolBySlug("sld")!.faqs)).join(" ")).not.toContain("계산기 href");
+  });
+  it("설명 문장의 단순 필드명과 구현 식별자를 검출한다", () => {
+    for (const name of ["href", "slug", "nodeId", "edgeId", "fromNodeId", "toNodeId", "calculatorHref", "formulaId", "toolId"]) {
+      expect(`연결할 계산기 ${name}를 저장합니다.`).toMatch(internalNames);
+    }
+  });
+  it("링크 주소와 구조화 데이터의 정상 키를 설명 문장으로 검사하지 않는다", () => {
+    const text = strings({ slug: "slug", links: [{ href: "/tools/nodeId", label: "계산기 주소", text: "연결할 도구입니다." }], jsonLd: { "@type": "WebApplication", href: "https://example.com/edgeId", slug: "slug" } });
+    for (const line of text) expect(withoutAddresses(line)).not.toMatch(internalNames);
+    expect(withoutAddresses("참고: https://example.com/nodeId?slug=sld 및 /tools/edgeId")).not.toMatch(internalNames);
+  });
+  it("정상 기술 용어와 단위 및 렌더링된 HTML 속성은 유지한다", () => {
+    expect("노드·엣지, CSV, JSON, IEC, kW, kVA, r/min").not.toMatch(internalNames);
+    const html = renderToStaticMarkup(createElement(CalculatorExplain, { slug: "sld", formula: getFormulaById("formula-sld")! }));
+    expect(html).toContain('href="/');
+    expect(strings(getCalculatorGuide("sld")).join(" ")).not.toMatch(internalNames);
+  });
   it("회전수의 분 단위를 통계 최솟값과 혼동해 치환하지 않는다", () => {
     const faqs = JSON.stringify(getToolBySlug("motor-slip")!.faqs);
     expect(faqs).toContain("1800 r/min");

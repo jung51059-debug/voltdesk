@@ -1796,7 +1796,7 @@ export const extraTools: CalculatorTool[] = [
     faqs: [
       {
         question: "단선결선도를 자동으로 그리나요?",
-        answer: "하지 않습니다. 노드·엣지 목록과 계산기 href만 저장합니다. 캔버스 편집은 후순위입니다.",
+        answer: "지원하지 않습니다. 설비와 연결 관계 목록, 관련 계산기 주소만 저장합니다. 캔버스에서 직접 편집하는 기능은 제공하지 않습니다.",
       },
       {
         question: "KEC·IEC 심사를 하나요?",
