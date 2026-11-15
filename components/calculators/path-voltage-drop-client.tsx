@@ -123,8 +123,10 @@ export function PathVoltageDropClient() {
   useEffect(() => {
     pushRecentTool("tool-path-voltage-drop");
     const handed = draftFromHandoff(parseHandoff(searchParams));
-    if (handed) setDraft(handed);
-    setHydrated(true);
+    queueMicrotask(() => {
+      if (handed) setDraft(handed);
+      setHydrated(true);
+    });
   }, [searchParams]);
 
   useEffect(() => {

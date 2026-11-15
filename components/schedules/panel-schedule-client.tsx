@@ -26,7 +26,7 @@ export function PanelScheduleClient() {
   const formula = getFormulaById("formula-panel-schedule");
   useEffect(() => {
     const loaded = store.load();
-    setRows(loaded.length ? loaded : [empty()]);
+    queueMicrotask(() => setRows(loaded.length ? loaded : [empty()]));
     pushRecentTool("tool-panel-schedule");
   }, []);
   useEffect(() => {

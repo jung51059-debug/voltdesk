@@ -171,12 +171,14 @@ export function CalculatorWorkspace({
   useEffect(() => {
     const incoming = parseHandoff(new URLSearchParams(window.location.search));
     if (Object.keys(incoming).length === 0) return;
-    setValues((current) => {
-      const next = { ...current, ...incoming };
-      if (incoming.mode === "detailed") setShowAdvanced(true);
-      const engine = engines[tool.slug];
-      if (engine) setOutcome(engine(next, prefs.precision));
-      return next;
+    queueMicrotask(() => {
+      setValues((current) => {
+        const next = { ...current, ...incoming };
+        if (incoming.mode === "detailed") setShowAdvanced(true);
+        const engine = engines[tool.slug];
+        if (engine) setOutcome(engine(next, prefs.precision));
+        return next;
+      });
     });
   }, [tool.slug, prefs.precision]);
 

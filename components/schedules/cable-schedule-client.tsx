@@ -40,7 +40,7 @@ export function CableScheduleClient() {
   const formula = getFormulaById("formula-cable-schedule");
   useEffect(() => {
     const loaded = store.load();
-    setRows(loaded.length ? loaded : [empty()]);
+    queueMicrotask(() => setRows(loaded.length ? loaded : [empty()]));
     pushRecentTool("tool-cable-schedule");
   }, []);
   useEffect(() => {

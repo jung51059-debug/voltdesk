@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { EngineeringDisclaimer } from "@/components/calculators/engineering-disclaimer";
@@ -106,7 +107,7 @@ export default function ElectricalQrCardPage() {
       <section className="mt-10">
         <h2 className="text-xl font-semibold">QR 카드 미리보기</h2>
         <a href={previewSrc} className="mt-4 block">
-          <img
+          <Image
             src={previewSrc}
             alt="Ampory 현장용 전기 계산기 QR 카드 A4 미리보기"
             width={previewWidth}

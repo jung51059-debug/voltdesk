@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useToast } from "@/components/providers/toast-provider";
 import {
@@ -37,12 +37,12 @@ export function ResultHandoff({
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<SiteNotes>({ site: "", equipment: "", memo: "" });
   const [job, setJob] = useState<PrintJob | null>(null);
-  const [mounted, setMounted] = useState(false);
   const printed = useRef<number | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     if (!open) return;

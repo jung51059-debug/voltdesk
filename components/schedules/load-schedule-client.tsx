@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { EngineeringDisclaimer } from "@/components/calculators/engineering-disclaimer";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
@@ -84,6 +85,7 @@ function ReviewLinks({
 }
 
 export function LoadScheduleClient() {
+  const router = useRouter();
   const [rows, setRows] = useState<LoadRow[]>([]);
   const [equipment, setEquipment] = useState<LoadEquipment>({ transformerKva: 0, generatorKw: 0 });
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -94,8 +96,10 @@ export function LoadScheduleClient() {
 
   useEffect(() => {
     const doc = parseLoadScheduleDocument(readJson<unknown>(LOAD_KEY, []));
-    setRows(doc.rows.length ? doc.rows : [emptyLoadRow()]);
-    setEquipment(doc.equipment);
+    queueMicrotask(() => {
+      setRows(doc.rows.length ? doc.rows : [emptyLoadRow()]);
+      setEquipment(doc.equipment);
+    });
     pushRecentTool("tool-load-schedule");
   }, []);
 
@@ -139,7 +143,7 @@ export function LoadScheduleClient() {
       return;
     }
     writeJson("voltdesk:panel-schedule", next);
-    window.location.href = "/tools/schedules/panel";
+    router.push("/tools/schedules/panel");
   }
 
   function writeCableSchedule() {
@@ -149,7 +153,7 @@ export function LoadScheduleClient() {
       return;
     }
     writeJson("voltdesk:cable-schedule", next);
-    window.location.href = "/tools/schedules/cable";
+    router.push("/tools/schedules/cable");
   }
 
   const selectedPanelGroup = panelFilter ? panels.find((p) => p.key === panelFilter) : null;
