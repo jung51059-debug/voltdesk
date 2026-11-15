@@ -914,6 +914,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "조명 전력밀도",
     nameEn: "Lighting power density",
+    metaTitle: "조명 전력밀도 계산기, W/m²·LED 절감량",
+    metaDescription: "조명 합산 W와 면적 m²로 LPD를 계산하고 교체 전후 전력 차이로 절감 kWh를 비교합니다. lux 조도 성능과 구분하며 배광·유지율 검토가 필요합니다.",
     description: "W/m²와 기존 대비 LED 교체 절감 참고를 계산합니다.",
     longDescription: "건축 에너지 기준 적합 판정이 아닙니다. 요금은 평균 단가 곱셈입니다.",
     formulaId: "formula-lpd",
@@ -926,7 +928,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("법규 한도와 비교하려면?", "해당 고시·인증 문서를 직접 대조하세요."),
+    faqs: [
+      {
+        "question": "W/m²를 lux로 바꿀 수 있나요?",
+        "answer": "전력밀도만으로 조도를 정할 수 없습니다. 등기구 광속·배광·배치·이용률·유지율이 필요합니다."
+      },
+      {
+        "question": "조명 전력에는 무엇을 넣나요?",
+        "answer": "해당 구역 조명의 실제 입력전력을 합산합니다. 드라이버 손실 포함 여부와 면적 범위를 같은 기준으로 맞추세요."
+      },
+      {
+        "question": "절감 금액이 실제 청구서와 같나요?",
+        "answer": "전력 차이×연간 시간×사용자 단가의 참고입니다. 기본요금·계약종별·시간대별 요금은 별도입니다."
+      },
+      {
+        "question": "LPD가 낮으면 설계가 완료되나요?",
+        "answer": "조도·균제도·눈부심은 별도로 확인해야 합니다. 배광 자료와 유지율을 반영한 조명 설계가 필요합니다."
+      }
+    ],
   }),
   tool({
     id: "tool-solar-pv",
@@ -936,6 +955,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "태양광 기본 설계",
     nameEn: "Solar PV sizing",
+    metaTitle: "태양광 용량 계산기, 일일 kWh로 kWp·패널 수",
+    metaDescription: "일일 사용량·PSH·시스템 효율로 필요 kWp와 패널 수를 산정합니다. 설비용량과 발전량을 구분하고 계절·손실 조건을 검토하세요. 발전량·수익을 보증하지 않습니다.",
     description: "일일 사용량과 PSH로 필요 kWp, 패널 수, 인버터·배터리를 추정합니다.",
     longDescription: "계통연계 / 독립형 / 하이브리드를 나눕니다. 일사량은 사용자가 넣습니다.",
     formulaId: "formula-solar",
@@ -948,7 +969,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("한국 PSH 기본값이 있나요?", "지역·월별로 달라 내장하지 않았습니다. 기상 자료를 넣으세요."),
+    faqs: [
+      {
+        "question": "kWp와 kWh는 어떻게 다른가요?",
+        "answer": "kWp는 모듈 설비의 정격용량, kWh는 일정 기간의 에너지입니다. 같은 용량도 일사량·계절·손실에 따라 발전량이 달라집니다."
+      },
+      {
+        "question": "PSH는 낮 시간 전체인가요?",
+        "answer": "일사량을 정격 일사 강도의 시간으로 환산한 값입니다. 지역·월별 자료를 사용하며 단순 일조시간과 구분하세요."
+      },
+      {
+        "question": "패널 수는 어떻게 반올림하나요?",
+        "answer": "반올림 전 필요 kWp를 패널 정격 W로 나눠 올림합니다. 표시된 kWp를 다시 나누면 경계에서 다를 수 있습니다."
+      },
+      {
+        "question": "예상 발전량과 수익이 보장되나요?",
+        "answer": "입력 PSH·효율과 올림한 패널 수의 에너지 수지 참고입니다. 시간별 기상·음영·정산을 모델링하지 않아 발전량·수익 보증에 쓸 수 없습니다."
+      }
+    ],
   }),
   tool({
     id: "tool-grounding-rod",
@@ -980,6 +1018,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "토양저항률 (Wenner)",
     nameEn: "Soil resistivity",
+    metaTitle: "토양저항률 계산기, Wenner 4전극 겉보기 ρ",
+    metaDescription: "Wenner 4전극법의 전극 간격과 측정 저항으로 겉보기 토양저항률을 환산합니다. 층상·수분·계절 영향과 접지 설계의 차이를 확인하세요.",
     description: "4극법 측정 저항과 간격으로 겉보기 저항률을 환산합니다.",
     longDescription: "층상 해석은 하지 않습니다.",
     formulaId: "formula-soil",
@@ -992,7 +1032,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("a를 여러 개 재면?", "심도별 ρ를 그려 접지 설계에 씁니다. 이 도구는 한 점 환산입니다."),
+    faqs: [
+      {
+        "question": "전극 간격이 측정 깊이인가요?",
+        "answer": "간격과 깊이는 일대일 관계가 아닙니다. 여러 간격의 겉보기 저항률을 함께 해석해야 층상 구조를 검토할 수 있습니다."
+      },
+      {
+        "question": "측정 저항과 토양저항률은 같은가요?",
+        "answer": "측정 저항 R은 Ω, 환산 저항률 ρ는 Ω·m입니다. 접지극의 접지저항과도 구분합니다."
+      },
+      {
+        "question": "비 온 뒤 측정값을 설계에 써도 되나요?",
+        "answer": "수분과 계절에 따라 달라지므로 측정 조건을 기록하고 건조기 등 다른 조건을 함께 검토하세요."
+      },
+      {
+        "question": "이 값으로 접지저항을 보증할 수 있나요?",
+        "answer": "한 점의 겉보기 저항률 환산입니다. 접지극 형상·층상 모델·시공 후 측정은 별도입니다."
+      }
+    ],
   }),
   tool({
     id: "tool-earth-conductor",
@@ -1090,6 +1147,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "발전기 연료 사용량",
     nameEn: "Generator fuel",
+    metaTitle: "발전기 연료 계산기, 운전 kW·시간으로 L 추정",
+    metaDescription: "부하 kW·운전시간·L/kWh 또는 제조사 L/h로 발전기 연료 사용량을 계산합니다. 부하율별 소비 곡선과 단순 추정의 차이, 저장량 검토 조건을 확인하세요.",
     description: "일반 추정(L/kWh)과 제조사 L/h 모드를 구분해 연료량을 계산합니다.",
     longDescription: "기종별 편차가 커서 추정 모드 결과를 계약 물량으로 쓰지 마세요.",
     formulaId: "formula-generator-fuel",
@@ -1102,7 +1161,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("0.28 L/kWh는 표준인가요?", "아닙니다. 사용자가 바꾸는 추정 원단위 기본값입니다."),
+    faqs: [
+      {
+        "question": "0.28 L/kWh가 모든 발전기에 맞나요?",
+        "answer": "수정 가능한 추정 원단위입니다. 기종·부하율별 제조사 연료 소비 곡선을 우선하세요."
+      },
+      {
+        "question": "부하가 절반이면 연료도 절반인가요?",
+        "answer": "고정 원단위 모드에서는 비례하지만 실제 경부하·무부하 소비는 비례하지 않을 수 있습니다."
+      },
+      {
+        "question": "제조사 L/h 모드는 부하에 따라 보간하나요?",
+        "answer": "입력 L/h에 시간만 곱합니다. 해당 부하율의 L/h를 사용자가 선정해야 하며 곡선 보간은 하지 않습니다."
+      },
+      {
+        "question": "계산량만큼 탱크를 마련하면 되나요?",
+        "answer": "유효 저장량·운전시간·보충 계획·사용 불가 잔량·현장 보관 조건을 별도로 검토해야 합니다."
+      }
+    ],
   }),
   tool({
     id: "tool-generator-start-vd",
@@ -1112,6 +1188,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "발전기 기동 전압강하",
     nameEn: "Generator motor starting VD",
+    metaTitle: "발전기 기동 전압강하 계산기, 기동 kVA·Xpu",
+    metaDescription: "발전기 정격 kVA·Xpu·모터 기동 kVA로 전압강하율을 근사합니다. 케이블 경로 전압강하와 구분하며 AVR·과도응답·기동방식의 상세 해석은 포함하지 않습니다.",
     description: "단순 리액턴스 모델로 모터 기동 시 발전기 전압강하율을 추정합니다.",
     longDescription: "AVR 응답을 무시합니다. 제조사 기동 곡선이 우선입니다.",
     formulaId: "formula-generator-start-vd",
@@ -1124,7 +1202,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("허용 20%인가요?", "프로젝트·제어전원 허용치입니다. 여기서 정하지 않습니다."),
+    faqs: [
+      {
+        "question": "일반 전압강하 계산과 무엇이 다른가요?",
+        "answer": "이 도구는 발전기 내부 리액턴스와 기동 부하의 비를 봅니다. 케이블 길이·저항에 따른 경로 강하와 다릅니다."
+      },
+      {
+        "question": "모터 정격 kVA를 넣으면 되나요?",
+        "answer": "정상 운전 정격이 아니라 기동 순간의 피상전력이 필요합니다. 실제 기동방식과 제조사 자료로 확인하세요."
+      },
+      {
+        "question": "AVR과 소프트스타터 효과를 계산하나요?",
+        "answer": "시간에 따른 AVR·과도응답이나 방식별 기동 곡선은 계산하지 않습니다. 방식에 맞는 기동 kVA를 입력해야 합니다."
+      },
+      {
+        "question": "계산 결과가 허용치 이내면 기동 가능한가요?",
+        "answer": "가속 토크·시간·주파수 변동·제어전원 유지 등 추가 검토가 필요합니다. 허용치나 기동 성공을 판정하지 않습니다."
+      }
+    ],
   }),
   tool({
     id: "tool-battery-capacity",
@@ -1160,6 +1255,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "설비 부하율·가동률",
     nameEn: "Equipment load factor",
+    metaTitle: "설비 부하율·가동률 계산기, 평균 kW·운전시간",
+    metaDescription: "명판 정격 대비 평균 kW의 설비 부하율과 기간 대비 운전시간의 가동률을 계산합니다. 수요율과 구분하고 실측 평균·운전기록의 기준을 맞춰 비교하세요.",
     description: "정격 대비 평균 전력과 운전시간 비율을 계산합니다.",
     longDescription: "향후 설비별 이력 저장을 염두에 둔 단순 지표입니다.",
     formulaId: "formula-equipment-load",
@@ -1172,7 +1269,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("계정에 저장되나요?", "지금은 브라우저에서 계산만 합니다. 계정 기능은 이후 확장 예정입니다."),
+    faqs: [
+      {
+        "question": "부하율과 가동률은 같은가요?",
+        "answer": "이 도구의 설비 부하율은 평균 kW/정격 kW, 가동률은 운전시간/기간시간입니다. 전력 크기와 시간의 비율을 나누어 봅니다."
+      },
+      {
+        "question": "수요율도 계산하나요?",
+        "answer": "수요율은 최대수요전력/설비용량으로 구분합니다. 최대수요를 입력받지 않으므로 여기서는 계산하지 않습니다."
+      },
+      {
+        "question": "명판 축출력과 계측 입력 kW를 비교해도 되나요?",
+        "answer": "동일한 전력 기준으로 맞춰야 합니다. 모터 축출력과 전기 입력을 효율 검토 없이 직접 비교하면 해석이 왜곡됩니다."
+      },
+      {
+        "question": "평균값은 어떻게 준비하나요?",
+        "answer": "운전 중 평균인지 전체 기간 평균인지 기록하고 같은 정의로 비교하세요. 전력계 추세와 운전시간 기록을 함께 확인합니다."
+      }
+    ],
   }),
   tool({
     id: "tool-energy-intensity",
@@ -1204,6 +1318,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "사용량 기반 단순 에너지 비용 추정",
     nameEn: "Usage-based energy cost estimate",
+    metaTitle: "에너지 비용 계산기, kWh·사용자 단가로 추정",
+    metaDescription: "검침 kWh와 사용자 단가로 비용을 추정하고 선택 입력한 kW 기본요금분을 더합니다. 계약종별·시간대·세금은 자동 반영하지 않으며 한전 실제 청구금액을 보증하지 않습니다.",
     description: "검침 kWh 또는 운전전력×시간으로 사용량 기반 비용을 추정합니다. 한전 청구 예측이 아닙니다.",
     longDescription: "한전 요금표·기본 단가를 내장하지 않습니다. 단가는 사용자가 넣습니다. 계약종별·시간대별 요금과 kWh 곱셈을 구분하세요.",
     formulaId: "formula-energy-cost",
@@ -1216,7 +1332,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("청구서와 다른 이유?", "계절·시간대·역률·각종 가감이 빠졌기 때문입니다."),
+    faqs: [
+      {
+        "question": "kWh와 kW는 요금에서 어떻게 쓰이나요?",
+        "answer": "kWh는 사용 에너지로 전력량 단가와 곱합니다. 선택 입력 kW는 사용자 기본단가와 곱하며 실제 청구 수요 산정 규칙은 구현하지 않습니다."
+      },
+      {
+        "question": "기본요금도 포함하나요?",
+        "answer": "수요 kW와 원/kW를 직접 넣으면 단순 곱을 더합니다. 계약전력·요금적용전력 결정이나 계약종별 표를 자동 적용하지 않습니다."
+      },
+      {
+        "question": "시간대별·계절별 요금을 계산하나요?",
+        "answer": "단일 사용자 단가로 계산합니다. 시간대·계절 요금표와 연료비 조정·역률·세금 등은 자동 반영하지 않습니다."
+      },
+      {
+        "question": "결과가 실제 청구금액인가요?",
+        "answer": "사용량과 가정 단가에 따른 비교용 비용입니다. 실제 청구금액을 예측·보증하지 않습니다."
+      }
+    ],
   }),
   tool({
     id: "tool-pm-interval",
@@ -1336,6 +1469,8 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "방사형 조류 계산",
     nameEn: "Radial load flow",
+    metaTitle: "방사형 조류 계산기, 모선 전압·전류·손실",
+    metaDescription: "소스 하나인 방사형 계통의 kW·kvar·선로 R/X로 전압·전류·손실을 DistFlow 근사합니다. 실제 계통 해석과 차이가 있으며 보호협조·KEC 적합 판정은 제공하지 않습니다.",
     description: "버스 부하와 선로 R,X로 모선 전압과 손실을 근사합니다. 방사형만 지원합니다.",
     longDescription: "DistFlow 근사입니다. 루프·메쉬는 풀지 않습니다.",
     formulaId: "formula-load-flow",
@@ -1348,7 +1483,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("환상 계통은?", "초기 버전은 소스 하나인 방사형만 됩니다."),
+    faqs: [
+      {
+        "question": "환상·메쉬 계통도 계산하나요?",
+        "answer": "소스 하나의 연결된 방사형 계통만 지원합니다. 루프·메쉬와 다중 전원은 지원하지 않습니다."
+      },
+      {
+        "question": "전압·전류는 무엇을 뜻하나요?",
+        "answer": "전압은 기준 전압 대비 모선 전압 비율, 전류는 하위 부하 P/Q 합과 송전단 전압으로 구한 선로 전류 근사입니다."
+      },
+      {
+        "question": "손실을 실제 3상 손실로 써도 되나요?",
+        "answer": "상별 저항 R과 반올림 전 선전류 I로 3I²R/1000 kW를 계산한 3상 전체 유효전력 손실 근사입니다. I²R은 한 상 도체의 손실입니다. 기본 50 kW/20 kvar 예제의 3상 손실은 1.607 kW입니다. 손실의 상위 부하 되먹임과 반복 수렴은 없으며, 전압 50% 하한은 물리적 해를 보장하지 않습니다."
+      },
+      {
+        "question": "KEC 적합이나 보호협조를 판정하나요?",
+        "answer": "전압·전류·손실 참고만 제공합니다. 단락전류·차단기 동작·보호협조·KEC 적합 판정은 별도 검토입니다."
+      }
+    ],
   }),
   tool({
     id: "tool-arc-flash",

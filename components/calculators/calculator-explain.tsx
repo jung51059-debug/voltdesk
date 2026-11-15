@@ -72,15 +72,15 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
         <p className="text-sm font-medium">결과: {formula.example.result}</p>
       </Section>
 
-      {guide.walkthrough ? (
-        <Section title={guide.walkthrough.title}>
-          {guide.walkthrough.lines.map((line) => (
+      {(guide.walkthroughs ?? (guide.walkthrough ? [guide.walkthrough] : [])).map((example) => (
+        <Section key={example.title} title={example.title}>
+          {example.lines.map((line) => (
             <p key={line} className="text-sm leading-7 text-muted">
               {line}
             </p>
           ))}
         </Section>
-      ) : null}
+      ))}
 
       {(guide.lookups?.length ? guide.lookups : guide.lookup ? [guide.lookup] : []).map((table) => (
         <Section key={table.title} title={table.title}>

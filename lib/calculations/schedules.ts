@@ -661,6 +661,8 @@ export type FlowResult = {
 /**
  * 방사형 1개 소스(첫 버스)  DistFlow 근사.
  * V_to² ≈ V_from² − 2(R P + X Q), I ≈ S / (√3 V)
+ * V는 선간 실효전압, P/Q는 3상 합산 부하, R/X는 구간의 상별 등가 임피던스(Ω).
+ * 손실은 3I²R/1000 kW. 반올림 전 전류를 사용하며 상위 부하에 되먹이지 않습니다.
  */
 export function radialLoadFlow(buses: FlowBus[], branches: FlowBranch[], vBaseV: number): FlowResult {
   if (buses.length === 0) return { ok: false, error: "버스를 한 개 이상 입력하세요." };
@@ -729,7 +731,7 @@ export function radialLoadFlow(buses: FlowBus[], branches: FlowBranch[], vBaseV:
       v.set(br.to, vt);
       const s = Math.hypot(p, q);
       const i = vf > 0 ? s / (SQRT_3 * vf) : 0;
-      const loss = ((i * i * br.r) / 1000);
+      const loss = (3 * i ** 2 * br.r) / 1000;
       totalLoss += loss;
       branchesRes.push({ from: br.from, to: br.to, iA: i, lossKw: loss });
     }

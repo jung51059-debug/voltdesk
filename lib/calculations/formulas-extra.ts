@@ -237,10 +237,10 @@ export const extraFormulas: FormulaDefinition[] = [
   }, {}),
   f("formula-lpd", "조명 전력밀도", "LPD = P / A", [
     { symbol: "P", name: "전력", unit: "W", description: "" },
-  ], { title: "960 W / 96 m²", given: "LED", steps: ["LPD=10 W/m²"], result: "10 W/m²" }, {}),
+  ], { title: "960 W / 96 m² · 조명 교체 비교", given: "기존 2400 W, 연간 3000 h, 사용자 단가 140 원/kWh", steps: ["LPD = 960/96 = 10 W/m²", "절감 전력 = 2400−960 = 1,440 W", "절감 에너지 = 1.44×3000 = 4,320 kWh", "비용 참고 = 4320×140 = 604,800원"], result: "10 W/m² · 연간 4,320 kWh · 604,800원 참고" }, {}),
   f("formula-solar", "PV 에너지 수지", "P_kWp = E_day / (PSH η)", [
     { symbol: "PSH", name: "Peak Sun Hours", unit: "h", description: "사용자 지역 값" },
-  ], { title: "24 kWh/일, PSH 3.8, η 0.78, 450 W", given: "계통연계", steps: ["kWp", "N"], result: "필요 kWp와 패널 수" }, {}),
+  ], { title: "24 kWh/일, PSH 3.8, η 0.78, 450 W", given: "계통연계 · PSH 3.8 h · 시스템 효율 0.78 · 패널 450 W", steps: ["필요 용량 = 24/(3.8×0.78) = 8.1 kWp", "반올림 전 필요 용량으로 패널 수를 올림 = 18장", "참고 발전량 = 18×450×3.8×0.78/1000 = 24.01 kWh/일", "인버터 참고 = 필요 용량×1.1 = 8.91 kW"], result: "8.1 kWp · 18장 · 참고 발전량 24.01 kWh/일 (보증 아님)" }, {}),
   f("formula-grounding-rod", "수직 접지봉 근사", "R = ρ/(2πL) ln(4L/d)", [
     { symbol: "ρ", name: "토양저항률", unit: "Ω·m", description: "" },
   ], { title: "ρ=100, L=2.4 m, d=14 mm", given: "단일 봉", steps: ["R=ρ/(2πL)ln(4L/d)"], result: "Ω" }, {
@@ -252,7 +252,7 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-soil", "Wenner 저항률", "ρ = 2 π a R", [
     { symbol: "a", name: "전극 간격", unit: "m", description: "" },
-  ], { title: "a=5 m, R=3.2 Ω", given: "4극", steps: ["ρ=2π×5×3.2"], result: "약 100.5 Ω·m" }, {}),
+  ], { title: "a=5 m, R=3.2 Ω", given: "4극", steps: ["ρ=2π×5×3.2"], result: "100.53 Ω·m (겉보기 저항률)" }, {}),
   f("formula-earth-conductor", "접지도체 단열식", "S = (I/k) √t", [
     { symbol: "k", name: "재질 계수", unit: "A√s/mm²", description: "표준 표를 사용자가 입력" },
   ], {
@@ -274,12 +274,12 @@ export const extraFormulas: FormulaDefinition[] = [
   ], { title: "일반 120 + 모터 55 + UPS 40 kW", given: "동시 0.85, 여유 15%", steps: ["P_run", "기동 가산", "P_need"], result: "kW / kVA" }, {}),
   f("formula-generator-fuel", "연료 추정", "V = (L/h) t  또는  (L/kWh) P t", [
     { symbol: "L/kWh", name: "원단위", unit: "L/kWh", description: "추정 모드" },
-  ], { title: "320 kW, 8 h, 0.28 L/kWh", given: "추정 모드", steps: ["L/h=89.6", "V=716.8 L"], result: "약 717 L" }, {
+  ], { title: "320 kW, 8 h, 0.28 L/kWh", given: "추정 모드", steps: ["L/h=89.6", "V=716.8 L"], result: "716.8 L (고정 원단위 추정)" }, {
     warnings: ["제조사 데이터 모드와 일반 추정을 구분합니다."],
   }),
   f("formula-generator-start-vd", "발전기 기동 전압강하 근사", "ΔV/V ≈ X_pu × S_start / S_gen", [
     { symbol: "X_pu", name: "리액턴스", unit: "pu", description: "명판" },
-  ], { title: "500 kVA, x=0.2, 기동 180 kVA", given: "단순 모델", steps: ["0.2×180/500=7.2%"], result: "7.2%" }, {}),
+  ], { title: "500 kVA, x=0.2, 기동 180 kVA", given: "단순 모델", steps: ["0.2×180/500×100=7.2%"], result: "7.2%" }, {}),
   f("formula-battery-ah", "배터리 필요 Ah", "E = P t / (ηinv ηb k_age DOD), C = E/V", [
     { symbol: "DOD", name: "방전심도", unit: "—", description: "" },
   ], { title: "5 kW, 384 V, 15분, η 0.92/0.9, 노화 0.8, DOD 0.8", given: "UPS 배터리", steps: ["E", "C"], result: "Ah, kWh" }, {
@@ -287,13 +287,13 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-equipment-load", "설비 부하율·가동률", "부하율=Pavg/Prated, 가동률=trun/tperiod", [
     { symbol: "Pavg", name: "평균전력", unit: "kW", description: "" },
-  ], { title: "정격 75 kW, 평균 42 kW, 420/730 h", given: "월", steps: ["56%", "57.5%"], result: "부하율·가동률" }, {}),
+  ], { title: "정격 75 kW, 평균 42 kW, 420/730 h", given: "월", steps: ["부하율 = 42/75×100 = 56%", "가동률 = 420/730×100 = 57.53%"], result: "설비 부하율 56% · 가동률 57.53%" }, {}),
   f("formula-energy-intensity", "전력 원단위", "원단위 = kWh / 활동량", [
     { symbol: "활동량", name: "분모", unit: "사용자", description: "면적·생산량 등" },
   ], { title: "125000 kWh / 10000 m²", given: "연간", steps: ["12.5 kWh/m²"], result: "12.5" }, {}),
   f("formula-energy-cost", "사용량 기반 단순 에너지 비용 추정", "≈ kWh×사용자단가 + kW×사용자 기본단가", [
     { symbol: "단가", name: "사용자 단가", unit: "원", description: "사용자가 직접 입력" },
-  ], { title: "15000 kWh, 92 kW", given: "사용자 단가", steps: ["사용량분", "수요분"], result: "원" }, {
+  ], { title: "15000 kWh, 92 kW", given: "검침 모드 · 140 원/kWh · 7,000 원/kW (사용자 입력)", steps: ["사용량분 = 15000×140 = 2,100,000원", "수요분 = 92×7000 = 644,000원", "합계 = 2,744,000원"], result: "2,744,000원 (청구금액 보증 아님)" }, {
     warnings: ["한전 청구요금 예측이 아닙니다."],
   }),
   f("formula-pm", "예방정비 주기", "remaining = T − (t mod T)", [
@@ -343,7 +343,7 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-load-flow", "방사형 조류 (DistFlow 근사)", "V²_to ≈ V²_from − 2(RP+XQ)", [
     { symbol: "R,X", name: "선로 임피던스", unit: "Ω", description: "" },
-  ], { title: "소스 380 V, 부하 50 kW", given: "방사형 2모선", steps: ["후방 전력", "전방 전압"], result: "모선 전압, 손실" }, {}),
+  ], { title: "소스 380 V · B2 50 kW / 20 kvar", given: "선간전압 380 V, 3상 합산 부하, B1 부하 0, B1→B2 상별 R=0.08 Ω·X=0.04 Ω", steps: ["하위 P=50 kW, Q=20 kvar를 합산", "B2 전압 = √(380²−2×(0.08×50000+0.04×20000)) → 96.62%", "선로 전류 = √(50000²+20000²)/(√3×380) = 81.82 A", "반올림 전 선전류로 3I²R/1000 = 1.607 kW (3상 전체 유효전력 손실)"], result: "B2 96.62% · 81.82 A · 3상 전체 손실 1.607 kW" }, {}),
   f("formula-arc-flash", "아크플래시 점검 목록", "입사에너지 수치 계산 없음", [
     { symbol: "입력", name: "필요 자료", unit: "—", description: "전압, 갭, 작업거리, Ibf 등" },
   ], { title: "자료 체크리스트", given: "현장", steps: ["입력 수집"], result: "계산 보류" }, {

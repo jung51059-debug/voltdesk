@@ -390,6 +390,84 @@ describe("부하 스케줄·방사형 조류", () => {
   });
 });
 
+describe("평형 3상 조류 손실의 독립 공학 검증", () => {
+  function single(pKw: number, qKvar: number, r = 0.08, x = 0.04) {
+    const result = radialLoadFlow(
+      [{ id: "S", loadKw: 0, loadKvar: 0 }, { id: "L", loadKw: pKw, loadKvar: qKvar }],
+      [{ from: "S", to: "L", r, x }], 380,
+    );
+    if (!result.ok) throw new Error(result.error);
+    return result;
+  }
+
+  it.each([25, 50, 100])("%s kW: 상별 회로의 세 상 손실을 합산한다", (pKw) => {
+    const pW = pKw * 1000;
+    const qVar = pW * 0.4;
+    // 독립 상별 등가회로: S_phase=S_3phase/3, V_phase=V_LL/√3.
+    const phaseCurrent = Math.hypot(pW / 3, qVar / 3) / (380 / Math.sqrt(3));
+    const onePhaseLossKw = phaseCurrent ** 2 * 0.08 / 1000;
+    const result = single(pKw, pKw * 0.4);
+    expect(result.branches[0].iA).toBeCloseTo(phaseCurrent, 10);
+    expect(result.branches[0].lossKw).toBeCloseTo(onePhaseLossKw * 3, 10);
+    expect(result.totalLossKw).toBeCloseTo(onePhaseLossKw * 3, 10);
+    expect(result.totalLossKw / onePhaseLossKw).toBeCloseTo(3, 12);
+  });
+
+  it("다구간은 각 송전단 전압의 손실 합계이며 손실을 상위 부하에 되먹이지 않는다", () => {
+    const result = radialLoadFlow(
+      [{ id: "S", loadKw: 0, loadKvar: 0 }, { id: "M", loadKw: 20, loadKvar: 8 }, { id: "L", loadKw: 30, loadKvar: 12 }],
+      [{ from: "S", to: "M", r: 0.08, x: 0.04 }, { from: "M", to: "L", r: 0.12, x: 0.06 }], 380,
+    );
+    if (!result.ok) throw new Error(result.error);
+    const vMidSquared = 380 ** 2 - 2 * (0.08 * 50000 + 0.04 * 20000);
+    // 3I²R = R(P_3phase²+Q_3phase²)/V_LL², 엔진 출력으로 기대값을 만들지 않는다.
+    const firstLoss = 0.08 * (50000 ** 2 + 20000 ** 2) / 380 ** 2 / 1000;
+    const secondLoss = 0.12 * (30000 ** 2 + 12000 ** 2) / vMidSquared / 1000;
+    expect(result.branches[0].lossKw).toBeCloseTo(firstLoss, 10);
+    expect(result.branches[1].lossKw).toBeCloseTo(secondLoss, 10);
+    expect(result.totalLossKw).toBeCloseTo(firstLoss + secondLoss, 10);
+    expect(result.totalLossKw).toBeCloseTo(result.branches.reduce((sum, branch) => sum + branch.lossKw, 0), 12);
+    expect(result.branches[0].iA).toBeCloseTo(Math.hypot(50000, 20000) / (Math.sqrt(3) * 380), 10);
+    expect(result.branches[1].iA).toBeCloseTo(Math.hypot(30000, 12000) / Math.sqrt(3 * vMidSquared), 10);
+    const vLastSquared = vMidSquared - 2 * (0.12 * 30000 + 0.06 * 12000);
+    expect(result.buses[2].vPct).toBeCloseTo(Math.sqrt(vLastSquared) / 380 * 100, 10);
+  });
+
+  it("동일 전압·저항에서 선전류 2배이면 손실 4배", () => {
+    const lo = single(25, 10);
+    const hi = single(50, 20);
+    expect(hi.branches[0].iA / lo.branches[0].iA).toBeCloseTo(2, 12);
+    expect(hi.totalLossKw / lo.totalLossKw).toBeCloseTo(4, 12);
+  });
+
+  it("R=0이면 전류·리액턴스가 있어도 유효전력 손실은 0", () => {
+    const result = single(50, 20, 0, 0.04);
+    expect(result.branches[0].iA).toBeGreaterThan(0);
+    expect(result.branches[0].lossKw).toBe(0);
+    expect(result.totalLossKw).toBe(0);
+    expect(result.buses[1].vPct).toBeLessThan(100);
+  });
+
+  it("기존 전류와 전압 근사값은 유지한다", () => {
+    const result = single(50, 20);
+    expect(result.branches[0].iA).toBeCloseTo(81.81911450077911, 10);
+    expect(result.buses[1].vPct).toBeCloseTo(96.61873552992537, 10);
+    expect(result.buses[1].vPct).toBeCloseTo(Math.sqrt(380 ** 2 - 2 * (0.08 * 50000 + 0.04 * 20000)) / 380 * 100, 10);
+  });
+
+  it("기존 전압 50% 하한을 유지한다", () => {
+    expect(single(1000, 400, 1, 0.5).buses[1].vPct).toBe(50);
+  });
+
+  it("손실 계산에는 표시용 반올림 전 전류를 사용한다", () => {
+    const result = single(50, 20);
+    const expected = 0.08 * (50000 ** 2 + 20000 ** 2) / 380 ** 2 / 1000;
+    const lossFromDisplayedCurrent = 3 * 81.82 ** 2 * 0.08 / 1000;
+    expect(result.totalLossKw).toBeCloseTo(expected, 12);
+    expect(Math.abs(result.totalLossKw - lossFromDisplayedCurrent)).toBeGreaterThan(0.00001);
+  });
+});
+
 describe("카탈로그 정합", () => {
   it("워크스페이스 도구는 공식·스키마·엔진이 있다", () => {
     for (const tool of getPublishedTools()) {

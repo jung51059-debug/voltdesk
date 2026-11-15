@@ -1,3 +1,5 @@
+import { phase3b2aGuides } from "@/lib/data/calculator-guides-phase3b2a";
+
 export type GuideLookup = {
   title: string;
   note: string;
@@ -13,6 +15,7 @@ export type CalculatorGuide = {
   cautions: string[];
   /** 공식 예제와 별도로, 검색에서 자주 묻는 조건을 계산기 반올림과 같게 적습니다. */
   walkthrough?: { title: string; lines: string[] };
+  walkthroughs?: { title: string; lines: string[] }[];
   /** 같은 전압·역률에서 전력만 바꾼 참고표. 행은 계산기 precision 2와 같아야 합니다. */
   lookup?: GuideLookup;
   /** 조건이 다른 참고표를 여러 개 둘 때 사용합니다. */
@@ -25,6 +28,7 @@ export type CalculatorGuide = {
 
 /** 핵심 계산기만. 공식·예제 숫자는 FormulaDefinition을 화면에 재사용한다. */
 export const calculatorGuides: CalculatorGuide[] = [
+  ...phase3b2aGuides,
   {
     slug: "single-phase-current",
     whenToUse: [
