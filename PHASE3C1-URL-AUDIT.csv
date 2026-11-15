@@ -1,0 +1,134 @@
+url,type,slug_or_title,search_intent,score_uniqueness,score_value,score_expertise,score_seo,score_trust,score_total,priority,issues,recommended_action,in_sitemap,has_guide,faq_count,unique_meta_title
+"https://ampory.vercel.app/tools/electrical/single-phase-current",calculator,"single-phase-current","계산: 단상 부하전류 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/three-phase-current",calculator,"three-phase-current","계산: 3상 부하전류 계산기",19,20,17,12,12,77,P2,"가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,5,yes
+"https://ampory.vercel.app/tools/electrical/contract-power-current",calculator,"contract-power-current","계산: 계약전력 예상 전류 계산기",19,20,17,12,12,77,P2,"가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,6,yes
+"https://ampory.vercel.app/tools/electrical/power-strip-capacity",calculator,"power-strip-capacity","계산: 콘센트·멀티탭 용량 계산기",19,20,17,12,12,77,P2,"가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,7,yes
+"https://ampory.vercel.app/tools/electrical/amp-to-kw",calculator,"amp-to-kw","계산: 전류(A) → 예상 전력(kW) 계산기",19,20,17,12,12,77,P2,"가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,8,yes
+"https://ampory.vercel.app/tools/electrical/kw-kva-hp",calculator,"kw-kva-hp","계산: kW / kVA / HP 환산기",19,20,17,12,12,77,P2,"가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,5,yes
+"https://ampory.vercel.app/tools/electrical/power-factor",calculator,"power-factor","계산: 역률 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/transformer-load",calculator,"transformer-load","계산: 변압기 용량·부하율 계산기",19,20,17,12,12,77,P2,"가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/voltage-drop",calculator,"voltage-drop","계산: 전압강하 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/path-voltage-drop",calculator,"path-voltage-drop","계산: 경로 전압강하 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/cable-resistance",calculator,"cable-resistance","계산: 도체 저항 계산기",17,17,15,10,10,66,P1,"metaTitle 없음; metaDescription 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,yes,3,no(fallback)
+"https://ampory.vercel.app/tools/electrical/breaker-current",calculator,"breaker-current","계산: 차단기 정격 참고 계산기",19,20,17,11,11,76,P2,"walkthrough/lookup 얕음","콘텐츠·SEO 보강",yes,yes,3,yes
+"https://ampory.vercel.app/tools/facility/ups-backup-time",calculator,"ups-backup-time","계산: UPS 백업시간 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/ups-capacity",calculator,"ups-capacity","계산: UPS 용량 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/generator-load",calculator,"generator-load","계산: 발전기 부하율 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/facility/monthly-energy",calculator,"monthly-energy","계산: 월간 전력사용량 비교",17,17,15,10,10,66,P1,"metaTitle 없음; metaDescription 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,yes,3,no(fallback)
+"https://ampory.vercel.app/tools/electrical/motor-current",calculator,"motor-current","계산: 모터 정격전류 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/motor-slip",calculator,"motor-slip","계산: 전동기 슬립·동기속도 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,6,yes
+"https://ampory.vercel.app/tools/electrical/motor-starting",calculator,"motor-starting","계산: 모터 기동 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/motor-acceleration",calculator,"motor-acceleration","계산: 모터 가속시간 추정",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/power-factor-correction",calculator,"power-factor-correction","계산: 역률 개선 콘덴서",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/power-triangle",calculator,"power-triangle","계산: 전력 삼각형",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/thd",calculator,"thd","계산: THD 계산기",17,17,15,10,10,66,P1,"metaTitle 없음; metaDescription 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,yes,3,no(fallback)
+"https://ampory.vercel.app/tools/electrical/harmonic-filter",calculator,"harmonic-filter","계산: 하모닉 필터 기본 검토",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/cable-sizing",calculator,"cable-sizing","계산: LV 케이블 굵기 검토",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/cable-parallel",calculator,"cable-parallel","계산: 케이블 병렬 운전",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/cable-ampacity",calculator,"cable-ampacity","계산: 케이블 허용전류 검토",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/busbar",calculator,"busbar","계산: 부스바 단면 검토",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/transformer-sizing",calculator,"transformer-sizing","계산: 변압기 용량 산정",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/transformer-current",calculator,"transformer-current","계산: 변압기 1·2차 전류",17,17,15,10,10,66,P1,"metaTitle 없음; metaDescription 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,yes,3,no(fallback)
+"https://ampory.vercel.app/tools/electrical/transformer-parallel",calculator,"transformer-parallel","계산: 병렬 변압기 분담",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/transformer-loss",calculator,"transformer-loss","계산: 변압기 손실·효율",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/short-circuit",calculator,"short-circuit","계산: 3상 단락전류 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/ct-ratio",calculator,"ct-ratio","계산: CT 변류비 계산기",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/pt-ratio",calculator,"pt-ratio","계산: PT / VT 변성비",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/vfd-sizing",calculator,"vfd-sizing","계산: VFD 용량 검토",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/soft-starter",calculator,"soft-starter","계산: 소프트스타터 간이 검토",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/protection-relay",calculator,"protection-relay","계산: 보호계전기 IEC 곡선",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/lux",calculator,"lux","계산: 조도(루멘법) 계산기",20,20,17,12,12,78,P2,"relatedToolIds 부족","콘텐츠·SEO 보강",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/lighting-density",calculator,"lighting-density","계산: 조명 전력밀도",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/solar-pv",calculator,"solar-pv","계산: 태양광 기본 설계",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/grounding-rod",calculator,"grounding-rod","계산: 접지봉 저항 간이 계산",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/soil-resistivity",calculator,"soil-resistivity","계산: 토양저항률 (Wenner)",20,20,17,12,12,78,P2,"relatedToolIds 부족","콘텐츠·SEO 보강",yes,yes,4,yes
+"https://ampory.vercel.app/tools/electrical/earth-conductor",calculator,"earth-conductor","계산: 접지도체 굵기 (단열식)",20,21,18,12,12,80,P2,"","유지",yes,yes,3,yes
+"https://ampory.vercel.app/tools/electrical/spd-helper",calculator,"spd-helper","계산: SPD 선정 도우미 (간이)",20,20,17,12,12,78,P2,"relatedToolIds 부족","콘텐츠·SEO 보강",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/generator-sizing",calculator,"generator-sizing","계산: 비상발전기 용량 산정",17,18,15,10,10,69,P1,"FAQ 1개; walkthrough/lookup 얕음; 가이드 내부링크 부족","콘텐츠·SEO 보강",yes,yes,1,yes
+"https://ampory.vercel.app/tools/facility/generator-fuel",calculator,"generator-fuel","계산: 발전기 연료 사용량",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/generator-start-vd",calculator,"generator-start-vd","계산: 발전기 기동 전압강하",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/battery-capacity",calculator,"battery-capacity","계산: 배터리 용량(Ah) 산정",17,17,15,10,10,66,P1,"metaTitle 없음; metaDescription 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,yes,3,no(fallback)
+"https://ampory.vercel.app/tools/facility/equipment-load",calculator,"equipment-load","계산: 설비 부하율·가동률",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/energy-intensity",calculator,"energy-intensity","계산: 전력사용 원단위",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/energy-cost",calculator,"energy-cost","계산: 사용량 기반 단순 에너지 비용 추정",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/pm-interval",calculator,"pm-interval","계산: 예방정비 주기",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/yoy-energy",calculator,"yoy-energy","계산: 전년 동월 전력 비교",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/schedules/load",calculator,"load-schedule","계산: 부하 스케줄 작성",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/schedules/cable",calculator,"cable-schedule","계산: 케이블 스케줄",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/schedules/panel",calculator,"panel-schedule","계산: 반·MCC 스케줄",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/electrical/load-flow",calculator,"load-flow","계산: 방사형 조류 계산",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/advanced/arc-flash",calculator,"arc-flash","계산: 아크플래시 점검 목록",20,20,17,12,12,78,P2,"relatedToolIds 부족","콘텐츠·SEO 보강",yes,yes,4,yes
+"https://ampory.vercel.app/tools/advanced/lightning-risk",calculator,"lightning-risk","계산: 낙뢰보호 점검 목록",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/advanced/sld",calculator,"sld","계산: 단선도 초안 (구조)",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/field-compare",calculator,"field-compare","계산: 설계값 vs 실측값",20,21,18,12,12,80,P2,"","유지",yes,yes,4,yes
+"https://ampory.vercel.app/tools/facility/phase-unbalance",calculator,"phase-unbalance","계산: 3상 전압·전류 불평형",17,17,15,10,10,66,P1,"metaTitle 없음; metaDescription 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,yes,3,no(fallback)
+"https://ampory.vercel.app/tools/facility/generator-load-test",calculator,"generator-load-test","계산: 발전기 로드테스트",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/duty-cycle",calculator,"duty-cycle","계산: 설비 가동률 (Runtime)",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/sensor-calibration",calculator,"sensor-calibration","계산: 센서·계측기 비교",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/trend-analysis",calculator,"trend-analysis","계산: Trend 기초 분석",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/tools/facility/retrofit-compare",calculator,"retrofit-compare","계산: 개선 전후 에너지 비교",11,11,9,6,6,42,P1,"metaTitle 없음; metaDescription 없음; FAQ 1개; CalculatorGuide 없음 ;고유 meta 없음","콘텐츠·SEO 보강",yes,no,1,no(fallback)
+"https://ampory.vercel.app/","home",,,20,20,16,12,12,88,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/about","trust",,,20,20,16,12,12,85,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools","hub",,,20,20,16,12,12,82,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/electrical","hub",,,20,20,16,12,12,82,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/facility","hub",,,20,20,16,12,12,82,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references","hub",,,20,20,16,12,12,86,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/privacy","policy",,,20,20,16,12,12,90,P2,"AdSense·쿠키 명시",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/terms","policy",,,20,20,16,12,12,88,P2,"면책·광고 안내",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/contact","trust",,,20,20,16,12,12,84,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/sources","trust",,,20,20,16,12,12,87,P2,"",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/resources/electrical-qr-card","resource",,,20,20,16,12,12,80,P2,"마케팅성 부가 페이지",유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/electrical-basics",category-hub,"전기 기본 계산","전기 기본 계산 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/cable",category-hub,"케이블 / 배선","케이블 / 배선 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/transformer",category-hub,"변압기","변압기 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/motor",category-hub,"모터","모터 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/protection",category-hub,"보호 / 차단기","보호 / 차단기 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/grounding",category-hub,"접지 / 낙뢰","접지 / 낙뢰 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/power-quality",category-hub,"전력품질","전력품질 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/lighting",category-hub,"조명","조명 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/solar",category-hub,"태양광","태양광 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/power-system",category-hub,"전력계통","전력계통 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/schedule",category-hub,"설계 / Schedule","설계 / Schedule 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/advanced",category-hub,"고급 검토","고급 검토 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/generator",category-hub,"발전기 / 비상전원","발전기 / 비상전원 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/ups",category-hub,"UPS / 배터리","UPS / 배터리 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/facility-ops",category-hub,"시설관리","시설관리 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/tools/categories/field-verify",category-hub,"현장 검증","현장 검증 목록",18,18,15,12,12,78,P2,"도구 목록 위주",내부링크·소개문 보강,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/kw-vs-kva",reference,"kw-vs-kva","실무 참고: kW와 kVA의 차이",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/ct-100-5a",reference,"ct-100-5a","실무 참고: CT 100/5A의 의미",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/mccb-vs-elb",reference,"mccb-vs-elb","실무 참고: MCCB와 ELB의 차이",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/ats-vs-ctts",reference,"ats-vs-ctts","실무 참고: ATS와 CTTS의 차이",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/ups-vs-generator",reference,"ups-vs-generator","실무 참고: UPS와 비상발전기의 역할 차이",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/transformer-load-ratio",reference,"transformer-load-ratio","실무 참고: 변압기 부하율 계산 방법",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/voltage-drop-principles",reference,"voltage-drop-principles","실무 참고: 전압강하 계산의 원리",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/poor-power-factor",reference,"poor-power-factor","실무 참고: 역률이 나빠지는 이유",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/single-phase-vs-three-phase",reference,"single-phase-vs-three-phase","실무 참고: 단상 전류와 3상 전류",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/cable-sizing-basics",reference,"cable-sizing-basics","실무 참고: 케이블 사이즈 검토의 기본",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/cable-sizing",reference,"cable-sizing","실무 참고: 저압 케이블 굵기 검토 순서",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/voltage-drop",reference,"voltage-drop","실무 참고: 전압강하를 단계별로 보는 방법",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/short-circuit",reference,"short-circuit","실무 참고: 3상 단락전류 1차 검토",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/transformer-sizing",reference,"transformer-sizing","실무 참고: 변압기 용량을 수요에서 역산하기",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/motor-current",reference,"motor-current","실무 참고: 모터 정격전류와 명판 읽기",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/power-factor",reference,"power-factor","실무 참고: 역률 개선이 전류를 줄이는 이유",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/ct-ratio",reference,"ct-ratio","실무 참고: 변류비가 다르면 2차 전류가 달라진다",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/ups-sizing",reference,"ups-sizing","실무 참고: UPS 용량과 배터리 시간",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/generator-sizing",reference,"generator-sizing","실무 참고: 비상발전기 부하를 더하는 방법",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/grounding",reference,"grounding","실무 참고: 접지 계산의 가정과 한계",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/lux",reference,"lux","실무 참고: 루멘법으로 등기구 수 잡기",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/vfd",reference,"vfd","실무 참고: VFD와 소프트스타터를 고를 때",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/spd",reference,"spd","실무 참고: SPD를 위치별로 보는 간이 안내",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/solar-pv",reference,"solar-pv","실무 참고: 태양광 에너지 수지 잡기",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/breaker-and-cable",reference,"breaker-and-cable","실무 참고: 차단기 정격과 케이블을 같이 보는 이유",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/demand-vs-load-factor",reference,"demand-vs-load-factor","실무 참고: 수용률과 부하율의 차이",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/motor-kw-input-or-output",reference,"motor-kw-input-or-output","실무 참고: 모터 kW는 입력일까 출력일까",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/fault-current-and-breaking-capacity",reference,"fault-current-and-breaking-capacity","실무 참고: 단락전류와 차단기 차단용량",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/elb-rated-current-and-sensitivity",reference,"elb-rated-current-and-sensitivity","실무 참고: 누전차단기 30A와 30mA의 차이",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/motor-start-voltage-dip",reference,"motor-start-voltage-dip","실무 참고: 모터를 켤 때 전압이 떨어지는 이유",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/cable-ampacity-and-installation",reference,"cable-ampacity-and-installation","실무 참고: 같은 굵기인데 허용전류가 다른 이유",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/phase-unbalance-and-neutral",reference,"phase-unbalance-and-neutral","실무 참고: 상 전류가 다를 때 중성선은",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/ups-on-generator",reference,"ups-on-generator","실무 참고: UPS를 발전기에 연결할 때",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/references/power-factor-correction-location",reference,"power-factor-correction-location","실무 참고: 역률 보상은 어디에 둘까",20,22,18,13,12,84,P2,,유지,yes,n/a,n/a,yes
+"https://ampory.vercel.app/search",utility,search,"사이트 내 검색",10,12,10,8,10,55,P2,"noindex·얕은 목적 페이지",유지(noindex),no,n/a,n/a,yes
+"https://ampory.vercel.app/favorites",utility,favorites,"즐겨찾기",8,10,8,5,10,48,P2,"noindex·개인화",유지(noindex),no,n/a,n/a,yes
+"https://ampory.vercel.app/settings",utility,settings,"환경설정",8,10,8,5,10,48,P2,"noindex",유지(noindex),no,n/a,n/a,yes
+"https://ampory.vercel.app/tools/electrical/motor-start-vd",calculator,motor-start-vd,"모터 기동 VD(미공개)",5,5,5,0,5,25,P2,"coming-soon·noindex·sitemap 제외",공개 전 정책 결정,no,no,0,no
