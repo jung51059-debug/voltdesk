@@ -1,0 +1,62 @@
+slug,name,href,status,audit_target,meta_unique,faqs,has_guide,walkthroughs,lookup_rows,engine,score,calibration_accuracy,practical,examples,cautions_seo,priority,notes
+single-phase-current,단상 부하전류,/tools/electrical/single-phase-current,published,yes,yes,3,yes,1,3,yes,88,28,18,16,14+12,P2,Phase3A/B 가이드·엔진 테스트 있음
+three-phase-current,3상 부하전류,/tools/electrical/three-phase-current,published,yes,yes,5,yes,1,5,yes,86,28,16,18,14+10,P2,FAQ·lookup 풍부; 가이드 links 0
+contract-power-current,계약전력 예상 전류,/tools/electrical/contract-power-current,published,yes,yes,6,yes,0,6,yes,84,28,20,14,12+10,P2,walkthrough 없음·topics 6
+power-strip-capacity,멀티탭 용량,/tools/electrical/power-strip-capacity,published,yes,yes,7,yes,1,4,yes,85,28,18,16,14+9,P2,
+amp-to-kw,A→kW,/tools/electrical/amp-to-kw,published,yes,yes,8,yes,0,11,yes,83,28,18,14,12+11,P2,walkthrough 없음
+kw-kva-hp,kW/kVA/HP,/tools/electrical/kw-kva-hp,published,yes,yes,5,yes,1,0,yes,78,28,16,12,12+10,P2,lookup 없음
+power-factor,역률,/tools/electrical/power-factor,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+10,P2,
+transformer-load,변압기 부하율,/tools/electrical/transformer-load,published,yes,yes,4,yes,1,0,yes,76,28,14,12,12+10,P1,핵심·lookup/walkthrough 가이드 미흡
+voltage-drop,전압강하,/tools/electrical/voltage-drop,published,yes,yes,4,yes,0,0,yes,72,28,14,10,12+8,P1,핵심 도구·가이드 예제/lookup 없음
+path-voltage-drop,경로 전압강하,/tools/electrical/path-voltage-drop,published,yes,yes,3,yes,1,3,dedicated,82,26,18,16,12+10,P2,전용 UI·phase3b1 경로 예제 테스트
+cable-resistance,도체 저항,/tools/electrical/cable-resistance,published,yes,no,3,yes,1,2,yes,74,28,16,14,10+6,P1,metaTitle/Description 없음(이름·설명 fallback)
+breaker-current,차단기 참고,/tools/electrical/breaker-current,published,yes,yes,3,yes,0,0,yes,74,28,16,10,12+8,P1,가이드 예제表 없음·단락 링크는 양호
+ups-backup-time,UPS 백업시간,/tools/facility/ups-backup-time,published,yes,no,1,yes,0,0,yes,62,28,10,8,10+6,P1,FAQ 1·meta 없음·Peukert 검증 수동 미실시
+ups-capacity,UPS 용량,/tools/facility/ups-capacity,published,yes,no,1,yes,0,0,yes,62,28,10,8,10+6,P1,UPS 쌍 개선 권장
+generator-load,발전기 부하율,/tools/facility/generator-load,published,yes,yes,3,yes,1,4,yes,86,28,18,18,14+8,P2,
+monthly-energy,월간 사용량,/tools/facility/monthly-energy,published,yes,no,3,yes,1,2,yes,76,28,14,14,10+10,P1,meta 없음
+motor-current,모터 정격전류,/tools/electrical/motor-current,published,yes,yes,3,yes,1,3,yes,88,28,18,18,14+10,P2,phase3b1 예제 58.29 검증
+motor-slip,모터 슬립,/tools/electrical/motor-slip,published,yes,yes,6,yes,1,6,yes,90,28,20,20,14+8,P2,Phase2A급 콘텐츠
+motor-starting,모터 기동,/tools/electrical/motor-starting,published,yes,yes,3,yes,0,0,yes,70,28,14,8,12+8,P1,핵심·가이드 walkthrough/lookup 없음
+motor-start-vd,모터 기동 전압강하,/tools/electrical/motor-start-vd,coming-soon,no,no,1,no,0,0,yes,40,20,0,0,8+12,P2,미공개·motor-starting과 중복 검토
+motor-acceleration,가속시간,/tools/electrical/motor-acceleration,published,yes,yes,3,yes,1,4,yes,88,28,18,18,14+10,P2,Phase2A
+power-factor-correction,역률 개선,/tools/electrical/power-factor-correction,published,yes,yes,3,yes,1,2,yes,84,28,16,16,14+10,P2,phase3b1 151.55 kvar
+power-triangle,전력 삼각형,/tools/electrical/power-triangle,published,yes,yes,3,yes,1,4,yes,88,28,18,18,14+10,P2,Phase2A
+thd,THD,/tools/electrical/thd,published,yes,no,3,yes,1,3,yes,78,28,16,16,10+8,P1,meta 없음
+harmonic-filter,하모닉 필터,/tools/electrical/harmonic-filter,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+10,P2,phase3b1
+cable-sizing,케이블 굵기,/tools/electrical/cable-sizing,published,yes,yes,3,yes,1,3,yes,88,28,18,18,14+10,P2,
+cable-parallel,케이블 병렬,/tools/electrical/cable-parallel,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+8,P2,
+cable-ampacity,허용전류,/tools/electrical/cable-ampacity,published,yes,yes,3,yes,1,2,yes,84,28,16,16,14+10,P2,
+busbar,부스바,/tools/electrical/busbar,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+8,P2,
+transformer-sizing,변압기 용량,/tools/electrical/transformer-sizing,published,yes,yes,3,yes,1,3,yes,88,28,18,18,14+10,P2,
+transformer-current,변압기 전류,/tools/electrical/transformer-current,published,yes,no,3,yes,1,2,yes,76,28,14,16,10+8,P1,meta 없음
+transformer-parallel,병렬 변압기,/tools/electrical/transformer-parallel,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+8,P2,
+transformer-loss,변압기 손실,/tools/electrical/transformer-loss,published,yes,yes,3,yes,1,3,yes,88,28,18,18,14+10,P2,Phase2A
+short-circuit,3상 단락전류,/tools/electrical/short-circuit,published,yes,yes,3,yes,1,3,yes,82,26,16,16,14+10,P1,근사식·κ 검증은 테스트 있으나 1선지락 미지원 고지 강화 필요
+ct-ratio,CT,/tools/electrical/ct-ratio,published,yes,yes,3,yes,1,4,yes,88,28,18,18,14+10,P2,Phase2A
+pt-ratio,PT,/tools/electrical/pt-ratio,published,yes,yes,3,yes,1,4,yes,88,28,18,18,14+10,P2,phase3b1
+vfd-sizing,VFD,/tools/electrical/vfd-sizing,published,yes,yes,3,yes,1,4,yes,88,28,18,18,14+10,P2,Phase2A
+soft-starter,소프트스타터,/tools/electrical/soft-starter,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+10,P2,phase3b1
+protection-relay,계전기,/tools/electrical/protection-relay,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+8,P2,
+lux,조도,/tools/electrical/lux,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+10,P2,phase3b1
+grounding-rod,접지봉,/tools/electrical/grounding-rod,published,yes,no,1,yes,0,0,yes,58,28,10,6,8+6,P1,최소 가이드·FAQ1·meta 없음·토양저항률과 연계만
+spd-helper,SPD 점검,/tools/electrical/spd-helper,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P1,CalculatorExplain 미표시·콘텐츠 데이터 작업 필요
+earth-conductor,접지 도체,/tools/electrical/earth-conductor,published,yes,yes,3,yes,1,3,yes,86,28,18,16,14+10,P2,
+generator-sizing,발전기 용량,/tools/facility/generator-sizing,published,yes,yes,3,yes,0,0,yes,72,28,14,10,12+8,P1,가이드 예제表 없음
+battery-capacity,배터리,/tools/facility/battery-capacity,published,yes,no,3,yes,1,3,yes,78,28,16,16,10+8,P1,meta 없음
+energy-intensity,에너지 원단위,/tools/facility/energy-intensity,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P1,가이드 없음
+pm-interval,예방정비,/tools/facility/pm-interval,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P2,가이드 없음
+yoy-energy,YoY,/tools/facility/yoy-energy,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P2,가이드 없음
+field-compare,현장 비교,/tools/facility/field-compare,published,yes,no,1,no,0,0,yes,46,26,4,4,4+8,P1,전용 엔진·현장 검증 핵심
+phase-unbalance,상불평형,/tools/facility/phase-unbalance,published,yes,no,3,yes,1,3,yes,78,28,16,16,10+8,P1,meta 없음
+generator-load-test,부하시험,/tools/facility/generator-load-test,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P2,가이드 없음
+duty-cycle,듀티,/tools/facility/duty-cycle,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P2,가이드 없음
+sensor-calibration,센서 보정,/tools/facility/sensor-calibration,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P2,가이드 없음
+retrofit-compare,개조 비교,/tools/facility/retrofit-compare,published,yes,no,1,no,0,0,yes,48,28,4,4,4+8,P2,가이드 없음
+load-schedule,부하 스케줄,/tools/schedules/load,published,yes,no,1,no,0,0,dedicated,50,26,6,4,4+10,P1,스케줄 3종 공통 콘텐츠 부재
+cable-schedule,케이블 스케줄,/tools/schedules/cable,published,yes,no,1,no,0,0,dedicated,50,26,6,4,4+10,P1,
+panel-schedule,판넬 스케줄,/tools/schedules/panel,published,yes,no,1,no,0,0,dedicated,50,26,6,4,4+10,P1,
+arc-flash,아크플래시,/tools/advanced/arc-flash,published,yes,no,1,no,0,0,dedicated,52,24,6,4,6+12,P1,계산 없음 점검목록·안전 문구 강화
+lightning-risk,낙뢰,/tools/advanced/lightning-risk,published,yes,no,1,no,0,0,dedicated,52,24,6,4,6+12,P1,위험점수 계산 없음 명시
+sld,SLD,/tools/advanced/sld,published,yes,no,1,no,0,0,dedicated,50,26,4,4,4+12,P2,도구 성격 상 콘텐츠 최소 허용 가능
+trend-analysis,트렌드,/tools/facility/trend-analysis,published,yes,no,1,no,0,0,dedicated,48,26,4,4,4+10,P1,전용 UI·가이드 없음
