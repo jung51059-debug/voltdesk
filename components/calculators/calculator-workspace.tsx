@@ -396,7 +396,7 @@ export function CalculatorWorkspace({
 
       <CalculatorExplain slug={tool.slug} formula={formula} />
 
-      <TechnicalDisclosure formula={formula} variant={getCalculatorGuide(tool.slug) ? "compact" : "full"} />
+      <TechnicalDisclosure formula={formula} slug={tool.slug} variant={getCalculatorGuide(tool.slug) ? "compact" : "full"} />
 
       {tool.faqs.length > 0 ? (
         <section className="mt-8 border-t border-border pt-6">

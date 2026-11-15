@@ -80,7 +80,7 @@ export function SldClient() {
         ))}
       </ul>
       {formula ? <CalculatorExplain slug="sld" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} slug="sld" variant="compact" /> : null}
     </div>
   );
 }

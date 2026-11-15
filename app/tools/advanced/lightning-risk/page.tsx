@@ -1,3 +1,4 @@
+import { CalculatorFaq } from "@/components/calculators/calculator-faq";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -64,7 +65,8 @@ export default function LightningPage() {
         이 페이지는 점검 목록입니다. LPS 등급, 수뢰부 배치, 이격거리는 계산하지 않습니다.
       </p>
       {formula ? <CalculatorExplain slug="lightning-risk" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : <EngineeringDisclaimer />}
+      {formula ? <TechnicalDisclosure formula={formula} slug="lightning-risk" variant="compact" /> : <EngineeringDisclaimer />}
+      {tool ? <CalculatorFaq faqs={tool.faqs} /> : null}
     </div>
   );
 }

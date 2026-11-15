@@ -132,8 +132,11 @@ describe("Phase 3B-2B-3 메타·안내형", () => {
     expect(getToolBySlug("arc-flash")?.metaDescription).toMatch(/계산하지 않습니다/);
   });
 
-  it("load-schedule localStorage 언급", () => {
-    expect(JSON.stringify(getCalculatorGuide("load-schedule"))).toContain("voltdesk:load-schedule");
+  it("load-schedule 브라우저 저장 범위를 설명하고 내부 저장 키는 노출하지 않는다", () => {
+    const guide = JSON.stringify(getCalculatorGuide("load-schedule"));
+    expect(guide).toContain("브라우저 저장소");
+    expect(guide).toContain("동기화되지 않습니다");
+    expect(guide).not.toContain("voltdesk:load-schedule");
   });
 });
 

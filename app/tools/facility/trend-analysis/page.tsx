@@ -1,3 +1,4 @@
+import { CalculatorFaq } from "@/components/calculators/calculator-faq";
 import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -45,6 +46,7 @@ export default function TrendAnalysisPage() {
         ]}
       />
       <TrendClient />
+      {tool ? <CalculatorFaq faqs={tool.faqs} /> : null}
     </>
   );
 }

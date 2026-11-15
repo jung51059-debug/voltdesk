@@ -13,78 +13,78 @@ export const phase3c2aGuides: CalculatorGuide[] = [
         title: "목록 도구와 자동 선정",
         paragraphs: [
           "Size·Type·Cores는 사용자가 넣는 검토 칸입니다. Ampory가 KEC 허용전류나 표준 단면을 자동으로 채우지 않습니다.",
-          "행을 선택하면 설계전류(Ib)만 handoff로 케이블 굵기·전압강하·차단기 참고 계산기에 넘깁니다.",
+          "행을 선택하면 설계전류(Ib)를 케이블 굵기·전압강하·차단기 참고 계산기로 전달합니다.",
         ],
       },
       {
         title: "부하 스케줄과의 관계",
         paragraphs: [
-          "Load Schedule의 「Cable Schedule 검토 목록 만들기」는 rowPowers의 수요 전류를 태그·Panel·부하명에 실어 넣습니다. ΔV%·길이는 비워 둡니다.",
-          "역방향으로 케이블 CSV만 수정한 뒤 Load를 다시 만들 필요는 없습니다. 두 localStorage 키는 독립입니다(voltdesk:cable-schedule).",
+          "Load Schedule의 「Cable Schedule 검토 목록 만들기」는 행별 부하 집계의 수요 전류를 태그·Panel·부하명에 실어 넣습니다. ΔV%·길이는 비워 둡니다.",
+          "역방향으로 케이블 CSV만 수정한 뒤 Load를 다시 만들 필요는 없습니다. 부하 목록과 케이블 목록은 따로 저장됩니다.",
         ],
       },
       {
         title: "CSV와 필드",
         paragraphs: [
-          "첫 행은 헤더입니다. tag, from, to, load, voltage, current, cableType, cores, size, length, vdPct, route, remark 순을 권장합니다.",
+          "첫 행은 열 이름입니다. 내보낸 CSV의 열 이름과 순서를 유지해 케이블 번호·출발/도착·부하·전압·전류·종류·심수·규격·길이·전압강하·경로·비고를 관리하세요.",
           "가져온 숫자는 검증만 하며 잘못된 열은 무시하지 않고 가능한 칸에 매핑합니다.",
         ],
       },
     ],
     inputMeaning: [
-      { label: "current", text: "해당 회로 설계전류(A). Load에서 넘기면 수요 전류이며 기동 가산은 포함되지 않을 수 있습니다." },
-      { label: "length · vdPct", text: "편도 길이와 허용 전압강하 %는 검토 메모입니다. 이 화면에서 ΔV를 계산하지 않습니다." },
-      { label: "size", text: "공칭 단면·규격 후보입니다. 최종 선정은 케이블 계산기와 제조사 표로 확인합니다." },
+      { label: "설계전류", text: "해당 회로 설계전류(A). Load에서 넘기면 수요 전류이며 기동 가산은 포함되지 않을 수 있습니다." },
+      { label: "길이 · 전압강하율", text: "편도 길이와 허용 전압강하 %는 검토 메모입니다. 이 화면에서 ΔV를 계산하지 않습니다." },
+      { label: "규격", text: "공칭 단면·규격 후보입니다. 최종 선정은 케이블 계산기와 제조사 표로 확인합니다." },
     ],
     walkthroughs: [
       {
         title: "Load에서 넘긴 2×15 kW 모터 회로",
         lines: [
-          "380 V 3상, 수요 전류 ≈ 46.63 A가 current에 실립니다.",
-          "cores는 3C+E, size는 비워 둔 채로 행을 선택해 케이블 굵기 검토로 넘깁니다.",
-          "Ib만 handoff 되며 Iz·보정계수는 케이블 계산기에서 처리합니다.",
+          "380 V 3상, 수요 전류 ≈ 46.63 A가 설계전류에 실립니다.",
+          "심수는 3C+E, 규격은 비워 둔 채로 행을 선택해 케이블 굵기 검토로 넘깁니다.",
+          "설계전류 Ib만 전달되며 Iz·보정계수는 케이블 계산기에서 처리합니다.",
         ],
       },
       {
         title: "수동 입력: 분전반→원격 팬 32 A",
         lines: [
-          "from=DB-1, to=FAN-3, load=환기팬, voltage=380, current=32.",
-          "length 45 m, vdPct 3은 메모로 남깁니다. 전압강하 계산기에서 r·L을 넣어 검증합니다.",
-          "size에 6 mm²를 적어도 허용전류 적합은 이 도구가 판단하지 않습니다.",
+          "출발=DB-1, 도착=FAN-3, 부하=환기팬, 전압=380, 설계전류=32.",
+          "길이 45 m, 전압강하율 3은 메모로 남깁니다. 전압강하 계산기에서 r·L을 넣어 검증합니다.",
+          "규격에 6 mm²를 적어도 허용전류 적합은 이 도구가 판단하지 않습니다.",
         ],
       },
       {
         title: "220 V 단상 조명 다회로",
         lines: [
-          "단상 220 V, current 5.56 A(40×0.04 kW 조명 행과 같은 규모).",
-          "cores 2C+E, cableType CV는 관례 표기일 뿐입니다.",
+          "단상 220 V, 설계전류 5.56 A(40×0.04 kW 조명 행과 같은 규모).",
+          "심수 2C+E, 케이블 종류 CV는 관례 표기일 뿐입니다.",
           "같은 Panel에서 여러 행을 CSV로 묶어 시공·자재 리스트로 씁니다.",
         ],
       },
     ],
     lookup: {
-      title: "Load rowPowers → 케이블 행 전류 (precision 2)",
-      note: "schedules.rowPowers와 동일. size 자동 없음.",
-      columns: ["부하 조건", "I (A)", "cores"],
+      title: "Load 행별 부하 집계 → 케이블 행 전류 (소수 2자리)",
+      note: "행별 부하 집계와 동일. 규격 자동 없음.",
+      columns: ["부하 조건", "I (A)", "심수"],
       rows: [
         ["2×15 kW 모터 380 V 3상", "46.63 A", "3C+E"],
         ["40×0.04 kW 조명 220 V 단상", "5.56 A", "2C+E"],
-        ["40 kW UPS η0.95 coincidence0.7", "49.76 A", "3C+E"],
+        ["40 kW UPS η0.95 동시사용률 0.7", "49.76 A", "3C+E"],
       ],
     },
     interpretation: [
       "표는 설계 검토용 목록입니다. 시공 승인·감리 제출 형식을 대체하지 않습니다.",
-      "vdPct가 비어 있어도 경로 전압강하는 별도 계산이 필요합니다.",
+      "전압강하율이 비어 있어도 경로 전압강하는 별도 계산이 필요합니다.",
     ],
     cautions: [
       "자동 케이블·차단기 선정, 다심 보정, 온도·군 설치 보정을 하지 않습니다.",
-      "localStorage 삭제 시 목록이 사라집니다. CSV 백업을 권장합니다.",
+      "브라우저 저장소 삭제 시 목록이 사라집니다. CSV 백업을 권장합니다.",
       "기동전류·고조파 부하는 Ib에 사용자가 반영해야 합니다.",
     ],
     links: [
       { href: "/tools/schedules/load", label: "부하 스케줄", text: "연결·수요 kW를 집계한 뒤 Cable 목록을 만듭니다." },
       { href: "/tools/electrical/cable-sizing", label: "케이블 굵기 검토", text: "행 전류와 허용 ΔV%로 단면 후보를 봅니다." },
-      { href: "/tools/electrical/voltage-drop", label: "전압강하 계산기", text: "length·r로 ΔV를 구간별로 확인합니다." },
+      { href: "/tools/electrical/voltage-drop", label: "전압강하 계산기", text: "길이·r로 ΔV를 구간별로 확인합니다." },
       { href: "/references/cable-sizing", label: "케이블 사이즈 검토의 기본", text: "Ib와 Iz를 구분하는 참고글입니다." },
     ],
   },
@@ -105,13 +105,13 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       {
         title: "불평형 % 정의",
         paragraphs: [
-          "phaseImbalance는 각 상 전류 합에 대해 평균에서 가장 벗어난 값의 비율(%)입니다. IEC 대칭분 VUF가 아닙니다.",
-          "부하 스케줄의 phaseAnalysis(kW 기준)와 목적이 다릅니다. 여기서는 회로 전류 배치가 중심입니다.",
+          "상별 전류 불평형은 각 상 전류 합에 대해 평균에서 가장 벗어난 값의 비율(%)입니다. IEC 대칭분 VUF가 아닙니다.",
+          "부하 스케줄의 상별 전력 집계(kW 기준)와 목적이 다릅니다. 여기서는 회로 전류 배치가 중심입니다.",
         ],
       },
     ],
     inputMeaning: [
-      { label: "current", text: "회로 설계전류(A). Load handoff 시 rowPowers 전류와 같습니다." },
+      { label: "설계전류", text: "회로 설계전류(A)입니다. 부하 스케줄에서 전달하면 행별 수요 전류를 사용합니다." },
       { label: "phase", text: "R/S/T 단상 또는 RST 3상. kw는 참고 표기이며 합산 검증은 전류로 합니다." },
       { label: "breaker · cable", text: "검토 메모 칸입니다. 자동 선정값이 아닙니다." },
     ],
@@ -128,8 +128,8 @@ export const phase3c2aGuides: CalculatorGuide[] = [
         title: "R20 · S20 · T40 A",
         lines: [
           "평균 전류 (20+20+40)/3 = 26.7 A입니다.",
-          "최대 편차 13.3 A → 불평형 약 50.0% (화면 precision 1).",
-          "phaseImbalance 함수와 동일합니다.",
+          "최대 편차 13.3 A → 불평형 약 50.0% (화면 소수 1자리).",
+          "각 상 전류 평균에서 최대 편차의 비율을 구합니다.",
         ],
       },
       {
@@ -141,8 +141,8 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       },
     ],
     lookup: {
-      title: "phaseImbalance 전류 예 (A)",
-      note: "schedules.phaseImbalance. precision 1 표시.",
+      title: "상별 전류 불평형 계산 전류 예 (A)",
+      note: "상별 전류 불평형 계산. 소수 1자리 표시.",
       columns: ["R", "S", "T", "불평형 %"],
       rows: [
         ["30", "30", "30", "0.0 %"],
@@ -157,7 +157,7 @@ export const phase3c2aGuides: CalculatorGuide[] = [
     cautions: [
       "KEC·IEEE 한도를 내장하지 않습니다. 적용 기준은 프로젝트와 제조사 데이터로 확인하세요.",
       "회로 전류에 기동·순간 부하를 넣었는지 사용자가 기록해야 합니다.",
-      "voltdesk:panel-schedule localStorage는 기기 간 동기화되지 않습니다.",
+      "브라우저 저장소는 기기 간 동기화되지 않습니다.",
     ],
     links: [
       { href: "/tools/schedules/load", label: "부하 스케줄", text: "Panel 목록 생성과 상 배치 추천의 시작점입니다." },
@@ -271,17 +271,17 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "voltage · current", text: "동시에 측정한 선간전압(V)과 선전류(A)입니다. 단상은 별도 모드입니다." },
-      { label: "ratedKw · ratedKva", text: "명판 정격 대비 %. 적합·계약 용량 판정이 아닙니다." },
-      { label: "meterStart · meterEnd", text: "계량 kWh 차이가 있으면 계산 에너지보다 우선합니다." },
+      { label: "측정 선간전압(V) · 선전류(A)", text: "동시에 측정한 선간전압(V)과 선전류(A)입니다. 단상은 별도 모드입니다." },
+      { label: "정격 kW · 정격 kVA", text: "명판 정격 대비 %. 적합·계약 용량 판정이 아닙니다." },
+      { label: "시작 계량값 · 종료 계량값", text: "계량 kWh 차이가 있으면 계산 에너지보다 우선합니다." },
     ],
     walkthroughs: [
       {
         title: "380 V 3상 · 420 A · PF 0.8 · 2 h",
         lines: [
-          "S = √3×380×420/1000 → 화면 precision 2로 276.44 kVA입니다.",
+          "S = √3×380×420/1000 → 화면 소수 2자리로 276.44 kVA입니다.",
           "P ≈ 221.15 kW, 에너지 ≈ 442.30 kWh(2 h, 계량 없을 때).",
-          "extra.test와 동일 입력이며 표시만 precision 2입니다.",
+          "계측 조건을 고정하고 소수 둘째 자리까지 표시한 예입니다.",
         ],
       },
       {
@@ -300,8 +300,8 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       },
     ],
     lookup: {
-      title: "380 V 3상 · PF 0.8 (precision 2)",
-      note: "calculateGeneratorLoadTest와 동일 공식.",
+      title: "380 V 3상 · PF 0.8 (소수 2자리)",
+      note: "입력한 전압·전류로 피상전력을 구하고 역률이 있을 때만 유효전력으로 환산합니다.",
       columns: ["I (A)", "S (kVA)", "P (kW)"],
       rows: [
         ["105", "69.11 kVA", "55.29 kW"],
@@ -336,7 +336,7 @@ export const phase3c2aGuides: CalculatorGuide[] = [
         title: "Runtime vs 모터 Duty",
         paragraphs: [
           "IEC 60034 S1~S10 Duty Type(연속·단시·주기 등)과 다릅니다. 관찰기간 대비 ON 시간 비율만 냅니다.",
-          "ON 비율(ON+OFF 기준)은 offHours를 넣고 합이 period와 다를 때만 보입니다.",
+          "ON 비율(ON+OFF 기준)은 정지시간을 넣고 합이 관찰기간과 다를 때만 보입니다.",
         ],
       },
       {
@@ -348,9 +348,9 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "periodHours", text: "로그·검침으로 잡은 전체 관찰 시간(h)." },
-      { label: "onHours", text: "설비가 실제로 운전된 시간(h). period를 넘기면 오류입니다." },
-      { label: "starts", text: "관찰기간 내 기동(또는 사이클) 횟수. 0이면 평균 ON/OFF는 표시하지 않습니다." },
+      { label: "관찰기간", text: "로그·검침으로 잡은 전체 관찰 시간(h)." },
+      { label: "운전시간", text: "설비가 실제로 운전된 시간(h). 관찰기간을 넘기면 오류입니다." },
+      { label: "기동 횟수", text: "관찰기간 내 기동(또는 사이클) 횟수. 0이면 평균 ON/OFF는 표시하지 않습니다." },
     ],
     walkthroughs: [
       {
@@ -366,21 +366,21 @@ export const phase3c2aGuides: CalculatorGuide[] = [
         lines: [
           "가동률 ≈ 71.43%.",
           "Starts/h ≈ 0.119 회/h.",
-          "장시간 연속 운전 설비는 starts가 0에 가까울 수 있습니다.",
+          "장시간 연속 운전 설비는 기동 횟수가 0에 가까울 수 있습니다.",
         ],
       },
       {
-        title: "ON+OFF 명시: 10 h ON · 14 h OFF (period 24)",
+        title: "ON+OFF 명시: 10 h ON · 14 h OFF (관찰기간 24)",
         lines: [
-          "ON+OFF=24이면 ON 비율(ON+OFF 기준)은 41.67%로 별도 메트릭입니다.",
-          "Runtime Ratio는 여전히 ON/period입니다.",
+          "운전 10 h와 정지 14 h의 합이 관찰기간 24 h와 같으면 가동률 41.67%를 표시하고 같은 값의 운전·정지 기준 비율은 별도 표시하지 않습니다.",
+          "Runtime Ratio는 여전히 ON/관찰기간입니다.",
         ],
       },
     ],
     lookup: {
-      title: "가동률 예 (precision 2)",
-      note: "calculateDutyCycle",
-      columns: ["period", "ON", "starts", "Runtime %"],
+      title: "가동률 예 (소수 2자리)",
+      note: "관찰기간 대비 운전시간 비율입니다.",
+      columns: ["관찰기간", "ON", "기동 횟수", "Runtime %"],
       rows: [
         ["24 h", "8 h", "12", "33.33 %"],
         ["168 h", "120 h", "20", "71.43 %"],
@@ -388,7 +388,7 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       ],
     },
     interpretation: [
-      "가동률이 높다고 설비가 과부하인 것은 아닙니다. kW 부하는 equipment-load 등 다른 도구로 봅니다.",
+      "가동률이 높다고 설비가 과부하인 것은 아닙니다. 전력 부하 비율은 설비 부하율 도구에서 따로 봅니다.",
       "시간대별 demand는 본 도구 범위 밖입니다.",
     ],
     cautions: [
@@ -413,22 +413,22 @@ export const phase3c2aGuides: CalculatorGuide[] = [
       {
         title: "기준선과 개선안",
         paragraphs: [
-          "baselineKw·proposedKw와 각각의 연간 운전시간으로 E = P×h를 비교합니다. h가 다르면 운전시간 변화도 반영됩니다.",
+          "기존 전력과 개선 후 전력, 각각의 연간 운전시간으로 E = P×h를 비교합니다. h가 다르면 운전시간 변화도 반영됩니다.",
           "절감 kW = baseline − proposed, 절감 kWh = E0 − E1.",
         ],
       },
       {
         title: "비용과 Payback",
         paragraphs: [
-          "baselineRate·proposedRate는 사용자 단가(원/kWh 등)입니다. 한전 표 자동 적용 없음.",
-          "capitalCost와 연간 비용 절감이 모두 양수일 때만 Simple Payback(년)을 표시합니다.",
+          "기존 단가·개선 후 단가는 사용자 단가(원/kWh 등)입니다. 한전 표 자동 적용 없음.",
+          "투자비와 연간 비용 절감이 모두 양수일 때만 Simple Payback(년)을 표시합니다.",
         ],
       },
     ],
     inputMeaning: [
-      { label: "baselineKw / proposedKw", text: "동일 경계(예: 한 대의 AHU)에서 개선 전·후 평균 소비전력입니다." },
-      { label: "baselineHours", text: "연간 또는 분석 기간 운전시간. 개선 후 시간이 줄면 proposedHours에 넣습니다." },
-      { label: "capitalCost", text: "투자비. 비우면 절감 kWh·kW만 표시합니다." },
+      { label: "기존 전력 / 개선 후 전력", text: "동일 경계(예: 한 대의 AHU)에서 개선 전·후 평균 소비전력입니다." },
+      { label: "기존 연간 운전시간", text: "연간 또는 분석 기간 운전시간. 개선 후 시간이 줄면 개선 후 연간 운전시간에 넣습니다." },
+      { label: "투자비", text: "투자비. 비우면 절감 kWh·kW만 표시합니다." },
     ],
     walkthroughs: [
       {
@@ -436,27 +436,27 @@ export const phase3c2aGuides: CalculatorGuide[] = [
         lines: [
           "절감 kW = 7 kW, 연간 절감 kWh = 28000 kWh.",
           "연간 비용 절감 = 2 800 000 원, Payback ≈ 0.5 년.",
-          "extra.test 개선 전후 케이스와 같습니다.",
+          "두 조건의 연간 운전시간을 같게 둔 비교 예입니다.",
         ],
       },
       {
         title: "투자비 없음",
         lines: [
-          "capitalCost=0이면 pb 메트릭 없음.",
+          "투자비가 0이면 투자회수기간은 표시하지 않습니다.",
           "절감률 % = (baseline−proposed)/baseline×100.",
         ],
       },
       {
         title: "운전시간도 감소",
         lines: [
-          "proposedHours < baselineHours면 kWh 절감이 전력만 줄인 것보다 커질 수 있습니다.",
+          "개선 후 연간 운전시간이 기존보다 짧으면 kWh 절감이 전력만 줄인 것보다 커질 수 있습니다.",
           "역방향(개선 후 kW 증가)이면 절감이 음수로 표시됩니다.",
         ],
       },
     ],
     lookup: {
-      title: "절감 예 (h 동일, precision 2)",
-      note: "calculateRetrofitCompare",
+      title: "절감 예 (h 동일, 소수 2자리)",
+      note: "기존·개선 후의 전력과 운전시간을 각각 곱해 비교합니다.",
       columns: ["P0 kW", "P1 kW", "h", "ΔkWh"],
       rows: [
         ["18", "11", "4000", "28000 kWh"],

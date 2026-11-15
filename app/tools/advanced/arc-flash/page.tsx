@@ -1,3 +1,4 @@
+import { CalculatorFaq } from "@/components/calculators/calculator-faq";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -74,7 +75,8 @@ export default function ArcFlashPage() {
         않습니다.
       </p>
       {formula ? <CalculatorExplain slug="arc-flash" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : <EngineeringDisclaimer />}
+      {formula ? <TechnicalDisclosure formula={formula} slug="arc-flash" variant="compact" /> : <EngineeringDisclaimer />}
+      {tool ? <CalculatorFaq faqs={tool.faqs} /> : null}
     </div>
   );
 }

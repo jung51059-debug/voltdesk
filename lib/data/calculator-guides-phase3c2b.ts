@@ -12,7 +12,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       {
         title: "원단위와 분모",
         paragraphs: [
-          "원단위 = kWh ÷ 활동량입니다. 분모 단위는 unitLabel로 표기만 하며 단위 변환은 하지 않습니다.",
+          "원단위 = kWh ÷ 활동량입니다. 분모 단위는 활동량 단위로 표기만 하며 단위 변환은 하지 않습니다.",
           "m²·천개·인시 등 프로젝트마다 정의가 다르면 숫자를 직접 비교하지 마세요.",
         ],
       },
@@ -26,8 +26,8 @@ export const phase3c2bGuides: CalculatorGuide[] = [
     ],
     inputMeaning: [
       { label: "kWh", text: "분석 구간 전력량입니다. 한전 청구·계량기·EMS 합산 중 무엇을 넣었는지 기록하세요." },
-      { label: "denominator", text: "면적·생산량·인원 등 활동량입니다. 0이면 나눌 수 없습니다." },
-      { label: "unitLabel", text: "분모 단위 이름(예: m², 개, p)입니다. 계산에는 영향 없습니다." },
+      { label: "활동량", text: "면적·생산량·인원 등 활동량입니다. 0이면 나눌 수 없습니다." },
+      { label: "활동량 단위", text: "분모 단위 이름(예: m², 개, 인시)입니다. 계산에는 영향 없습니다." },
     ],
     walkthroughs: [
       {
@@ -47,8 +47,8 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     lookup: {
-      title: "원단위 예 (precision 2)",
-      note: "calculateEnergyIntensity",
+      title: "원단위 예 (소수 2자리)",
+      note: "전력량을 같은 기간의 활동량으로 나눈 예입니다. 단위 이름을 바꿔도 수치는 자동 환산되지 않습니다.",
       columns: ["kWh", "분모", "원단위"],
       rows: [
         ["12000", "3000 m²", "4.00 kWh/m²"],
@@ -61,7 +61,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       "한전·산업단위 벤치마크와의 차등 판정을 하지 않습니다.",
     ],
     cautions: [
-      "탄소·비용은 energy-cost 등 별도 도구입니다.",
+      "비용 비교는 에너지 비용 추정 도구에서 별도로 확인하며 탄소배출량은 이 도구에서 계산하지 않습니다.",
       "kWh가 0이어도 분모>0이면 원단위 0이 나옵니다.",
       "법정 에너지 관리 기준 적합 판정이 아닙니다.",
     ],
@@ -95,8 +95,8 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "runHours", text: "마지막 정비 이후 또는 설치 이후 누적 운전시간(h)." },
-      { label: "intervalHours", text: "권장 PM 주기(h). 제조사·사내 PM 표에서 가져옵니다." },
+      { label: "누적 운전시간", text: "마지막 정비 이후 또는 설치 이후 누적 운전시간(h)." },
+      { label: "정비 주기", text: "권장 PM 주기(h). 제조사·사내 PM 표에서 가져옵니다." },
     ],
     walkthroughs: [
       {
@@ -108,7 +108,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
       {
         title: "누적 2 500 h · 주기 500 h",
-        lines: ["2500 mod 500 = 0 → 주기 도래로 표시합니다.", "정비 직후 runHours를 리셋하거나 이력에 반영하세요."],
+        lines: ["2500 mod 500 = 0 → 주기 도래로 표시합니다.", "정비 직후 누적 운전시간을 리셋하거나 이력에 반영하세요."],
       },
       {
         title: "누적 100 h · 주기 800 h",
@@ -117,7 +117,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
     ],
     lookup: {
       title: "잔여 시간 예 (h)",
-      note: "calculatePmInterval",
+      note: "누적 운전시간과 설정한 정비 주기로 남은 시간을 계산합니다.",
       columns: ["누적", "주기", "다음까지"],
       rows: [
         ["2300", "500", "200 h"],
@@ -164,13 +164,13 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "thisKwh / lastKwh", text: "같은 달 검침 kWh입니다. 말일·초일 정책을 맞추세요." },
-      { label: "thisDemand / lastDemand", text: "Peak Demand 기록이 있을 때만 넣습니다." },
+      { label: "올해 사용량 / 전년 사용량", text: "같은 달 검침 kWh입니다. 말일·초일 정책을 맞추세요." },
+      { label: "올해 최대수요 / 전년 최대수요", text: "Peak Demand 기록이 있을 때만 넣습니다." },
     ],
     walkthroughs: [
       {
         title: "올해 12 000 · 전년 10 000 kWh",
-        lines: ["Δ = 2000 kWh, +20.00%입니다.", "증가·감소 문구는 엔진 interpretation과 같습니다."],
+        lines: ["Δ = 2000 kWh, +20.00%입니다.", "변화율의 부호로 증가·감소를 구분하며 원인은 별도로 확인해야 합니다."],
       },
       {
         title: "올해 9 000 · 전년 10 000 kWh",
@@ -182,8 +182,8 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     lookup: {
-      title: "동월 kWh 예 (precision 2)",
-      note: "calculateYoyEnergy",
+      title: "동월 kWh 예 (소수 2자리)",
+      note: "전년 대비 사용량 차이와 변화율을 계산합니다.",
       columns: ["올해", "전년", "Δ", "%"],
       rows: [
         ["12000", "10000", "+2000 kWh", "+20.00 %"],
@@ -217,8 +217,8 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       {
         title: "지원 범위",
         paragraphs: [
-          "voltdesk:sld-draft localStorage에 노드·엣지 JSON을 저장합니다. 자동 배선·심볼·KEC 검토 없음.",
-          "노드 kind별 기본 calculatorHref는 SLD_KIND_LINKS에서 정해집니다.",
+          "브라우저 저장소에 노드·엣지 JSON을 저장합니다. 자동 배선·심볼·KEC 검토 없음.",
+          "노드 종류별 기본 연결 계산기는 장비 종류별 연결 목록에서 정해집니다.",
         ],
       },
       {
@@ -231,7 +231,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
     ],
     inputMeaning: [
       { label: "nodes", text: "utility·transformer·bus 등 종류와 이름, 연결할 계산기 href." },
-      { label: "edges", text: "from→to와 cable·bus 등 연결 kind. 임피던스·길이는 저장만 하고 계산하지 않습니다." },
+      { label: "edges", text: "출발→도착 연결과 케이블·모선 등의 연결 종류입니다. 임피던스·길이는 저장만 하고 계산하지 않습니다." },
     ],
     walkthroughs: [
       {
@@ -245,13 +245,13 @@ export const phase3c2bGuides: CalculatorGuide[] = [
         title: "모선 분기 추가",
         lines: [
           "bus 노드를 추가하고 edge로 TR에서 분기합니다.",
-          "케이블 edge는 cable-sizing으로 handoff할 때만 링크 의미가 있습니다.",
+          "케이블 연결은 케이블 굵기 검토 계산기로 이동하는 링크이며 이 도면에서 굵기를 선정하지 않습니다.",
         ],
       },
       {
         title: "비상 발전기 노드",
         lines: [
-          "generator kind 노드를 달고 발전기 용량·로드테스트 URL을 붙입니다.",
+          "발전기 노드를 추가하고 발전기 용량·로드테스트 계산기 링크를 연결합니다.",
           "ATS·병렬운전 로직은 구현하지 않습니다.",
         ],
       },
@@ -273,7 +273,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
     cautions: [
       "자동 CAD·법적 단선도 심사 기능이 없습니다.",
       "기호 표준(IEC 60617) 전체를 그리지 않습니다.",
-      "백업 없이 localStorage만 사용합니다.",
+      "백업 없이 브라우저 저장소만 사용합니다.",
     ],
     links: [
       { href: "/tools/electrical/transformer-sizing", label: "변압기 용량", text: "TR 노드 검토에 연결합니다." },
@@ -305,12 +305,12 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "spanMin · spanMax", text: "계측 범위. Max>Min 이어야 합니다." },
-      { label: "ind1…ind5 / ref1…ref5", text: "최소 1점. 5점은 extra.test 예제와 같은 0~100 스팬입니다." },
+      { label: "측정 범위 최솟값 · 측정 범위 최댓값", text: "계측 범위. Max>Min 이어야 합니다." },
+      { label: "ind1…ind5 / ref1…ref5", text: "최소 1점. 5점은 비교 예와 같은 0~100 스팬입니다." },
     ],
     walkthroughs: [
       {
-        title: "0~100 스팬 5점 (extra.test)",
+        title: "0~100 스팬 5점 (비교 예)",
         lines: [
           "P2에서 절대오차 0.8이 최대입니다.",
           "worst point = 2, wabs = 0.8입니다.",
@@ -327,7 +327,7 @@ export const phase3c2bGuides: CalculatorGuide[] = [
     ],
     lookup: {
       title: "5점 예 (span 0~100)",
-      note: "calculateSensorCalibration, precision 4",
+      note: "표시값과 기준값의 차이를 소수 넷째 자리까지 표시한 예입니다.",
       columns: ["Point", "Error", "|Error|"],
       rows: [
         ["P1 (0)", "+0.2", "0.2"],
@@ -374,31 +374,31 @@ export const phase3c2bGuides: CalculatorGuide[] = [
       },
     ],
     inputMeaning: [
-      { label: "textarea / CSV", text: "parseTrendText로 파싱합니다. 잘못된 줄은 오류로 보고합니다." },
+      { label: "입력 데이터 · CSV", text: "입력한 기간별 데이터를 분석합니다. 숫자로 읽을 수 없는 줄은 줄 번호와 오류를 안내합니다." },
     ],
     walkthroughs: [
       {
         title: "10 · 12 · 14",
         lines: [
           "평균 12, 표본표준편차 2, 변화율 40%입니다.",
-          "extra.test Trend 표본표준편차와 같습니다.",
+          "각 값과 평균 차이를 제곱해 합산하고 표본 수에서 1을 뺀 값으로 나눈 뒤 제곱근을 구합니다.",
         ],
       },
       {
         title: "값만 5점",
-        lines: ["시각 없으면 duration·/h 변화율 메트릭은 생략됩니다.", "min·max·range는 엔진이 직접 계산합니다."],
+        lines: ["시각이 없으면 관찰기간과 시간당 변화율은 표시하지 않습니다.", "입력값에서 최솟값·최댓값과 두 값의 차이를 계산합니다."],
       },
       {
         title: "시각 포함 샘플",
         lines: [
-          "SAMPLE 주석의 5시간 구간 218→224.",
-          "Peak 값·시각 라벨은 analyzeTrend.peak에서 가져옵니다.",
+          "화면 예제는 08:00부터 12:00까지 4시간 동안 값이 218에서 224로 변합니다.",
+          "최댓값과 해당 데이터에 입력된 시각을 함께 표시합니다. 시각이 없으면 시각 없음으로 표시합니다.",
         ],
       },
     ],
     lookup: {
       title: "10·12·14 통계",
-      note: "analyzeTrend",
+      note: "입력 순서에 따른 기초 통계입니다. 시간 간격을 반영한 가중 평균이나 미래 사용량 예측은 하지 않습니다.",
       columns: ["지표", "값"],
       rows: [
         ["평균", "12"],

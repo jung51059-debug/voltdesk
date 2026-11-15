@@ -180,7 +180,7 @@ export function CableScheduleClient() {
         </Link>
       </div>
       {formula ? <CalculatorExplain slug="cable-schedule" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} slug="cable-schedule" variant="compact" /> : null}
     </div>
   );
 }

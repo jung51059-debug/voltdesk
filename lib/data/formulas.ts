@@ -39,9 +39,9 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-1p",
-        title: "일반 전기공학 전력·전류 관계식",
+        title: "단상 유효전력·부하전류 관계식",
         publisher: "공학 교과서",
-        note: "단상 I = P/(V PF). 표준 표를 사용하지 않습니다.",
+        note: "단상 P=VI·PF 관계를 역산합니다. 축출력 입력에는 효율 η를 별도로 반영하며 표준 선정표를 사용하지 않습니다.",
       },
     ],
   },
@@ -81,7 +81,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-3p",
-        title: "일반 전기공학 3상 전력·전류 관계식",
+        title: "평형 3상 유효전력·선전류 관계식",
         publisher: "공학 교과서",
         note: "P = √3 V I PF 역산. 표준 표를 사용하지 않습니다.",
       },
@@ -117,7 +117,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-contract",
-        title: "일반 전기공학 단상·3상 전력·전류 관계식",
+        title: "단상·평형 3상 부하전류 환산식",
         publisher: "공학 교과서",
         note: "단상·3상 부하전류 계산과 같은 식입니다. 표준 표를 사용하지 않습니다.",
       },
@@ -154,7 +154,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-va",
-        title: "일반 전기공학 전압·전류·전력 관계",
+        title: "전압·전류 곱에 의한 전력 관계식",
         publisher: "공학 교과서",
         note: "P = V × I. 표준 표나 제조사 정격을 내장하지 않습니다.",
       },
@@ -189,7 +189,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-amp-kw",
-        title: "일반 전기공학 단상·3상 전력 관계식",
+        title: "단상·평형 3상 전기 입력전력 관계식",
         publisher: "공학 교과서",
         note: "단상·3상 부하전류 식의 역산이며 효율은 넣지 않습니다. 표준 표를 사용하지 않습니다.",
       },
@@ -230,10 +230,10 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-nist-hp",
-        title: "NIST / SI 환산 — mechanical horsepower",
+        title: "NIST SP 811 부록 B.8 — 마력의 와트 환산",
         publisher: "NIST",
-        note: "1 hp ≈ 746 W",
-        url: "https://www.nist.gov",
+        note: "기계 마력은 약 745.6999 W이며 이 도구는 746 W/HP로 근사합니다. 미터마력(PS)과 구분하며 엔진 환산계수는 유지합니다.",
+        url: "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8",
       },
     ],
   },
@@ -272,7 +272,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-pf",
-        title: "일반 전기공학 전력 삼각형",
+        title: "유효·무효·피상전력의 전력 삼각형",
         publisher: "공학 교과서",
         note: "PF = P/S. 측정 창·진성 역률 정의는 사용하지 않습니다.",
       },
@@ -314,7 +314,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-tr-load",
-        title: "일반 전기공학 용량 비율",
+        title: "운전 피상전력과 변압기 정격용량의 비율",
         publisher: "공학 교과서",
         note: "부하율 = S/S_rated. 냉각 보정은 수행하지 않습니다.",
       },
@@ -360,9 +360,9 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-vd",
-        title: "일반 전기공학 선로 전압강하 근사식",
+        title: "도체 저항 성분에 의한 선로 전압강하 근사식",
         publisher: "공학 교과서",
-        note: "저항 성분만. KEC 허용치는 내장하지 않습니다.",
+        note: "전압강하 식은 도체 저항 성분만 반영합니다. 선택한 국내 기준 비교의 근거·범위는 별도 계산 기준 안내를 확인하세요.",
       },
     ],
   },
@@ -404,7 +404,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-ups-t",
-        title: "일반 전기공학 에너지 수지",
+        title: "가용 배터리 에너지와 부하전력의 시간 관계",
         publisher: "공학 교과서",
         note: "t = 가용Wh / P. 제조사 런타임 곡선은 사용하지 않습니다.",
       },
@@ -440,7 +440,7 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-gen-load",
-        title: "일반 전기공학 부하율",
+        title: "발전기 실부하와 정격 유효전력의 비율",
         publisher: "공학 교과서",
         note: "P_load/P_rated. 정격 분류 전체를 구현하지 않습니다.",
       },
@@ -481,9 +481,9 @@ export const baseFormulas: FormulaDefinition[] = [
     referenceSources: [
       {
         id: "src-eng-month",
-        title: "일반 시설관리 사용량 비교",
+        title: "검침 사용량의 차이·증감률 비교",
         publisher: "공학 교과서",
-        note: "검침값 차. 에너지 정규화는 사용하지 않습니다.",
+        note: "검침값의 차이·증감률과 선택 입력한 검침 일수당 사용량을 비교합니다. 생산량·기상 정규화는 하지 않습니다.",
       },
     ],
   },
@@ -507,7 +507,7 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: ["R = 0.0175 × 100 / 35 = 0.05 Ω", "r = 0.0175 × 1000 / 35 = 0.5 Ω/km"],
       result: "0.05 Ω (0.5 Ω/km)",
     },
-    referenceSources: [{ id: "src-eng-r", title: "일반 전기공학 도체 저항", publisher: "공학 교과서", note: "R = ρL/A. 도체 저항표를 내장하지 않습니다." }],
+    referenceSources: [{ id: "src-eng-r", title: "균질 도체의 저항률·길이·단면적 관계식", publisher: "공학 교과서", note: "R = ρL/A. 도체 저항표를 내장하지 않습니다." }],
   },
   {
     id: "formula-breaker-ref",
@@ -534,7 +534,7 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: ["I_ref = 87 × 1.25 = 108.75 A", "상용 스케일 참고 125 A"],
       result: "참고 108.75 A (선정 확정 아님)",
     },
-    referenceSources: [{ id: "src-eng-brk", title: "임의 여유율 참고", publisher: "공학 교과서", note: "I×k. 차단기 선정·KEC 적합 판정이 아닙니다." }],
+    referenceSources: [],
   },
   {
     id: "formula-ups-capacity",
@@ -555,7 +555,7 @@ export const baseFormulas: FormulaDefinition[] = [
       steps: ["P_design = 48 kW", "S = 48 / 0.9 = 53.33 kVA"],
       result: "53.33 kVA",
     },
-    referenceSources: [{ id: "src-eng-ups-s", title: "일반 전기공학 kVA 환산", publisher: "공학 교과서", note: "UPS 제품 선정 절차는 사용하지 않습니다." }],
+    referenceSources: [{ id: "src-eng-ups-s", title: "유효전력과 부하·UPS 역률을 이용한 kVA 환산", publisher: "공학 교과서", note: "UPS 제품 선정 절차는 사용하지 않습니다." }],
   },
 ];
 

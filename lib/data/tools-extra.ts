@@ -1379,7 +1379,7 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "분모 단위는 어떻게 맞추나요?",
-        answer: "unitLabel은 표기만 합니다. m²·천개·인시 등 정의를 문서에 남기고 비교할 때 같은 정의만 쓰세요.",
+        answer: "활동량 단위는 결과의 단위 이름에만 반영됩니다. m²·천개·인시 등 정의를 문서에 남기고 비교할 때 같은 정의만 쓰세요.",
       },
       {
         question: "전년 대비는 여기서 하나요?",
@@ -1547,15 +1547,15 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "데이터는 어디에 저장되나요?",
-        answer: "로그인 없이 이 브라우저 localStorage(voltdesk:load-schedule)에 저장됩니다. 다른 PC와 동기화되지 않습니다.",
+        answer: "로그인 없이 이 브라우저의 저장소에 저장됩니다. 다른 PC와 동기화되지 않습니다.",
       },
       {
         question: "수용률과 동시사용률의 차이는?",
-        answer: "demand는 부하 종류 수용률, coincidence는 동시에 겹치는 정도입니다. 둘 다 0~1을 사용자가 넣습니다.",
+        answer: "수용률은 부하 종류별 사용 비율, 동시사용률은 동시에 겹치는 정도입니다. 둘 다 0~1을 사용자가 넣습니다.",
       },
       {
         question: "연결부하와 수요부하란?",
-        answer: "연결은 qty×kW, 수요는 연결/η×demand×coincidence입니다. 수요 kVA는 kW/PF로 구합니다.",
+        answer: "연결부하는 수량×단위 kW, 수요부하는 연결부하/효율×수용률×동시사용률입니다. 수요 kVA는 kW/PF로 구합니다.",
       },
     ],
   }),
@@ -1593,7 +1593,7 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "Load 스케줄과 연동되나요?",
-        answer: "Load에서 Cable 목록을 만들 수 있습니다. voltdesk:cable-schedule은 별도 저장입니다.",
+        answer: "부하 스케줄에서 케이블 목록을 만들 수 있습니다. 두 목록은 따로 저장됩니다.",
       },
       {
         question: "ΔV%는 누가 계산하나요?",
@@ -1639,7 +1639,7 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "차단기·케이블 칸은?",
-        answer: "검토 메모입니다. handoff로 검토 계산기에 전류만 넘깁니다.",
+        answer: "검토 메모입니다. 검토 계산기로 전류만 전달합니다.",
       },
     ],
   }),
@@ -1804,7 +1804,7 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "데이터는 어디에 있나요?",
-        answer: "voltdesk:sld-draft localStorage입니다. 백업·다른 PC 동기화는 없습니다.",
+        answer: "브라우저 저장소입니다. 백업·다른 PC 동기화는 없습니다.",
       },
       {
         question: "엣지에 케이블 길이를 넣으면?",
@@ -1955,8 +1955,8 @@ export const extraTools: CalculatorTool[] = [
         answer: "아닙니다. 단순 ON/기간 비율과 기동 빈도만 냅니다.",
       },
       {
-        question: "ON+OFF가 period와 다른 이유는?",
-        answer: "offHours를 직접 넣으면 ON+OFF 기준 %를 추가 표시할 수 있습니다.",
+        question: "운전시간과 정지시간의 합이 관찰기간과 다르면 어떻게 표시하나요?",
+        answer: "정지시간을 직접 넣고 운전·정지 합계가 관찰기간과 다르면 운전·정지 합계 기준의 비율을 추가로 표시합니다.",
       },
       {
         question: "부하율과 다른 점은?",
@@ -2048,7 +2048,7 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "첫 값이 0이면 변화율은?",
-        answer: "정의하지 않습니다. 절대 min·max·표준편차만 참고하세요.",
+        answer: "정의하지 않습니다. 절대 최솟값·최댓값·표준편차만 참고하세요.",
       },
     ],
   }),
@@ -2086,7 +2086,7 @@ export const extraTools: CalculatorTool[] = [
       },
       {
         question: "NPV·IRR은?",
-        answer: "구현하지 않습니다. Simple Payback만 capitalCost와 연간 비용 절감이 있을 때.",
+        answer: "구현하지 않습니다. Simple Payback만 투자비와 연간 비용 절감이 있을 때.",
       },
       {
         question: "baseline이 0이면?",

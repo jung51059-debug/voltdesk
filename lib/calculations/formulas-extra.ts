@@ -13,12 +13,12 @@ function f(
     title,
     formula,
     variables,
-    units: extra.units ?? ["SI"],
-    assumptions: extra.assumptions ?? ["정현파 정상 상태의 공학 관계식을 사용합니다."],
-    warnings: extra.warnings ?? ["결과는 초기 검토용이며 최종 설계값이 아닙니다."],
-    limitations: extra.limitations ?? ["현장 조건, 최신 적용 기준, 제조사 데이터를 대체하지 않습니다."],
+    units: extra.units ?? [],
+    assumptions: extra.assumptions ?? [],
+    warnings: extra.warnings ?? [],
+    limitations: extra.limitations ?? [],
     example,
-    referenceSources: extra.referenceSources ?? [{ id: `${id}-src`, title: "일반 전기공학 전력·전류 관계식", publisher: "공학 교과서", note: "공개된 기본 공식" }],
+    referenceSources: extra.referenceSources ?? [],
     criteriaNotes: extra.criteriaNotes,
   };
 }
@@ -36,7 +36,7 @@ export const extraFormulas: FormulaDefinition[] = [
     result: "58.29 A",
   }, {
     criteriaNotes: [{ standard: "일반 공식", appliesTo: "명판 P, PF, η로 전류 환산. 모터 명판 절차 전체를 수행하지 않음" }],
-    referenceSources: [{ id: "src-eng-motor", title: "일반 전기공학 전력·전류 관계식", publisher: "공학 교과서", note: "3상 I = P/(√3 V PF η)" }],
+    referenceSources: [{ id: "src-eng-motor", title: "모터 축출력·역률·효율을 반영한 정격전류 관계식", publisher: "공학 교과서", note: "3상 I = P/(√3 V PF η)" }],
   }),
   f("formula-motor-starting", "모터 기동 계산기", "I_start = k × I_FLC,  ΔV = k_phase × I_start × L × r", [
     { symbol: "k", name: "기동배수", unit: "—", description: "명판 또는 기동장치 설정" },
@@ -237,10 +237,16 @@ export const extraFormulas: FormulaDefinition[] = [
   }, {}),
   f("formula-lpd", "조명 전력밀도", "LPD = P / A", [
     { symbol: "P", name: "전력", unit: "W", description: "" },
-  ], { title: "960 W / 96 m² · 조명 교체 비교", given: "기존 2400 W, 연간 3000 h, 사용자 단가 140 원/kWh", steps: ["LPD = 960/96 = 10 W/m²", "절감 전력 = 2400−960 = 1,440 W", "절감 에너지 = 1.44×3000 = 4,320 kWh", "비용 참고 = 4320×140 = 604,800원"], result: "10 W/m² · 연간 4,320 kWh · 604,800원 참고" }, {}),
+  ], { title: "960 W / 96 m² · 조명 교체 비교", given: "기존 2400 W, 연간 3000 h, 사용자 단가 140 원/kWh", steps: ["LPD = 960/96 = 10 W/m²", "절감 전력 = 2400−960 = 1,440 W", "절감 에너지 = 1.44×3000 = 4,320 kWh", "비용 참고 = 4320×140 = 604,800원"], result: "10 W/m² · 연간 4,320 kWh · 604,800원 참고" }, {
+    units: ["W","m²","W/m²","h/년","kWh/년","원/kWh","원/년"],
+    limitations: ["전력밀도와 고정 단가의 절감 참고값입니다. lux·배광·균제도·유지율 검토와 실제 요금 청구는 별도입니다."],
+  }),
   f("formula-solar", "PV 에너지 수지", "P_kWp = E_day / (PSH η)", [
     { symbol: "PSH", name: "Peak Sun Hours", unit: "h", description: "사용자 지역 값" },
-  ], { title: "24 kWh/일, PSH 3.8, η 0.78, 450 W", given: "계통연계 · PSH 3.8 h · 시스템 효율 0.78 · 패널 450 W", steps: ["필요 용량 = 24/(3.8×0.78) = 8.1 kWp", "반올림 전 필요 용량으로 패널 수를 올림 = 18장", "참고 발전량 = 18×450×3.8×0.78/1000 = 24.01 kWh/일", "인버터 참고 = 필요 용량×1.1 = 8.91 kW"], result: "8.1 kWp · 18장 · 참고 발전량 24.01 kWh/일 (보증 아님)" }, {}),
+  ], { title: "24 kWh/일, PSH 3.8, η 0.78, 450 W", given: "계통연계 · PSH 3.8 h · 시스템 효율 0.78 · 패널 450 W", steps: ["필요 용량 = 24/(3.8×0.78) = 8.1 kWp", "반올림 전 필요 용량으로 패널 수를 올림 = 18장", "참고 발전량 = 18×450×3.8×0.78/1000 = 24.01 kWh/일", "인버터 참고 = 필요 용량×1.1 = 8.91 kW"], result: "8.1 kWp · 18장 · 참고 발전량 24.01 kWh/일 (보증 아님)" }, {
+    units: ["kWh/일","PSH(h/일)","W","kWp","장","kW","h","V","kWh","Ah"],
+    limitations: ["입력 일사량·효율의 에너지 수지로 계절별 발전량·수익을 보증하지 않습니다. 배치·음영·온도·충방전 시계열과 연계 규정은 별도 검토합니다."],
+  }),
   f("formula-grounding-rod", "수직 접지봉 근사", "R = ρ/(2πL) ln(4L/d)", [
     { symbol: "ρ", name: "토양저항률", unit: "Ω·m", description: "" },
   ], { title: "ρ=100, L=2.4 m, d=14 mm", given: "단일 봉", steps: ["R=ρ/(2πL)ln(4L/d)"], result: "Ω" }, {
@@ -268,40 +274,66 @@ export const extraFormulas: FormulaDefinition[] = [
   ], { title: "인입, Un 380 V, Uc 440 V", given: "위치=인입", steps: ["계통 확인", "협조"], result: "체크리스트" }, {
     criteriaNotes: [{ standard: "IEC 62305 (범위 안내)", appliesTo: "전체 위험평가 미구현. 간이 위치 안내만" }],
     warnings: ["간이 검토입니다."],
+    units: ["V(Un·Uc)","kA(In, 입력 시 표시만)"],
+    limitations: ["위치별 점검 안내이며 SPD 정격·제품·보호협조를 자동 선정하지 않습니다. 감전·낙뢰 보호 성능이나 표준 적합성을 보증하지 않습니다."],
   }),
   f("formula-generator-sizing", "비상발전기 부하 합산", "P_need = (P_run + P_start)(1+여유)", [
-    { symbol: "동시사용률", name: "diversity", unit: "—", description: "사용자" },
-  ], { title: "일반 120 + 모터 55 + UPS 40 kW", given: "동시 0.85, 여유 15%", steps: ["P_run", "기동 가산", "P_need"], result: "kW / kVA" }, {}),
+    { symbol: "동시사용률", name: "부하 동시사용 비율", unit: "—", description: "사용자" },
+  ], { title: "일반 120 + 모터 55 + UPS 40 kW", given: "동시 0.85, 여유 15%", steps: ["P_run", "기동 가산", "P_need"], result: "kW / kVA" }, {
+    units: ["kW","kVA","역률·수용률·동시사용률·여유율(비율)"],
+    limitations: ["입력한 부하와 기동 환산계수를 합산한 검토 용량입니다. 기동방식별 제조사 곡선·고조파·전압 회복·연료 저장량을 자동 검토하지 않습니다."],
+  }),
   f("formula-generator-fuel", "연료 추정", "V = (L/h) t  또는  (L/kWh) P t", [
     { symbol: "L/kWh", name: "원단위", unit: "L/kWh", description: "추정 모드" },
   ], { title: "320 kW, 8 h, 0.28 L/kWh", given: "추정 모드", steps: ["L/h=89.6", "V=716.8 L"], result: "716.8 L (고정 원단위 추정)" }, {
     warnings: ["제조사 데이터 모드와 일반 추정을 구분합니다."],
+    units: ["kW","h","L/kWh","L/h","L"],
+    limitations: ["고정 원단위 또는 입력한 제조사 L/h에 따른 연료량입니다. 부하율별 소비곡선 보간과 기동·무부하 연료는 자동 반영하지 않으며 탱크 유효 저장량·보충 계획은 별도 검토합니다."],
   }),
   f("formula-generator-start-vd", "발전기 기동 전압강하 근사", "ΔV/V ≈ X_pu × S_start / S_gen", [
     { symbol: "X_pu", name: "리액턴스", unit: "pu", description: "명판" },
-  ], { title: "500 kVA, x=0.2, 기동 180 kVA", given: "단순 모델", steps: ["0.2×180/500×100=7.2%"], result: "7.2%" }, {}),
+  ], { title: "500 kVA, x=0.2, 기동 180 kVA", given: "단순 모델", steps: ["0.2×180/500×100=7.2%"], result: "7.2%" }, {
+    units: ["kVA","pu","%"],
+    limitations: ["무부하 발전기의 순수 리액턴스 근사입니다. AVR·과도응답·케이블 전압강하·기동 성공 여부를 해석하지 않습니다."],
+  }),
   f("formula-battery-ah", "배터리 필요 Ah", "E = P t / (ηinv ηb k_age DOD), C = E/V", [
     { symbol: "DOD", name: "방전심도", unit: "—", description: "" },
   ], { title: "5 kW, 384 V, 15분, η 0.92/0.9, 노화 0.8, DOD 0.8", given: "UPS 배터리", steps: ["E", "C"], result: "Ah, kWh" }, {
     criteriaNotes: [{ standard: "에너지 수지", appliesTo: "Ah 산정 수식. 제조사 런타임 곡선·축전지 선정표 미사용" }],
+    units: ["W","V","h","Wh","kWh","Ah","효율·DOD·노화계수(비율)"],
+    limitations: ["배터리 에너지 수지이며 방전율·온도·열화·Peukert 효과를 반영한 제조사 방전곡선과 다릅니다. 실제 백업시간과 제품 선정은 별도 검토합니다."],
   }),
   f("formula-equipment-load", "설비 부하율·가동률", "부하율=Pavg/Prated, 가동률=trun/tperiod", [
     { symbol: "Pavg", name: "평균전력", unit: "kW", description: "" },
-  ], { title: "정격 75 kW, 평균 42 kW, 420/730 h", given: "월", steps: ["부하율 = 42/75×100 = 56%", "가동률 = 420/730×100 = 57.53%"], result: "설비 부하율 56% · 가동률 57.53%" }, {}),
+  ], { title: "정격 75 kW, 평균 42 kW, 420/730 h", given: "월", steps: ["부하율 = 42/75×100 = 56%", "가동률 = 420/730×100 = 57.53%"], result: "설비 부하율 56% · 가동률 57.53%" }, {
+    units: ["kW","h","%"],
+    limitations: ["정격과 평균전력은 같은 입력·출력 기준으로 비교합니다. 평균을 구한 기간과 운전시간 정의를 기록해야 하며 수요율·고장·수명을 판정하지 않습니다."],
+  }),
   f("formula-energy-intensity", "전력 원단위", "원단위 = kWh / 활동량", [
     { symbol: "활동량", name: "분모", unit: "사용자", description: "면적·생산량 등" },
-  ], { title: "125000 kWh / 10000 m²", given: "연간", steps: ["12.5 kWh/m²"], result: "12.5" }, {}),
+  ], { title: "125000 kWh / 10000 m²", given: "연간", steps: ["12.5 kWh/m²"], result: "12.5" }, {
+    units: ["kWh", "활동량 단위(예: m²·개·인시)", "kWh/활동량 단위"],
+    limitations: ["전력량과 활동량의 집계 기간·범위가 같아야 합니다. 단위 이름만 바꾸어도 수치가 환산되지 않으며 날씨·생산 구성·가동률 보정은 하지 않습니다."],
+  }),
   f("formula-energy-cost", "사용량 기반 단순 에너지 비용 추정", "≈ kWh×사용자단가 + kW×사용자 기본단가", [
     { symbol: "단가", name: "사용자 단가", unit: "원", description: "사용자가 직접 입력" },
   ], { title: "15000 kWh, 92 kW", given: "검침 모드 · 140 원/kWh · 7,000 원/kW (사용자 입력)", steps: ["사용량분 = 15000×140 = 2,100,000원", "수요분 = 92×7000 = 644,000원", "합계 = 2,744,000원"], result: "2,744,000원 (청구금액 보증 아님)" }, {
     warnings: ["한전 청구요금 예측이 아닙니다."],
+    units: ["kWh","kW","h","원/kWh","원/kW","원"],
+    limitations: ["사용자 단가에 따른 비교용 비용입니다. 선택 기본요금분은 kW×원/kW 단순 곱이며 계약종별·시간대·요금적용전력 산정·세금을 자동 반영하지 않습니다."],
   }),
   f("formula-pm", "예방정비 주기", "remaining = T − (t mod T)", [
     { symbol: "T", name: "주기", unit: "h", description: "" },
-  ], { title: "누적 1850 h, 주기 500 h", given: "운전시간", steps: ["1850 mod 500 = 350", "남음 150 h"], result: "150 h" }, {}),
+  ], { title: "누적 1850 h, 주기 500 h", given: "운전시간", steps: ["1850 mod 500 = 350", "남음 150 h"], result: "150 h" }, {
+    units: ["h","회"],
+    limitations: ["설정한 운전시간 주기의 나머지를 계산합니다. 정비 이력·법정 검사일·달력 기준 주기를 추적하지 않으며 제조사 정비 절차를 대체하지 않습니다."],
+  }),
   f("formula-yoy", "전년 동월 비교", "Δ = E_this − E_last", [
     { symbol: "E", name: "월간 kWh", unit: "kWh", description: "" },
-  ], { title: "14200 vs 12800 kWh", given: "동월", steps: ["Δ=1400", "%=10.9"], result: "+10.9%" }, {}),
+  ], { title: "14200 vs 12800 kWh", given: "동월", steps: ["Δ=1400", "%=10.9"], result: "+10.9%" }, {
+    units: ["kWh","kW","%"],
+    limitations: ["검침 경계·집계 기간·최대수요 측정 조건을 맞추어 비교하세요. 일수·생산량·기상 보정은 하지 않으며 전년 사용량 0일 때 변화율은 정의되지 않습니다."],
+  }),
   f("formula-load-schedule", "부하 스케줄 집계", "Demand = Connected × η⁻¹ × 수용률 × 동시사용률", [
     { symbol: "PF", name: "역률", unit: "—", description: "행 단위" },
   ], { title: "행 단위 부하 합산", given: "여러 부하", steps: ["연결부하", "수요", "kVA", "전류"], result: "Summary" }, {}),
@@ -343,7 +375,10 @@ export const extraFormulas: FormulaDefinition[] = [
   }),
   f("formula-load-flow", "방사형 조류 (DistFlow 근사)", "V²_to ≈ V²_from − 2(RP+XQ)", [
     { symbol: "R,X", name: "선로 임피던스", unit: "Ω", description: "" },
-  ], { title: "소스 380 V · B2 50 kW / 20 kvar", given: "선간전압 380 V, 3상 합산 부하, B1 부하 0, B1→B2 상별 R=0.08 Ω·X=0.04 Ω", steps: ["하위 P=50 kW, Q=20 kvar를 합산", "B2 전압 = √(380²−2×(0.08×50000+0.04×20000)) → 96.62%", "선로 전류 = √(50000²+20000²)/(√3×380) = 81.82 A", "반올림 전 선전류로 3I²R/1000 = 1.607 kW (3상 전체 유효전력 손실)"], result: "B2 96.62% · 81.82 A · 3상 전체 손실 1.607 kW" }, {}),
+  ], { title: "소스 380 V · B2 50 kW / 20 kvar", given: "선간전압 380 V, 3상 합산 부하, B1 부하 0, B1→B2 상별 R=0.08 Ω·X=0.04 Ω", steps: ["하위 P=50 kW, Q=20 kvar를 합산", "B2 전압 = √(380²−2×(0.08×50000+0.04×20000)) → 96.62%", "선로 전류 = √(50000²+20000²)/(√3×380) = 81.82 A", "반올림 전 선전류로 3I²R/1000 = 1.607 kW (3상 전체 유효전력 손실)"], result: "B2 96.62% · 81.82 A · 3상 전체 손실 1.607 kW" }, {
+    units: ["V(선간)","kW·kvar(3상 합산 부하)","Ω(구간 상별 R·X)","A(선전류)","kW(3상 전체 손실)","%"],
+    limitations: ["평형 3상 방사형 정상상태 근사입니다. 손실 되먹임·반복 수렴·불평형·메쉬 해석은 없으며 전압 50% 하한은 물리적 해를 보장하지 않습니다."],
+  }),
   f("formula-arc-flash", "아크플래시 점검 목록", "입사에너지 수치 계산 없음", [
     { symbol: "입력", name: "필요 자료", unit: "—", description: "전압, 갭, 작업거리, Ibf 등" },
   ], { title: "자료 체크리스트", given: "현장", steps: ["입력 수집"], result: "계산 보류" }, {
@@ -384,21 +419,33 @@ export const extraFormulas: FormulaDefinition[] = [
     { symbol: "V,I", name: "선간전압·선전류", unit: "V, A", description: "" },
   ], { title: "380 V 420 A", given: "625 kVA, PF는 사용자", steps: ["S", "PF 있으면 P"], result: "kVA, 선택 kW" }, {
     warnings: ["시험 합격을 판단하지 않습니다. PF를 자동으로 넣지 않습니다."],
+    units: ["V(선간)","A(선전류)","kVA","kW","h","kWh","%"],
+    limitations: ["평형 3상 측정 근사이며 역률을 입력한 경우에만 kW를 표시합니다. 계량값 차이와 운전시간 추정을 구분하고 시험 합격·연료·진동·보호협조를 별도로 확인합니다."],
   }),
   f("formula-duty-cycle", "가동률 (Runtime Ratio)", "Runtime = t_on / t_period", [
     { symbol: "t_on", name: "운전시간", unit: "h", description: "" },
   ], { title: "24h 중 8h ON", given: "기동 12회", steps: ["가동률", "SPH", "평균 ON"], result: "%" }, {
     warnings: ["IEC 60034 S1~S10 Duty Type과 다릅니다."],
+    units: ["h","회","회/h","%"],
+    limitations: ["운전시간 비율과 기동횟수의 운영 지표입니다. IEC 모터 운전 정격이나 허용 기동횟수를 판정하지 않습니다."],
   }),
   f("formula-sensor-cal", "센서 비교", "Error = 표시 − 기준, Correction = 기준 − 표시", [
     { symbol: "I,R", name: "표시·기준", unit: "사용자", description: "" },
   ], { title: "표시 50.1, 기준 50, span 100", given: "0~100", steps: ["Error 0.1", "Correction −0.1"], result: "오차" }, {
     warnings: ["공인교정을 대체하지 않습니다."],
+    units: ["표시값·기준값·스팬: 동일한 사용자 단위","%"],
+    limitations: ["표시와 기준의 단위·측정 범위·측정 조건을 맞추세요. 오차·보정값 비교이며 불확도 평가·교정 성적서·국가교정 인증이 아닙니다."],
   }),
   f("formula-trend", "Trend 기초 통계", "평균, 최소, 최대, 표본표준편차, 변화율", [
     { symbol: "x_i", name: "시료", unit: "사용자", description: "" },
-  ], { title: "일련 측정", given: "CSV 또는 붙여넣기", steps: ["n", "평균", "σ"], result: "통계" }, {}),
+  ], { title: "일련 측정", given: "CSV 또는 붙여넣기", steps: ["n", "평균", "σ"], result: "통계" }, {
+    units: ["측정값·평균·최솟값·최댓값·표준편차: 입력 데이터와 같은 단위","h","입력 단위/h","%"],
+    limitations: ["입력 순서의 첫 값과 끝 값으로 변화율을 계산하며 시간을 자동 정렬하지 않습니다. 시간 가중 평균·결측 보정·예측·이상탐지는 수행하지 않습니다."],
+  }),
   f("formula-retrofit", "개선 전후 비교", "ΔE = P0 t0 − P1 t1, Payback = 투자 / 연간절감", [
     { symbol: "P0,P1", name: "전력", unit: "kW", description: "" },
-  ], { title: "18 kW → 11 kW, 4000 h", given: "단가 사용자", steps: ["ΔP", "ΔE"], result: "절감 kWh" }, {}),
+  ], { title: "18 kW → 11 kW, 4000 h", given: "단가 사용자", steps: ["ΔP", "ΔE"], result: "절감 kWh" }, {
+    units: ["kW","h/년","kWh/년","원/kWh","원","원/년","년"],
+    limitations: ["연간 운전시간과 평균전력 기준의 단순 회수기간입니다. 투자비와 연간 비용 절감이 양수일 때만 표시하며 NPV·IRR·세금·요금표를 반영하지 않습니다."],
+  }),
 ];

@@ -397,7 +397,7 @@ export function PathVoltageDropClient() {
       {formula ? (
         <>
           <CalculatorExplain slug="path-voltage-drop" formula={formula} />
-          <TechnicalDisclosure formula={formula} variant={getCalculatorGuide("path-voltage-drop") ? "compact" : "full"} />
+          <TechnicalDisclosure formula={formula} slug="path-voltage-drop" variant={getCalculatorGuide("path-voltage-drop") ? "compact" : "full"} />
         </>
       ) : null}
 

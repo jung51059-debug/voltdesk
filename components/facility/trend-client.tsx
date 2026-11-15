@@ -211,7 +211,7 @@ export function TrendClient() {
         </Link>
       </div>
       {formula ? <CalculatorExplain slug="trend-analysis" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} slug="trend-analysis" variant="compact" /> : null}
     </div>
   );
 }

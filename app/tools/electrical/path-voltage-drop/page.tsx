@@ -1,3 +1,4 @@
+import { CalculatorFaq } from "@/components/calculators/calculator-faq";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -43,6 +44,7 @@ export default function PathVoltageDropPage() {
       <div className="mx-auto w-full max-w-5xl">
         <RelatedResources related={[]} articles={articles} />
       </div>
+      {pageTool ? <CalculatorFaq faqs={pageTool.faqs} /> : null}
     </>
   );
 }

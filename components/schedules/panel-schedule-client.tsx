@@ -208,7 +208,7 @@ export function PanelScheduleClient() {
         </p>
       </section>
       {formula ? <CalculatorExplain slug="panel-schedule" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} slug="panel-schedule" variant="compact" /> : null}
     </div>
   );
 }

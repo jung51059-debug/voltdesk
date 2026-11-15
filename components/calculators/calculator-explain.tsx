@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { getCalculatorGuide } from "@/lib/data/calculator-guides";
+import {
+  formulaSectionTitle,
+  getToolContentProfile,
+  shouldShowFormulaBlock,
+  shouldShowFormulaExample,
+  uniqueContentLines,
+} from "@/lib/data/tool-content-profile";
 import type { FormulaDefinition } from "@/lib/types";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -16,6 +23,11 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export function CalculatorExplain({ slug, formula }: { slug: string; formula: FormulaDefinition }) {
   const guide = getCalculatorGuide(slug);
   if (!guide) return null;
+
+  const profile = getToolContentProfile(slug);
+  const showFormula = shouldShowFormulaBlock(profile, formula);
+  const showExample = shouldShowFormulaExample(profile, formula);
+  const cautionItems = uniqueContentLines([...guide.cautions, ...(showFormula ? formula.limitations : [])]);
 
   return (
     <div className="mt-10 space-y-8 border-t border-border pt-8">
@@ -37,18 +49,20 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
         ))}
       </Section>
 
-      <Section title="사용 공식">
-        <p className="font-mono text-base text-primary">{formula.formula}</p>
-        <ul className="space-y-1 text-sm leading-6 text-muted">
-          {formula.variables.map((variable) => (
-            <li key={variable.symbol}>
-              <span className="font-mono text-ink">{variable.symbol}</span> · {variable.name} ({variable.unit})
-              {variable.description ? ` — ${variable.description}` : ""}
-            </li>
-          ))}
-        </ul>
-        {formula.units.length > 0 ? <p className="text-sm text-muted">단위: {formula.units.join(", ")}</p> : null}
-      </Section>
+      {showFormula ? (
+        <Section title={formulaSectionTitle(profile)}>
+          <p className="font-mono text-base text-primary">{formula.formula}</p>
+          <ul className="space-y-1 text-sm leading-6 text-muted">
+            {formula.variables.map((variable) => (
+              <li key={variable.symbol}>
+                <span className="font-mono text-ink">{variable.symbol}</span> · {variable.name} ({variable.unit})
+                {variable.description ? ` — ${variable.description}` : ""}
+              </li>
+            ))}
+          </ul>
+          {formula.units.length > 0 ? <p className="text-sm text-muted">단위: {formula.units.join(", ")}</p> : null}
+        </Section>
+      ) : null}
 
       <Section title="입력값 의미">
         <dl className="space-y-3">
@@ -61,16 +75,18 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
         </dl>
       </Section>
 
-      <Section title="실무 예제">
-        <p className="text-sm font-medium">{formula.example.title}</p>
-        <p className="text-sm leading-6 text-muted">입력: {formula.example.given}</p>
-        <ol className="list-decimal space-y-1 pl-5 text-sm leading-6 text-muted">
-          {formula.example.steps.map((step) => (
-            <li key={step}>{step}</li>
-          ))}
-        </ol>
-        <p className="text-sm font-medium">결과: {formula.example.result}</p>
-      </Section>
+      {showExample ? (
+        <Section title="실무 예제">
+          <p className="text-sm font-medium">{formula.example.title}</p>
+          <p className="text-sm leading-6 text-muted">입력: {formula.example.given}</p>
+          <ol className="list-decimal space-y-1 pl-5 text-sm leading-6 text-muted">
+            {formula.example.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <p className="text-sm font-medium">결과: {formula.example.result}</p>
+        </Section>
+      ) : null}
 
       {(guide.walkthroughs ?? (guide.walkthrough ? [guide.walkthrough] : [])).map((example) => (
         <Section key={example.title} title={example.title}>
@@ -84,7 +100,7 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
 
       {(guide.lookups?.length ? guide.lookups : guide.lookup ? [guide.lookup] : []).map((table) => (
         <Section key={table.title} title={table.title}>
-          <p className="text-sm leading-6 text-muted">{table.note}</p>
+          {table.note ? <p className="text-sm leading-6 text-muted">{table.note}</p> : null}
           <div className="overflow-x-auto">
             <table className="w-full min-w-[16rem] border-collapse text-left text-sm">
               <thead>
@@ -137,29 +153,34 @@ export function CalculatorExplain({ slug, formula }: { slug: string; formula: Fo
 
       <Section title="주의사항과 한계">
         <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
-          {guide.cautions.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-          {formula.limitations.map((item) => (
+          {cautionItems.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
       </Section>
 
-      <Section title="출처">
-        <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
-          {formula.referenceSources.map((source) => (
-            <li key={source.id}>
-              {source.title} ({source.publisher}) — {source.note}
-            </li>
-          ))}
-        </ul>
+      {formula.referenceSources.length > 0 ? (
+        <Section title="출처">
+          <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
+            {formula.referenceSources.map((source) => (
+              <li key={source.id}>
+                {source.title} ({source.publisher}) — {source.note}
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm">
+            <Link href="/sources" className="font-medium text-primary hover:underline">
+              전체 계산기 출처
+            </Link>
+          </p>
+        </Section>
+      ) : (
         <p className="text-sm">
           <Link href="/sources" className="font-medium text-primary hover:underline">
             전체 계산기 출처
           </Link>
         </p>
-      </Section>
+      )}
     </div>
   );
 }

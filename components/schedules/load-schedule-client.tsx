@@ -607,7 +607,7 @@ export function LoadScheduleClient() {
       {panelFilter ? <p className="mt-2 text-xs text-muted">표·분류 Summary는 Panel 필터가 적용됩니다. 상단 설비 합계와 변압기·발전기 버튼은 전체 부하 기준입니다.</p> : null}
 
       {formula ? <CalculatorExplain slug="load-schedule" formula={formula} /> : null}
-      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : <EngineeringDisclaimer />}
+      {formula ? <TechnicalDisclosure formula={formula} slug="load-schedule" variant="compact" /> : <EngineeringDisclaimer />}
     </div>
   );
 }

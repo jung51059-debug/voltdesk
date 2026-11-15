@@ -153,7 +153,7 @@ export function LoadFlowClient() {
         )}
       </section>
       <p className="mt-3 text-sm leading-6 text-muted">손실의 상위 부하 되먹임과 반복 수렴은 수행하지 않습니다. 불평형·메쉬 계통은 지원하지 않습니다. 전압 50% 하한은 물리적 해를 보장하지 않습니다.</p>
-      {formula ? <TechnicalDisclosure formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} slug="load-flow" /> : null}
     </div>
   );
 }

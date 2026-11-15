@@ -12,49 +12,49 @@ export const phase3b2b3Guides: CalculatorGuide[] = [
       {
         title: "연결부하와 수요부하",
         paragraphs: [
-          "연결 kW = 수량 × 단위 kW입니다. 입력 kW = 연결 / 효율(η)이며, 수요 kW = 입력 × 수용률(demand) × 동시사용률(coincidence)입니다.",
+          "연결 kW = 수량 × 단위 kW입니다. 입력 kW = 연결 / 효율(η)이며, 수요 kW = 입력 × 수용률 × 동시사용률입니다.",
           "수요 kVA = 수요 kW / 역률, 무효는 √(kVA²−kW²)입니다. 행마다 전압·상(단상/3상)이 달라도 합산은 kW·kVA를 더하고, 피더 전류는 전압별로 kVA를 묶어 추정합니다.",
         ],
       },
       {
         title: "수용률·동시사용률·분류",
         paragraphs: [
-          "demand는 부하 종류별 수용률(설비가 동시에 몇 % 도는지)이고, coincidence는 같은 패널·시간대에 겹치는 정도입니다. Ampory가 표준 표를 넣지 않으며 0~1을 사용자가 넣습니다.",
+          "수용률은 부하 종류별 수용률(설비가 동시에 몇 % 도는지)이고, 동시사용률은 같은 패널·시간대에 겹치는 정도입니다. Ampory가 표준 표를 넣지 않으며 0~1을 사용자가 넣습니다.",
           "분류는 조명·콘센트·냉방·모터·UPS·기타로 Summary를 냅니다. 알 수 없는 분류 문자열은 기타로 묶입니다.",
         ],
       },
       {
         title: "브라우저 저장·CSV",
         paragraphs: [
-          "행과 변압기·발전기 kVA/kW는 로그인 없이 이 브라우저 localStorage(voltdesk:load-schedule)에 저장됩니다. 다른 기기·브라우저와 동기화되지 않습니다.",
+          "행과 변압기·발전기 kVA/kW는 로그인 없이 이 브라우저의 저장소에 저장됩니다. 다른 기기·브라우저와 동기화되지 않습니다.",
           "예전 배열 형식 JSON도 읽습니다. CSV 가져오기·내보내기는 부하 표만 다루며 케이블·차단기 칸을 자동 채우지 않습니다.",
         ],
       },
     ],
     inputMeaning: [
-      { label: "qty · unit kW", text: "설비 대수와 정격·평균 부하 kW입니다. 기동 kW 가산은 사용자가 행으로 넣습니다." },
-      { label: "η · PF · demand · coincidence", text: "행 단위입니다. 변압기 부하율 비교용 전체 PF는 Summary에서 kW/kVA로 구합니다." },
-      { label: "Panel · pole", text: "패널별 Summary 필터와 Panel Schedule 전환에 씁니다. 3상은 RST, 단상은 R/S/T 상 지정입니다." },
+      { label: "수량 · 단위 부하 kW", text: "설비 대수와 정격·평균 부하 kW입니다. 기동 kW 가산은 사용자가 행으로 넣습니다." },
+      { label: "효율 · 역률 · 수용률 · 동시사용률", text: "행 단위입니다. 변압기 부하율 비교용 전체 PF는 Summary에서 kW/kVA로 구합니다." },
+      { label: "분전반 · 상 배치", text: "패널별 Summary 필터와 Panel Schedule 전환에 씁니다. 3상은 RST, 단상은 R/S/T 상 지정입니다." },
     ],
     walkthroughs: [
       {
-        title: "모터 2×15 kW · η0.92 · demand 0.8",
+        title: "모터 2×15 kW · η0.92 · 수용률 0.8",
         lines: [
           "연결 30 kW, 입력 ≈ 32.61 kW, 수요 ≈ 26.09 kW입니다.",
           "역률 0.85이면 수요 kVA ≈ 30.69, 전류(380 V 3상) ≈ 46.63 A입니다.",
-          "extra.test 「행 집계」와 같은 입력입니다.",
+          "행별 연결부하와 수요부하를 구분한 입력 예입니다.",
         ],
       },
       {
         title: "조명 40×0.04 kW · 단상 220 V",
         lines: [
-          "연결 1.6 kW, η=1, demand 0.9·coincidence 0.85 → 수요 ≈ 1.22 kW·kVA입니다.",
+          "연결 1.6 kW, η=1, 수용률 0.9·동시사용률 0.85 → 수요 ≈ 1.22 kW·kVA입니다.",
           "PF=1이면 무효 0, 전류 ≈ 5.56 A입니다.",
           "단상 전류는 kVA×1000/V입니다.",
         ],
       },
       {
-        title: "UPS 40 kW · coincidence 0.7",
+        title: "UPS 40 kW · 동시사용률 0.7",
         lines: [
           "연결 40 kW, η 0.95 → 입력 ≈ 42.11 kW, 수요 ≈ 29.47 kW입니다.",
           "PF 0.9 → kVA ≈ 32.75, 3상 380 V 전류 ≈ 49.76 A입니다.",
@@ -63,26 +63,26 @@ export const phase3b2b3Guides: CalculatorGuide[] = [
       },
     ],
     lookup: {
-      title: "단일 행 집계 예 (schedules.ts·precision 2)",
-      note: "rowPowers 결과. 피더 합계는 여러 행일 때 summarizeLoads를 씁니다.",
+      title: "단일 행 집계 예 (소수 둘째 자리)",
+      note: "행별 부하 집계 결과. 피더 합계는 여러 행일 때 전체 부하 집계를 씁니다.",
       columns: ["조건", "수요 kW", "수요 kVA", "I (A)"],
       rows: [
         ["2×15 kW 모터 380 V 3상", "26.09 kW", "30.69 kVA", "46.63 A"],
         ["40×0.04 kW 조명 220 V 단상", "1.22 kW", "1.22 kVA", "5.56 A"],
-        ["40 kW UPS η0.95 coincidence0.7", "29.47 kW", "32.75 kVA", "49.76 A"],
+        ["40 kW UPS η0.95 동시사용률 0.7", "29.47 kW", "32.75 kVA", "49.76 A"],
       ],
     },
     interpretation: [
       "Summary 수요 kVA는 차단기·케이블 최종선정이 아닙니다. 다음 단계 계산기로 넘기거나 표를 확인하세요.",
-      "transformerKva·generatorKw는 참고 부하율%만 보여 줍니다. 적합·여유 판정은 변압기·발전기 계산기가 담당합니다.",
+      "변압기 정격 kVA·발전기 정격 kW를 입력하면 참고 부하율을 표시합니다. 별도 용량 검토 계산기도 최종 적합 판정을 대신하지 않습니다.",
     ],
     cautions: [
       "자동 케이블·차단기 선정, KEC 허용전류, 기동 전류 동시 가산을 하지 않습니다.",
       "Panel Schedule의 상별 전류 분해와 본 화면 피더 전류 추정은 목적이 다릅니다.",
-      "localStorage 삭제·브라우저 초기화 시 데이터가 없어집니다.",
+      "브라우저 저장소 삭제·브라우저 초기화 시 데이터가 없어집니다.",
     ],
     links: [
-      { href: "/tools/schedules/cable", label: "케이블 스케줄", text: "합산 전류를 태그·목록으로 넘긴 뒤 굵기·ΔV handoff로 이어갈 때 씁니다." },
+      { href: "/tools/schedules/cable", label: "케이블 스케줄", text: "합산 전류를 태그·목록으로 넘긴 뒤 케이블 굵기·전압강하 검토로 이어갈 때 씁니다." },
       { href: "/tools/electrical/voltage-drop", label: "전압강하", text: "케이블 행의 전류와 Ω/km·길이로 구간 ΔV를 검토할 때 연결합니다." },
       { href: "/tools/schedules/panel", label: "반·MCC 스케줄", text: "회로별 R/S/T 배치와 상 불평형 %를 볼 때 연결합니다." },
       { href: "/tools/electrical/transformer-sizing", label: "변압기 용량 검토", text: "Summary kW·PF를 넘겨 kVA 하한을 볼 때 씁니다." },
@@ -207,7 +207,7 @@ export const phase3b2b3Guides: CalculatorGuide[] = [
         lines: [
           "설계 100, 실측 94 → 설계 대비 94%, 편차 −6%입니다.",
           "허용 구간 [95, 105]이면 실측은 범위 밖입니다.",
-          "extra.test와 동일 입력입니다.",
+          "설계값과 실측값을 같은 단위로 비교한 예입니다.",
         ],
       },
       {
@@ -226,8 +226,8 @@ export const phase3b2b3Guides: CalculatorGuide[] = [
       },
     ],
     lookup: {
-      title: "설계 대비 실측 (precision 2)",
-      note: "calculateFieldCompare. 합격 판정 아님.",
+      title: "설계 대비 실측 (소수 2자리)",
+      note: "설계값 대비 실측 편차이며 합격 판정이 아닙니다.",
       columns: ["조건", "설계 대비 %", "범위"],
       rows: [
         ["100 vs 94, ±5%", "94%", "밖 (95~105)"],

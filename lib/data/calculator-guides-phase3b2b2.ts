@@ -105,7 +105,7 @@ export const phase3b2b2Guides: CalculatorGuide[] = [
       {
         title: "Uc · Up · In · Imax",
         paragraphs: [
-          "Uc(최대 연속 전압)는 계통 상시·과도 전압보다 높아야 합니다. Up은 보호 수준(잔류 전압). In은 정격 방전전류, Imax/Iimp는 한계 에너지·충격용량에 가깝습니다.",
+          "Uc는 최대 연속 사용전압(V), Up은 전압 보호 수준(V)입니다. In·Imax·Iimp는 지정 시험파형에 대한 방전전류 정격(A 또는 kA)이며 에너지 단위가 아닙니다. 계통의 상시 전압과 일시적 과전압 조건에 맞는 Uc·제품 적용은 제조사 자료로 검토합니다.",
           "입력 Un·Uc는 ‘검토용’이며, Uc<Un이면 오입력 가능성 안내가 나옵니다. In kA를 넣으면 결과에 표시만 하며 적합 판정은 하지 않습니다.",
         ],
       },
@@ -119,8 +119,8 @@ export const phase3b2b2Guides: CalculatorGuide[] = [
     ],
     inputMeaning: [
       { label: "설치 위치", text: "인입·분전·기기 근접에 따라 안내 문구가 바뀝니다. 수치는 자동 산출되지 않습니다." },
-      { label: "Un · Uc", text: "계통 공칭과 제조사 명판 Uc를 대조합니다. 자동 선정·In/Iimp 충족 판정은 없습니다." },
-      { label: "In (선택)", text: "입력 시 메트릭에 표시만 합니다. 뇌격 등급·제조사 표와 사용자가 비교합니다." },
+      { label: "Un · Uc (V)", text: "계통 공칭과 제조사 명판 Uc를 대조합니다. 자동 선정·In/Iimp 충족 판정은 없습니다." },
+      { label: "In (kA, 선택)", text: "입력 시 메트릭에 표시만 합니다. 뇌격 등급·제조사 표와 사용자가 비교합니다." },
     ],
     walkthroughs: [
       {
@@ -159,7 +159,7 @@ export const phase3b2b2Guides: CalculatorGuide[] = [
       ],
     },
     interpretation: [
-      "계산하기를 눌러도 선정 공식은 실행되지 않습니다. interpretation은 위치별 주의 문구입니다.",
+      "계산하기를 눌러도 선정 공식은 실행되지 않습니다. 결과 해석은 위치별 주의 문구입니다.",
       "제품 카탈로그·IEC 62305·현장 도면을 대체하지 않습니다.",
     ],
     cautions: [

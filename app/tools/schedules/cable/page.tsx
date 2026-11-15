@@ -1,3 +1,4 @@
+import { CalculatorFaq } from "@/components/calculators/calculator-faq";
 import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -30,6 +31,7 @@ export default function CableSchedulePage() {
       {tool ? <JsonLd data={faqJsonLd(tool.faqs)} /> : null}
       <Breadcrumb items={[{ href: "/", label: "홈" }, { href: "/tools/categories/schedule", label: "Schedule" }, { label: "케이블 스케줄" }]} />
       <CableScheduleClient />
+      {tool ? <CalculatorFaq faqs={tool.faqs} /> : null}
     </>
   );
 }
