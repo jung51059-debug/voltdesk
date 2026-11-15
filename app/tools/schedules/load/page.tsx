@@ -2,14 +2,18 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { LoadScheduleClient } from "@/components/schedules/load-schedule-client";
-import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
-export const metadata: Metadata = {
-  title: "부하 스케줄 작성",
-  description: "부하를 행 단위로 추가해 연결부하·수요·kVA·전류를 집계하고 CSV로 내보내는 Ampory 설계 도구입니다.",
-  alternates: { canonical: "/tools/schedules/load" },
-};
+const pageTool = getToolBySlug("load-schedule");
+
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "부하 스케줄 작성",
+      description: "부하를 행 단위로 추가해 연결부하·수요·kVA·전류를 집계합니다.",
+      alternates: { canonical: "/tools/schedules/load" },
+    };
 
 export default function LoadSchedulePage() {
   const tool = getToolBySlug("load-schedule");

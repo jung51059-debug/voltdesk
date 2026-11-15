@@ -693,6 +693,9 @@ export const baseTools: CalculatorTool[] = [
     domain: "facility",
     name: "UPS 백업시간 계산기",
     nameEn: "UPS backup time calculator",
+    metaTitle: "UPS 백업시간 계산기, V·Ah·부하 kW로 분 환산",
+    metaDescription:
+      "384V·100Ah·20kW·η0.92·DOD0.8이면 약 84.79분입니다. Peukert·온도·제조사 런타임 곡선은 대체하지 않으며 UPS kVA는 UPS 용량 계산기를 쓰세요.",
     description: "배터리 전압·용량과 부하전력으로 추정 백업시간을 계산합니다.",
     longDescription:
       "배터리 공칭 에너지에 효율과 방전심도를 곱해 일정한 전력 부하에 대한 백업시간을 추정합니다. 제조사 런타임 테이블을 대체하지 않습니다.",
@@ -712,6 +715,21 @@ export const baseTools: CalculatorTool[] = [
         answer:
           "연축전지는 0.5~0.8, 리튬은 제조사 권고를 따릅니다. 수명과 온도를 고려해 보수적으로 넣는 것이 안전합니다.",
       },
+      {
+        question: "384V 100Ah 20kW 기본 예시의 시간은?",
+        answer:
+          "η=0.92, DOD=0.8, 노화 1일 때 추정 약 84.79분입니다. t=(V·Ah·η·DOD)/P 에너지 수지이며 제조사 분 표와 다를 수 있습니다.",
+      },
+      {
+        question: "UPS 용량 계산기와 무엇이 다른가요?",
+        answer:
+          "용량 계산기는 kVA 선정, 이 화면은 이미 정해진 배터리 에너지로 버티는 시간(분)을 봅니다. 순서는 보통 kVA→Ah→시간입니다.",
+      },
+      {
+        question: "Peukert 효과를 반영하나요?",
+        answer:
+          "아니요. 고율 방전·온도에 따라 실제 Ah가 줄어들 수 있어, 제조사 런타임 곡선과 온도 시험이 우선입니다.",
+      },
     ],
   },
   {
@@ -722,6 +740,9 @@ export const baseTools: CalculatorTool[] = [
     domain: "facility",
     name: "UPS 용량 계산기",
     nameEn: "UPS capacity calculator",
+    metaTitle: "UPS 용량 계산기, 부하 kW·역률·여유로 kVA",
+    metaDescription:
+      "40kW·PF0.8·여유25%·UPS PF0.9면 62.5kVA입니다. N+1·고조파는 사용자가 더하고 백업 분은 UPS 백업시간 계산기입니다.",
     description: "부하 kW, 역률, 여유율로 필요 UPS kVA를 산정합니다.",
     longDescription:
       "IT·설비 부하의 유효전력과 역률, 장래 여유, 출력 역률을 반영해 필요 UPS 용량(kVA)을 계산합니다. N+1 구성은 모듈 대수를 별도로 검토하세요.",
@@ -740,6 +761,21 @@ export const baseTools: CalculatorTool[] = [
         question: "역률이 낮은 부하는 왜 kVA가 커지나요?",
         answer:
           "UPS는 전류(피상전력)를 감당해야 합니다. 같은 kW라도 역률이 낮으면 필요 kVA가 커집니다.",
+      },
+      {
+        question: "40kW PF0.8 여유 25% 예시 kVA는?",
+        answer:
+          "설계 50kW, max(50/0.8, 50/0.9)=62.5kVA입니다. 부하 PF와 UPS 출력 PF 중 큰 값으로 나눕니다.",
+      },
+      {
+        question: "백업 시간은 여기서 나오나요?",
+        answer:
+          "기본 모드는 kVA만입니다. Ah·시간은 상세 모드 참고 또는 UPS 백업시간 계산기를 쓰세요.",
+      },
+      {
+        question: "장래 여유 0.2는 무엇인가요?",
+        answer:
+          "소수로 20% 증가입니다. kW×(1+여유)가 설계 부하 kW가 됩니다. 표준 여유를 자동 넣지 않습니다.",
       },
     ],
   },

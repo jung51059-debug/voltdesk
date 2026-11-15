@@ -146,6 +146,11 @@ export const extraTools: CalculatorTool[] = [
       { question: "Y-Δ는 왜 배수가 낮나요?", answer: "이론상 상전압 기동이라 DOL 전류의 약 1/3입니다. 전환 충격과 부하는 별도입니다. 계산에는 제조사 기동배수를 직접 넣으세요." },
       { question: "기동배수를 비우면요?", answer: "기동전류와 기동 전압강하를 계산하지 않고 입력을 요청합니다. 방식별 기본 배수는 넣지 않습니다." },
       { question: "허용 전압강하를 비우면요?", answer: "기동 전압강하(V, %)는 계산하고 허용값과는 비교하지 않습니다. Ampory가 15% 같은 기본 허용치를 넣지 않습니다." },
+      {
+        question: "FLC 60A·k=6·80m 0.524Ω/km 예시는?",
+        answer:
+          "I_start=360A, 기동 ΔV≈26.14V, ΔV%≈6.88%입니다. 허용 %를 넣지 않으면 ‘미검토’이며 적합 판정이 아닙니다.",
+      },
     ],
   }),
   tool({
@@ -678,6 +683,11 @@ export const extraTools: CalculatorTool[] = [
         answer:
           "안 됩니다. Ik″는 계통 쪽 사고전류 근사이고, Icu는 차단기가 끊을 수 있다고 표시한 능력의 한 종류입니다. Ics 등 다른 정격은 별도입니다. 이 화면은 차단용량 자동 선정·보호협조·안전 적합 확정을 하지 않으며, 숫자 비교는 차단기 정격 참고 계산기에서 사용자가 넣은 값만 합니다.",
       },
+      {
+        question: "최소 단락전류도 나오나요?",
+        answer:
+          "아닙니다. 사용자가 넣은 c·임피던스 조합의 Ik″만 계산합니다. 원격 사고점·고저항 조건의 최소값이나 전류 기반 보호협조는 별도 검토입니다.",
+      },
     ],
   }),
   tool({
@@ -996,6 +1006,10 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "접지봉 저항 간이 계산",
     nameEn: "Ground rod resistance",
+    pageHeading: "접지봉 저항 간이 계산",
+    metaTitle: "접지봉 저항 계산기, ρ·길이·직경 Dwight 근사",
+    metaDescription:
+      "토양저항률과 봉 길이·직경으로 수직 접지봉 Ω을 근사합니다. ρ100·L2.4 m·d14 mm·2본 k1.2면 약 25.98 Ω. KEC 합격·실측을 대체하지 않습니다.",
     description: "수직봉 근사식으로 접지저항을 추정합니다. 실측이 우선입니다.",
     longDescription: "IEEE 80 그리드 설계가 아닙니다. 국내 시공 기준의 인증 구현도 아닙니다.",
     formulaId: "formula-grounding-rod",
@@ -1008,7 +1022,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("목표 1 Ω이 나오나요?", "토양과 시공에 따라 전혀 다릅니다. 이 값은 간이 추정입니다."),
+    faqs: [
+      {
+        question: "목표 1 Ω이 자동으로 나오나요?",
+        answer: "아닙니다. KEC·시설별 목표 Ω를 내장하지 않습니다. 계산값과 현장 측정을 별도로 비교합니다.",
+      },
+      {
+        question: "병렬 보정계수는 뭘 넣나요?",
+        answer: "봉 간격·토양에 따라 사용자가 k_space를 넣습니다. Ampory는 표준 간격표를 자동 적용하지 않습니다.",
+      },
+      {
+        question: "토양저항률은 어디서 구하나요?",
+        answer: "Wenner 4극 측정으로 환산한 ρ를 쓰는 흐름이 일반적입니다. 토양저항률 계산기를 먼저 쓸 수 있습니다.",
+      },
+      {
+        question: "계산값이 측정보다 작은데 괜찮나요?",
+        answer: "흔합니다. 층상 토양·연결·계절·측정법 차이 때문입니다. 설계·검사는 측정값과 시방서가 우선입니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-soil-resistivity",
@@ -1099,6 +1130,10 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "SPD 선정 도우미 (간이)",
     nameEn: "SPD helper",
+    pageHeading: "SPD 점검 도우미",
+    metaTitle: "SPD 점검 도우미, Type·Uc·설치 위치 체크",
+    metaDescription:
+      "인입·분전·기기 근접 SPD의 Type·Uc·협조 질문을 정리합니다. In·Iimp·kA 자동 선정이 아니며 IEC 62305 전체 평가가 아닙니다.",
     description: "설치 위치별로 확인 항목을 안내합니다. 제품을 자동 선정하지 않습니다.",
     longDescription: "IEC 62305 전체 위험평가가 아닙니다. 간이 검토임을 명시합니다.",
     formulaId: "formula-spd",
@@ -1111,7 +1146,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("인입 SPD 용량이 나오나요?", "나오지 않습니다. In/Iimp는 제조사·뇌격 환경 자료로 정합니다."),
+    faqs: [
+      {
+        question: "In·Iimp 용량이 자동으로 나오나요?",
+        answer: "나오지 않습니다. In kA를 넣으면 표시만 합니다. 뇌격 등급·IEC 61643 선정은 제조사·설계 자료입니다.",
+      },
+      {
+        question: "이 도구는 계산기인가요?",
+        answer: "단락 kA·SPD kA를 구하는 계산기가 아닙니다. 위치별 체크리스트·Uc 검토 안내입니다.",
+      },
+      {
+        question: "Type 1·2·3을 자동 고르나요?",
+        answer: "아닙니다. 위치 선택에 따라 역할 설명만 바뀝니다. 클래스·카탈로그 매칭은 사용자가 합니다.",
+      },
+      {
+        question: "Uc가 Un보다 낮으면 어떻게 되나요?",
+        answer: "오입력 가능성 안내가 나옵니다. Uc는 계통 최대 연속 전압보다 커야 한다는 일반 원칙을 상기시킵니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-generator-sizing",
@@ -1403,6 +1455,10 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "부하 스케줄 작성",
     nameEn: "Load schedule builder",
+    pageHeading: "부하 스케줄 작성",
+    metaTitle: "부하 스케줄 작성, 연결·수요 kW·kVA 집계",
+    metaDescription:
+      "행 단위 수용률·동시사용률로 연결·수요 부하를 집계합니다. 2×15 kW 모터 행 수요는 약 26.09 kW·46.63 A(380 V 3상). CSV·localStorage 저장. 케이블·차단기 자동 선정은 없습니다.",
     description: "부하를 행 단위로 더해 연결부하·수요·kVA·전류를 집계하고 CSV로 내보냅니다.",
     longDescription: "행 단위 연결과 수요, 분류·Panel 합계, 상불평형을 계산합니다. 케이블·차단기는 확정하지 않고 검토 계산기로 넘깁니다. 로그인 없이 이 브라우저에 저장됩니다.",
     formulaId: "formula-load-schedule",
@@ -1415,7 +1471,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("자동 케이블 선정도 하나요?", "하지 않습니다. 스케줄과 선정 계산기는 분리되어 있습니다."),
+    faqs: [
+      {
+        question: "자동 케이블·차단기 선정도 하나요?",
+        answer: "하지 않습니다. 스케줄 합계만 제공하며 케이블·차단기 계산기는 별도입니다.",
+      },
+      {
+        question: "데이터는 어디에 저장되나요?",
+        answer: "로그인 없이 이 브라우저 localStorage(voltdesk:load-schedule)에 저장됩니다. 다른 PC와 동기화되지 않습니다.",
+      },
+      {
+        question: "수용률과 동시사용률의 차이는?",
+        answer: "demand는 부하 종류 수용률, coincidence는 동시에 겹치는 정도입니다. 둘 다 0~1을 사용자가 넣습니다.",
+      },
+      {
+        question: "연결부하와 수요부하란?",
+        answer: "연결은 qty×kW, 수요는 연결/η×demand×coincidence입니다. 수요 kVA는 kW/PF로 구합니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-cable-schedule",
@@ -1510,6 +1583,10 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "아크플래시 점검 목록",
     nameEn: "Arc flash review checklist",
+    pageHeading: "아크플래시 점검 목록",
+    metaTitle: "아크플래시 점검 목록, IEEE 1584 계산기 아님",
+    metaDescription:
+      "아크플래시 검토 전 자료 체크리스트입니다. Incident Energy·ARC 경계·PPE 등급을 계산하지 않습니다. NFPA 70E·IEEE 1584 전문 평가가 필요합니다.",
     description: "점검 목록입니다. 입사에너지와 접근 한계는 계산하지 않습니다.",
     longDescription: "IEEE 1584 계산기가 아닙니다. 관련 표준은 IEEE 1584 / IEEE 1584.2 자료 수집 안내입니다. 임의의 Incident Energy를 내지 않습니다.",
     formulaId: "formula-arc-flash",
@@ -1522,7 +1599,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("칼로리 값이 없나요?", "없습니다. 불완전 모델로 위험성 숫자를 만들지 않습니다."),
+    faqs: [
+      {
+        question: "Incident Energy(cal/cm²)가 나오나요?",
+        answer: "나오지 않습니다. IEEE 1584 전체 모델·NFPA 70E PPE 등급 산출을 구현하지 않았습니다.",
+      },
+      {
+        question: "3상 단락 계산기와 같은가요?",
+        answer: "다릅니다. 단락 계산기는 Ik″ 근사만 합니다. 1584 아크 전류·입사에너지 입력으로 쓰지 마세요.",
+      },
+      {
+        question: "PPE 등급을 고르나요?",
+        answer: "아닙니다. 사업장 안전 절차와 전문 아크플래시 분석 후 정합니다.",
+      },
+      {
+        question: "IEEE 1584.2는 어디까지 보나요?",
+        answer: "전극 구성·갭 등 수집 항목 안내만 합니다. 표준 계산기·준수 판정이 아닙니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-lightning",
@@ -1576,6 +1670,10 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "설계값 vs 실측값",
     nameEn: "Design versus measured",
+    pageHeading: "설계값 vs 실측값",
+    metaTitle: "설계값 vs 실측 비교, 사용자 허용 공차",
+    metaDescription:
+      "설계값과 실측의 편차·%와 사용자가 넣은 ±공차 범위 안·밖을 봅니다. 100 대비 94·±5%면 94%·범위 밖. 시험 합격 판정이 아닙니다.",
     description: "설계값과 현장 실측의 편차·허용구간을 사용자가 넣은 공차로 비교합니다.",
     longDescription: "허용오차는 시방서나 제조사 값을 직접 넣습니다. Ampory가 공차를 정하거나 시험 합격을 판단하지 않습니다.",
     formulaId: "formula-field-compare",
@@ -1588,7 +1686,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("몇 %면 합격인가요?", "프로젝트 시방을 넣으세요. 이 도구는 합격 도장을 찍지 않습니다."),
+    faqs: [
+      {
+        question: "몇 %면 합격인가요?",
+        answer: "Ampory가 정하지 않습니다. 시방·제조사 공차를 상대% 또는 절대값으로 넣고 범위 안·밖만 봅니다.",
+      },
+      {
+        question: "범위 밖이면 불합격인가요?",
+        answer: "산술 비교일 뿐입니다. 재측정·조건 확인·시험 성적서는 별도입니다.",
+      },
+      {
+        question: "절대 공차와 상대 공차 차이는?",
+        answer: "상대는 설계값의 ±%, 절대는 ±같은 단위(예: ±7 A)입니다. 모드를 바꿔 입력합니다.",
+      },
+      {
+        question: "설계값 0이면?",
+        answer: "% 편차를 정의하지 않습니다. 절대 편차와 허용 구간만 볼 수 있습니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-phase-unbalance",

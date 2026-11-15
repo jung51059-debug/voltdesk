@@ -6,18 +6,23 @@ import { EngineeringDisclaimer } from "@/components/calculators/engineering-disc
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { TrackRecentTool } from "@/components/calculators/track-recent-tool";
-import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 
-export const metadata: Metadata = {
-  title: "아크플래시 점검 목록",
-  description: "아크플래시 검토 전에 모을 자료 목록입니다. 입사에너지와 접근 한계는 계산하지 않습니다.",
-  alternates: { canonical: "/tools/advanced/arc-flash" },
-};
+const pageTool = getToolBySlug("arc-flash");
+
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "아크플래시 점검 목록",
+      description: "아크플래시 검토 전에 모을 자료 목록입니다. 입사에너지와 접근 한계는 계산하지 않습니다.",
+      alternates: { canonical: "/tools/advanced/arc-flash" },
+    };
 
 export default function ArcFlashPage() {
-  const tool = getToolBySlug("arc-flash");
+  const tool = pageTool;
   const formula = getFormulaById("formula-arc-flash");
   return (
     <div className="max-w-3xl">
@@ -68,7 +73,8 @@ export default function ArcFlashPage() {
         의복 등급과 접근 한계는 사업장 전기안전 절차와 적용 기준을 따릅니다. 이 페이지는 점검 목록이며 위험 범주를 계산하지
         않습니다.
       </p>
-      {formula ? <TechnicalDisclosure formula={formula} /> : <EngineeringDisclaimer />}
+      {formula ? <CalculatorExplain slug="arc-flash" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : <EngineeringDisclaimer />}
     </div>
   );
 }

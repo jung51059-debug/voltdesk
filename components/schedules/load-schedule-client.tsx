@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { EngineeringDisclaimer } from "@/components/calculators/engineering-disclaimer";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
@@ -605,7 +606,8 @@ export function LoadScheduleClient() {
       </div>
       {panelFilter ? <p className="mt-2 text-xs text-muted">표·분류 Summary는 Panel 필터가 적용됩니다. 상단 설비 합계와 변압기·발전기 버튼은 전체 부하 기준입니다.</p> : null}
 
-      {formula ? <TechnicalDisclosure formula={formula} /> : <EngineeringDisclaimer />}
+      {formula ? <CalculatorExplain slug="load-schedule" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : <EngineeringDisclaimer />}
     </div>
   );
 }

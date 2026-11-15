@@ -617,7 +617,7 @@ describe("2차 콘텐츠 안내 예제", () => {
       }
       const tool = getToolBySlug(slug);
       expect(tool?.faqs.length).toBeGreaterThanOrEqual(2);
-      expect(tool?.faqs.length).toBeLessThanOrEqual(3);
+      expect(tool?.faqs.length).toBeLessThanOrEqual(4);
     }
   });
 });
