@@ -600,6 +600,9 @@ export const baseTools: CalculatorTool[] = [
     domain: "electrical",
     name: "도체 저항 계산기",
     nameEn: "Conductor resistance calculator",
+    metaTitle: "도체 저항, Cu·Al 단면·길이로 20°C R·Ω/km",
+    metaDescription:
+      "구리·알루미늄 저항률과 단면·편도 길이로 편도 Ω과 Ω/km을 냅니다. Al 70 mm²·45 m이면 0.4029 Ω/km. 온도·표피효과 없음. 허용전류·케이블 선정 아님.",
     description: "재질, 단면적, 길이로 도체 저항과 km당 저항을 계산합니다.",
     longDescription:
       "구리·알루미늄의 20°C 저항률 근사값으로 도체 저항을 계산합니다. 전압강하 계산의 입력값(Ω/km)을 준비할 때 사용합니다.",
@@ -830,6 +833,9 @@ export const baseTools: CalculatorTool[] = [
     domain: "facility",
     name: "월간 전력사용량 비교",
     nameEn: "Monthly electricity consumption comparison",
+    metaTitle: "월간 전력 비교, 두 달 kWh·30일 환산·단가 추정",
+    metaDescription:
+      "기준·비교 달 kWh 차이와 %를 냅니다. 8,600→7,900 kWh면 −8.14%. 30일 환산·평균 단가 선택. 한전 청구·기본요금 반영 없음.",
     description: "두 달의 kWh, 최대수요, 추정 요금을 비교합니다.",
     longDescription:
       "기준 월과 비교 월의 전력량·최대수요를 비교하고, 선택적으로 일수 보정과 평균 단가를 적용합니다. 한전 요금 계산기가 아닙니다.",

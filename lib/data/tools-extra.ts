@@ -289,6 +289,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "THD 계산기",
     nameEn: "THD calculator",
+    metaTitle: "THD 계산, 기본파·고조파 실효값 전압·전류 %",
+    metaDescription:
+      "기본파와 고조파 RMS로 THD%를 냅니다. 전류 85 A·12·7·4 A면 약 17.01%. 차수 번호가 아닌 실효값 입력. 허용 한도·합격 판정 없음.",
     description: "기본파와 고조파 실효값으로 전압 또는 전류 THD를 계산합니다.",
     longDescription: "THD = √(ΣHn²)/H1×100. 전압 THD와 전류 THD를 구분해 입력합니다. 허용 한도는 판정하지 않습니다.",
     formulaId: "formula-thd",
@@ -550,6 +553,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "변압기 1·2차 전류",
     nameEn: "Transformer rated current",
+    metaTitle: "변압기 정격전류, kVA·1·2차 V로 3상 I",
+    metaDescription:
+      "3상 I=S/(√3V)로 1·2차 전부하 선전류를 냅니다. 750 kVA·6.6/380 V면 2차 1139.51 A·1차 65.61 A. 단상·차단기 선정·역률 없음.",
     description: "정격 kVA와 1·2차 전압으로 정격전류를 계산합니다.",
     longDescription: "3상 I = S/(√3 V). 단상은 이 식을 쓰지 마세요.",
     formulaId: "formula-transformer-current",
@@ -1281,6 +1287,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "배터리 용량(Ah) 산정",
     nameEn: "Battery Ah sizing",
+    metaTitle: "배터리 Ah, 부하·DC V·시간·효율·DOD 수지",
+    metaDescription:
+      "부하 W·시간·효율·노화·DOD로 필요 Ah·kWh를 냅니다. 1200 W·48 V·2 h 예는 약 163.4 Ah·7.84 kWh. 방전곡선·런타임 보증 아님.",
     description: "부하, DC 전압, 시간, 효율·노화·DOD로 필요 Ah와 에너지를 계산합니다.",
     longDescription: "직렬 셀 수는 모듈 전압으로 참고합니다. 병렬 스트링은 모듈 Ah로 나누면 됩니다.",
     formulaId: "formula-battery-ah",
@@ -1348,6 +1357,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "전력사용 원단위",
     nameEn: "Energy intensity",
+    metaTitle: "전력 원단위, kWh÷면적·생산량으로 EMS 원단위",
+    metaDescription:
+      "검침 kWh와 활동량(면적·생산·인시 등)으로 원단위를 냅니다. 12000 kWh·3000 m²이면 4.00 kWh/m². 분모 정의가 같아야 전년 비교·법정 원단위 판정이 아닙니다.",
     description: "kWh를 면적·생산량 등 활동량으로 나눈 원단위를 계산합니다.",
     longDescription: "분모 정의가 같아야 전년 비교가 의미가 있습니다.",
     formulaId: "formula-energy-intensity",
@@ -1360,7 +1372,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("한전 원단위인가요?", "사용자가 넣은 분모로 나눈 값입니다."),
+    faqs: [
+      {
+        question: "한전·법정 원단위와 같나요?",
+        answer: "아닙니다. 사용자가 넣은 분모로 kWh를 나눈 값입니다. 한전 EMS 원단위 정의·에너지이용합리화 기준 적합 판정이 아닙니다.",
+      },
+      {
+        question: "분모 단위는 어떻게 맞추나요?",
+        answer: "unitLabel은 표기만 합니다. m²·천개·인시 등 정의를 문서에 남기고 비교할 때 같은 정의만 쓰세요.",
+      },
+      {
+        question: "전년 대비는 여기서 하나요?",
+        answer: "원단위 추이는 kWh·분모를 각각 기록해 재계산하세요. 절대 kWh 증감은 yoy-energy 도구를 쓰세요.",
+      },
+      {
+        question: "kWh가 0이면?",
+        answer: "분모가 양수면 원단위 0이 나옵니다. 가동이 없었는지 검침 기간·계량 경계를 확인하세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-energy-cost",
@@ -1411,6 +1440,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "예방정비 주기",
     nameEn: "PM interval",
+    metaTitle: "예방정비 주기, 누적 운전h·PM 주기로 잔여 시간",
+    metaDescription:
+      "제조사·사내 PM 주기(h)와 누적 운전시간으로 다음 정비까지 남은 시간을 냅니다. 2300 h·주기 500 h면 약 200 h. 법정 검사·달력 점검 대체가 아닙니다.",
     description: "누적 운전시간과 주기로 다음 정비까지 남은 시간을 계산합니다.",
     longDescription: "법정 검사 주기와 다를 수 있습니다. 설비 이력 저장은 이후 계정 기능에서 확장할 수 있습니다.",
     formulaId: "formula-pm",
@@ -1423,7 +1455,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("UPS 점검 기록으로 쓰나요?", "시간 주기 참고입니다. 점검 체크리스트는 별도 문서화하세요."),
+    faqs: [
+      {
+        question: "법정 전기·소방 점검 주기와 같나요?",
+        answer: "아닙니다. 운전시간 mod 주기로 잔여 h만 냅니다. 월력·법정 주기는 별도 일정입니다.",
+      },
+      {
+        question: "주기 도래는 어떻게 표시되나요?",
+        answer: "누적이 주기의 정수 배면 다음까지 0 h·주기 도래로 표시합니다.",
+      },
+      {
+        question: "누적시간은 어디서 가져오나요?",
+        answer: "HMI 런타임·운영일지·EMS 등 신뢰할 출처를 직접 넣습니다. 기동 횟수만 세는 값과 혼동하지 마세요.",
+      },
+      {
+        question: "설비 이력은 저장되나요?",
+        answer: "하지 않습니다. 정비 후 리셋·이력은 사내 CMMS에 기록하세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-yoy-energy",
@@ -1433,6 +1482,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "전년 동월 전력 비교",
     nameEn: "Year-over-year energy",
+    metaTitle: "전년 동월 전력 비교, kWh·Peak 증감 %",
+    metaDescription:
+      "올해·전년 동월 kWh 차이와 전년 대비 %를 냅니다. 12000·10000 kWh면 +20%. 전년 0이면 % 정의 불가. 일수·생산 보정·한전 요금 아님.",
     description: "올해와 전년 같은 달의 kWh·최대수요를 비교합니다.",
     longDescription: "일수가 다르면 월간 비교 도구의 일수 보정을 함께 쓰세요.",
     formulaId: "formula-yoy",
@@ -1445,7 +1497,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("Peak Demand 기록은?", "최대수요 칸에 올해·전년 값을 넣으면 차이를 보여 줍니다."),
+    faqs: [
+      {
+        question: "전년 동월 kWh만 비교하나요?",
+        answer: "네. 동일 달 검침 kWh 차이와 %를 냅니다. 월 일수가 다르면 monthly-energy 일수 보정을 검토하세요.",
+      },
+      {
+        question: "전년 사용량이 0이면?",
+        answer: "%는 정의하지 않으며 해석에서 안내합니다. 절대 차이 kWh만 참고하세요.",
+      },
+      {
+        question: "Peak Demand는 요금 수요인가요?",
+        answer: "아닙니다. 사용자가 넣은 최대수요 kW 차이만 표시합니다. 계약전력·요금적용전력을 결정하지 않습니다.",
+      },
+      {
+        question: "감소면 효율 개선인가요?",
+        answer: "단순 증감입니다. 생산량·날씨·가동 변경과 원단위는 energy-intensity 등으로 따로 봅니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-load-schedule",
@@ -1498,6 +1567,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "케이블 스케줄",
     nameEn: "Cable schedule",
+    metaTitle: "케이블 스케줄, 태그·전류·CSV 목록",
+    metaDescription:
+      "케이블 태그·From-To·전류·규격 칸을 CSV로 관리합니다. Load에서 46.63 A 모터 회로 등을 넘겨 굵기·ΔV 검토만 handoff. 자동 선정 없음.",
     description: "케이블 태그·경로·규격 목록을 관리하고 CSV 내보내기/가져오기를 지원합니다.",
     longDescription: "자동 선정과 분리된 목록 도구입니다.",
     formulaId: "formula-cable-schedule",
@@ -1510,7 +1582,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("가져오기 형식은?", "첫 행이 헤더인 CSV입니다. 내보낸 파일을 다시 넣을 수 있습니다."),
+    faqs: [
+      {
+        question: "케이블 굵기를 자동으로 정하나요?",
+        answer: "하지 않습니다. 전류만 케이블·전압강하·차단기 계산기로 넘깁니다.",
+      },
+      {
+        question: "CSV 형식은?",
+        answer: "첫 행 헤더 CSV입니다. tag·current·voltage 등 내보낸 파일을 다시 넣을 수 있습니다.",
+      },
+      {
+        question: "Load 스케줄과 연동되나요?",
+        answer: "Load에서 Cable 목록을 만들 수 있습니다. voltdesk:cable-schedule은 별도 저장입니다.",
+      },
+      {
+        question: "ΔV%는 누가 계산하나요?",
+        answer: "이 목록은 메모 칸입니다. 전압강하 계산기에서 r·L로 검증하세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-panel-schedule",
@@ -1520,6 +1609,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "반·MCC 스케줄",
     nameEn: "Panel MCC schedule",
+    metaTitle: "반·MCC 스케줄, R/S/T 전류·상 불평형",
+    metaDescription:
+      "회로별 R/S/T 전류로 상 불평형 %를 봅니다. R20·S20·T40 A면 약 50.0%. Load에서 회로 생성. KEC 한도·차단기 자동 선정 없음.",
     description: "회로별 R/S/T 부하를 모아 상 불평형률을 계산합니다.",
     longDescription: "L1/L2/L3 표기도 R/S/T와 같이 취급합니다.",
     formulaId: "formula-panel-schedule",
@@ -1532,7 +1624,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("RST 부하는?", "3상 부하로 세 상에 같은 전류를 더합니다."),
+    faqs: [
+      {
+        question: "RST 3상 회로는 어떻게 합산되나요?",
+        answer: "RST는 R·S·T 각각에 동일 전류를 더합니다. 단상은 한 상에만 더합니다.",
+      },
+      {
+        question: "불평형 %가 IEC VUF인가요?",
+        answer: "아닙니다. 상 전류 합의 평균편차 %입니다.",
+      },
+      {
+        question: "Load와 다른 점은?",
+        answer: "Load는 kW 집계·수용률입니다. Panel은 회로 배치·불평형이 중심입니다.",
+      },
+      {
+        question: "차단기·케이블 칸은?",
+        answer: "검토 메모입니다. handoff로 검토 계산기에 전류만 넘깁니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-load-flow",
@@ -1626,6 +1735,10 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "낙뢰보호 점검 목록",
     nameEn: "Lightning protection checklist",
+    pageHeading: "낙뢰보호 점검 목록",
+    metaTitle: "낙뢰보호 점검 목록, LPS·위험점수 계산기 아님",
+    metaDescription:
+      "IEC 62305 검토 전 체크리스트입니다. 위험지수·LPS 등급·roll sphere를 계산하지 않습니다. SPD는 spd-helper로 연계.",
     description: "점검 목록입니다. 위험점수와 LPS 등급은 계산하지 않습니다.",
     longDescription: "관련 표준: IEC 62305. 불완전한 위험 점수를 설계 판정처럼 제공하지 않습니다.",
     formulaId: "formula-lightning",
@@ -1638,7 +1751,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("위험 등급이 나오나요?", "나오지 않습니다. 간이 검토 문구만 제공합니다."),
+    faqs: [
+      {
+        question: "위험 등급이나 LPS Level이 나오나요?",
+        answer: "나오지 않습니다. 확인할 항목 목록만 제공합니다.",
+      },
+      {
+        question: "IEC 62305 전체 위험평가인가요?",
+        answer: "아닙니다. 자료 수집·역할 안내입니다.",
+      },
+      {
+        question: "SPD는 여기서 선정하나요?",
+        answer: "Type·Uc·위치 체크는 SPD 점검 도우미를 씁니다. In 자동 선정 없습니다.",
+      },
+      {
+        question: "접지저항 목표를 판정하나요?",
+        answer: "하지 않습니다. 접지봉·토양 계산기는 근사만 제공합니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-sld",
@@ -1648,6 +1778,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "electrical",
     name: "단선도 초안 (구조)",
     nameEn: "SLD data structure",
+    metaTitle: "단선도 초안, SLD 노드·엣지·계산기 링크",
+    metaDescription:
+      "수전·변압기·모선·발전기를 노드·엣지로 localStorage 저장하고 각 노드를 Ampory 계산기 URL에 연결합니다. CAD·KEC 자동 검토·조류 계산 없음.",
     description: "유틸리티·변압기·발전기·모선 등을 노드·엣지로 저장할 수 있는 초안입니다. 캔버스는 후순위입니다.",
     longDescription: "각 장비를 기존 계산기 URL과 연결할 수 있게 데이터만 준비합니다.",
     formulaId: "formula-sld",
@@ -1660,7 +1793,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("도면을 그리나요?", "초기에는 목록·연결 데이터만 저장합니다."),
+    faqs: [
+      {
+        question: "단선결선도를 자동으로 그리나요?",
+        answer: "하지 않습니다. 노드·엣지 목록과 계산기 href만 저장합니다. 캔버스 편집은 후순위입니다.",
+      },
+      {
+        question: "KEC·IEC 심사를 하나요?",
+        answer: "하지 않습니다. 보호협조·단락·케이블 선정은 각 전기 계산기에서 따로 합니다.",
+      },
+      {
+        question: "데이터는 어디에 있나요?",
+        answer: "voltdesk:sld-draft localStorage입니다. 백업·다른 PC 동기화는 없습니다.",
+      },
+      {
+        question: "엣지에 케이블 길이를 넣으면?",
+        answer: "저장만 합니다. 전압강하·ΔV는 cable-sizing 등에서 계산하세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-field-compare",
@@ -1713,6 +1863,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "3상 전압·전류 불평형",
     nameEn: "Line voltage average-deviation unbalance",
+    metaTitle: "3상 불평형, 선간전압 평균편차·상전류 %",
+    metaDescription:
+      "Vab/Vbc/Vca 평균편차 전압 불평형%를 냅니다. 376·389·371 V면 약 2.73%. 상전류 선택 시 편차율 별도. IEC VUF·합격 한도 없음.",
     description: "선간전압 Vab/Vbc/Vca로 평균편차 방식 전압 불평형을 계산합니다. 위상각이 있으면 IEC 대칭분 VUF도 계산합니다.",
     longDescription: "기본은 선간 RMS 평균편차 방식입니다. IEC 대칭분 VUF는 상전압 크기와 위상각이 있을 때만 계산하며, RMS 세 값에 ±120°를 붙여 만들지 않습니다. 합격 한도는 없습니다.",
     formulaId: "formula-phase-unbalance",
@@ -1739,6 +1892,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "발전기 로드테스트",
     nameEn: "Generator load test",
+    metaTitle: "발전기 로드테스트, 380V·420A→kVA·kW 정리",
+    metaDescription:
+      "측정 선간전압·전류로 3상 kVA를 구합니다. 380V·420A·PF0.8이면 약 276.44 kVA·221.15 kW. PF 없으면 kVA만. 법정 시험 대체 아님.",
     description: "측정 선간전압·선전류로 실측 kVA를 정리합니다. PF를 넣으면 kW도 계산합니다.",
     longDescription: "용량 산정과 목적이 다릅니다. PF를 자동으로 가정하지 않습니다. 25~100%는 선택 예시 점이며 법정 단계가 아닙니다.",
     formulaId: "formula-generator-load-test",
@@ -1751,7 +1907,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("25/50/75/100%가 필수인가요?", "아닙니다. 상세 조건의 선택 예시입니다. 법정 시험 단계가 아닙니다."),
+    faqs: [
+      {
+        question: "25/50/75/100% 시험이 필수인가요?",
+        answer: "아닙니다. 선택 입력 예시입니다. 법정 절차를 대체하지 않습니다.",
+      },
+      {
+        question: "역률을 모르면?",
+        answer: "kVA·정격%만 표시하고 kW·kWh는 만들지 않습니다.",
+      },
+      {
+        question: "발전기 용량 계산기와 다른 점은?",
+        answer: "용량 산정은 부하 합산·여유입니다. 여기는 현장 계측 정리입니다.",
+      },
+      {
+        question: "단상 발전기도 되나요?",
+        answer: "phase를 단상으로 두면 I×V/1000 식으로 처리합니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-duty-cycle",
@@ -1761,6 +1934,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "설비 가동률 (Runtime)",
     nameEn: "Equipment runtime ratio",
+    metaTitle: "설비 가동률, ON 시간·기동횟수로 Runtime %",
+    metaDescription:
+      "관찰기간 대비 ON 시간으로 가동률을 냅니다. 24h 중 8h ON·12회 기동이면 약 33.3%·0.5회/h. IEC 모터 Duty Type 아님.",
     description: "관찰기간의 ON 시간과 기동횟수로 가동률, 시간당 기동, 평균 ON/OFF를 계산합니다.",
     longDescription: "IEC 60034 S1~S10 모터 Duty Type과 다른 운영시간 지표입니다. 기종별 허용 기동횟수는 명판을 확인하세요.",
     formulaId: "formula-duty-cycle",
@@ -1773,7 +1949,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("특정 펌프 전용인가요?", "아닙니다. 운전 시간 비율만 계산합니다."),
+    faqs: [
+      {
+        question: "IEC S4 Duty와 같나요?",
+        answer: "아닙니다. 단순 ON/기간 비율과 기동 빈도만 냅니다.",
+      },
+      {
+        question: "ON+OFF가 period와 다른 이유는?",
+        answer: "offHours를 직접 넣으면 ON+OFF 기준 %를 추가 표시할 수 있습니다.",
+      },
+      {
+        question: "부하율과 다른 점은?",
+        answer: "가동률은 시간 비율, equipment-load는 kW/정격kW입니다.",
+      },
+      {
+        question: "어떤 설비에 쓰나요?",
+        answer: "펌프·AHU·컴프레서 등 주기 운전 설비 운영 검토에 씁니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-sensor-calibration",
@@ -1783,6 +1976,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "센서·계측기 비교",
     nameEn: "Sensor comparison",
+    metaTitle: "센서 교정 비교, Error·%Span·최대 절대오차",
+    metaDescription:
+      "표시값·기준값 여러 점에서 Error, Correction, % of Reading·Span을 냅니다. 0~100 스팬 5점 예에서 최대 절대오차 0.8. 공인교정·KOLAS 성적 대체 아님.",
     description: "표시값과 Reference의 Error, Correction, % of reading, % of span을 계산합니다.",
     longDescription: "0~100% 점을 넣을 수 있습니다. 교정 인증이나 국가교정 성적을 대체하지 않습니다.",
     formulaId: "formula-sensor-cal",
@@ -1795,7 +1991,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("교정 성적서 대신 쓰나요?", "안 됩니다. 산술 비교 참고입니다."),
+    faqs: [
+      {
+        question: "교정 성적서를 대체하나요?",
+        answer: "안 됩니다. 표시−기준 산술과 최대 절대오차 요약만 제공합니다.",
+      },
+      {
+        question: "합격 여부는 누가 정하나요?",
+        answer: "사용자 허용오차·시방입니다. Ampory는 UAL/LAL 판정을 하지 않습니다.",
+      },
+      {
+        question: "기준값 0이면 % of Reading은?",
+        answer: "정의하지 않습니다. % of Span으로 저점 드리프트를 봅니다.",
+      },
+      {
+        question: "몇 점까지 넣나요?",
+        answer: "최대 5점( ind1~5 / ref1~5 ). 한 점 이상이면 계산합니다.",
+      },
+    ],
   }),
   tool({
     id: "tool-trend-analysis",
@@ -1805,6 +2018,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "Trend 기초 분석",
     nameEn: "Trend statistics",
+    metaTitle: "Trend 기초 분석, CSV·평균·표준편차·변화율",
+    metaDescription:
+      "값·시각 CSV로 평균·min·max·표본표준편차·첫→끝 변화율을 냅니다. 10·12·14이면 평균 12·s=2·+40%. BAS 이상탐지·관리도 대체 아님.",
     description: "측정값 목록 또는 CSV로 평균·최대·표준편차·변화율을 봅니다.",
     longDescription: "BAS/BMS 대체가 아닙니다. 간단한 선 그래프와 기초 통계만 제공합니다.",
     formulaId: "formula-trend",
@@ -1817,7 +2033,24 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("시간 열은?", "첫 열이 시각 또는 초 단위이면 관찰기간과 변화율을 계산합니다."),
+    faqs: [
+      {
+        question: "BAS·이상탐지를 대체하나요?",
+        answer: "아닙니다. 표본표준편차(n−1)와 첫→끝 % 변화 등 기초 통계만 냅니다.",
+      },
+      {
+        question: "CSV 형식은?",
+        answer: "한 줄에 값만, 또는 시각,값. 헤더에 value·값이 있으면 스킵합니다.",
+      },
+      {
+        question: "시각 열이 있으면?",
+        answer: "관찰기간(h)과 /h 평균 변화율(ROC)을 추가합니다.",
+      },
+      {
+        question: "첫 값이 0이면 변화율은?",
+        answer: "정의하지 않습니다. 절대 min·max·표준편차만 참고하세요.",
+      },
+    ],
   }),
   tool({
     id: "tool-retrofit-compare",
@@ -1827,6 +2060,9 @@ export const extraTools: CalculatorTool[] = [
     domain: "facility",
     name: "개선 전후 에너지 비교",
     nameEn: "Baseline versus proposed energy",
+    metaTitle: "개선 전후 에너지, 절감 kWh·Payback",
+    metaDescription:
+      "개선 전후 kW·연간 운전h로 절감 kWh를 냅니다. 18→11kW·4000h면 28000kWh. 투자비·단가 넣으면 Simple Payback. NPV·한전 요금 없음.",
     description: "기존·개선 전력과 운전시간으로 절감 kW·kWh와 Simple Payback을 계산합니다.",
     longDescription: "NPV/IRR은 없습니다. 단가는 사용자가 넣습니다. 한전 요금 계산기가 아닙니다.",
     formulaId: "formula-retrofit",
@@ -1839,6 +2075,23 @@ export const extraTools: CalculatorTool[] = [
     recentlyAdded: true,
     status: "published",
     updatedAt: "2026-08-29",
-    faqs: faq("투자비를 모르면?", "비우면 에너지 절감만 보여 줍니다."),
+    faqs: [
+      {
+        question: "투자비를 모르면?",
+        answer: "비우면 kW·kWh·% 절감만 표시하고 Payback은 숨깁니다.",
+      },
+      {
+        question: "한전 요금표를 쓰나요?",
+        answer: "단일 사용자 단가만 곱합니다. 계약종별·시간대 요금 자동 없음.",
+      },
+      {
+        question: "NPV·IRR은?",
+        answer: "구현하지 않습니다. Simple Payback만 capitalCost와 연간 비용 절감이 있을 때.",
+      },
+      {
+        question: "baseline이 0이면?",
+        answer: "% 절감을 정의하지 않습니다. 절감 kW는 그대로 볼 수 있습니다.",
+      },
+    ],
   }),
 ];

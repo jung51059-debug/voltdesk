@@ -2,17 +2,21 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SldClient } from "@/components/schedules/sld-client";
-import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
-export const metadata: Metadata = {
-  title: "단선도 초안",
-  description: "유틸리티·변압기·발전기·모선 등을 노드와 엣지로 저장하고 기존 Ampory 계산기와 연결하는 단선도 데이터 초안입니다.",
-  alternates: { canonical: "/tools/advanced/sld" },
-};
+const pageTool = getToolBySlug("sld");
+
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "단선도 초안",
+      description: "유틸리티·변압기·발전기·모선 등을 노드와 엣지로 저장하고 기존 Ampory 계산기와 연결하는 단선도 데이터 초안입니다.",
+      alternates: { canonical: "/tools/advanced/sld" },
+    };
 
 export default function SldPage() {
-  const tool = getToolBySlug("sld");
+  const tool = pageTool;
   return (
     <>
       <JsonLd

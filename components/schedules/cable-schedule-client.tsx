@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { buildHandoffHref } from "@/lib/calculations/handoff";
@@ -178,7 +179,8 @@ export function CableScheduleClient() {
           Load Schedule로 돌아가기
         </Link>
       </div>
-      {formula ? <TechnicalDisclosure formula={formula} /> : null}
+      {formula ? <CalculatorExplain slug="cable-schedule" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
     </div>
   );
 }

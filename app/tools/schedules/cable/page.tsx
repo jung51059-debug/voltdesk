@@ -2,17 +2,21 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CableScheduleClient } from "@/components/schedules/cable-schedule-client";
-import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
-export const metadata: Metadata = {
-  title: "케이블 스케줄",
-  description: "케이블 태그, 경로, 규격 목록을 관리하고 CSV로 주고받는 Ampory 설계 목록 도구입니다.",
-  alternates: { canonical: "/tools/schedules/cable" },
-};
+const pageTool = getToolBySlug("cable-schedule");
+
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "케이블 스케줄",
+      description: "케이블 태그, 경로, 규격 목록을 관리하고 CSV로 주고받는 Ampory 설계 목록 도구입니다.",
+      alternates: { canonical: "/tools/schedules/cable" },
+    };
 
 export default function CableSchedulePage() {
-  const tool = getToolBySlug("cable-schedule");
+  const tool = pageTool;
   return (
     <>
       <JsonLd

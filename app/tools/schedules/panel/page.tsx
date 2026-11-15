@@ -2,17 +2,21 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PanelScheduleClient } from "@/components/schedules/panel-schedule-client";
-import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
-export const metadata: Metadata = {
-  title: "반·MCC 스케줄",
-  description: "분전반·MCC 회로의 R/S/T 부하와 상 불평형률을 계산하는 Ampory 패널 스케줄입니다.",
-  alternates: { canonical: "/tools/schedules/panel" },
-};
+const pageTool = getToolBySlug("panel-schedule");
+
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "반·MCC 스케줄",
+      description: "분전반·MCC 회로의 R/S/T 부하와 상 불평형률을 계산하는 Ampory 패널 스케줄입니다.",
+      alternates: { canonical: "/tools/schedules/panel" },
+    };
 
 export default function PanelSchedulePage() {
-  const tool = getToolBySlug("panel-schedule");
+  const tool = pageTool;
   return (
     <>
       <JsonLd

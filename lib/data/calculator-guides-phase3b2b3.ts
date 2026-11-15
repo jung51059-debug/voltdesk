@@ -82,6 +82,8 @@ export const phase3b2b3Guides: CalculatorGuide[] = [
       "localStorage 삭제·브라우저 초기화 시 데이터가 없어집니다.",
     ],
     links: [
+      { href: "/tools/schedules/cable", label: "케이블 스케줄", text: "합산 전류를 태그·목록으로 넘긴 뒤 굵기·ΔV handoff로 이어갈 때 씁니다." },
+      { href: "/tools/electrical/voltage-drop", label: "전압강하", text: "케이블 행의 전류와 Ω/km·길이로 구간 ΔV를 검토할 때 연결합니다." },
       { href: "/tools/schedules/panel", label: "반·MCC 스케줄", text: "회로별 R/S/T 배치와 상 불평형 %를 볼 때 연결합니다." },
       { href: "/tools/electrical/transformer-sizing", label: "변압기 용량 검토", text: "Summary kW·PF를 넘겨 kVA 하한을 볼 때 씁니다." },
       { href: "/references/transformer-sizing", label: "변압기 용량을 고르는 방법", text: "스케줄 합과 용량 선정 질문을 구분합니다." },

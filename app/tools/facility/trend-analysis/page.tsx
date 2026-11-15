@@ -2,19 +2,24 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrendClient } from "@/components/facility/trend-client";
-import { breadcrumbJsonLd, calculatorBreadcrumbItems, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, calculatorBreadcrumbItems, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getToolBySlug } from "@/lib/data/tools";
 
-const description = "현장 계측값 또는 CSV로 평균, 최대, 표준편차, 변화율을 계산하는 Ampory Trend 도구입니다.";
+const pageTool = getToolBySlug("trend-analysis");
+const description =
+  pageTool?.metaDescription ??
+  "현장 계측값 또는 CSV로 평균, 최대, 표준편차, 변화율을 계산하는 Ampory Trend 도구입니다.";
 
-export const metadata: Metadata = {
-  title: "Trend 기초 분석",
-  description,
-  alternates: { canonical: "/tools/facility/trend-analysis" },
-};
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "Trend 기초 분석",
+      description,
+      alternates: { canonical: "/tools/facility/trend-analysis" },
+    };
 
 export default function TrendAnalysisPage() {
-  const tool = getToolBySlug("trend-analysis");
+  const tool = pageTool;
   return (
     <>
       <JsonLd

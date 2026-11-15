@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { SLD_KIND_LABEL, SLD_KIND_LINKS, type SldEdge, type SldKind, type SldNode } from "@/lib/data/sld";
@@ -78,7 +79,8 @@ export function SldClient() {
           </li>
         ))}
       </ul>
-      {formula ? <TechnicalDisclosure formula={formula} /> : null}
+      {formula ? <CalculatorExplain slug="sld" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { phase3b2aGuides } from "@/lib/data/calculator-guides-phase3b2a";
 import { phase3b2b1Guides } from "@/lib/data/calculator-guides-phase3b2b1";
 import { phase3b2b2Guides } from "@/lib/data/calculator-guides-phase3b2b2";
 import { phase3b2b3Guides } from "@/lib/data/calculator-guides-phase3b2b3";
+import { phase3c2aGuides } from "@/lib/data/calculator-guides-phase3c2a";
+import { phase3c2bGuides } from "@/lib/data/calculator-guides-phase3c2b";
 
 export type GuideLookup = {
   title: string;
@@ -35,6 +37,8 @@ export const calculatorGuides: CalculatorGuide[] = [
   ...phase3b2b1Guides,
   ...phase3b2b2Guides,
   ...phase3b2b3Guides,
+  ...phase3c2aGuides,
+  ...phase3c2bGuides,
   {
     slug: "single-phase-current",
     whenToUse: [
@@ -134,6 +138,12 @@ export const calculatorGuides: CalculatorGuide[] = [
     cautions: [
       "이 전류로 차단기 정격이나 전선 굵기를 정하지 않습니다. 부하 특성, 기동전류, 허용전류, 설치조건, 적용 기준과 제조사 자료를 확인합니다.",
       "불평형과 고조파는 이 식에 없습니다.",
+    ],
+    links: [
+      { href: "/tools/electrical/motor-current", label: "모터 정격전류", text: "축출력·명판 η로 FLC를 볼 때 연결합니다." },
+      { href: "/tools/electrical/motor-starting", label: "모터 기동", text: "기동전류·전압강하를 1차 볼 때 이어서 씁니다." },
+      { href: "/tools/electrical/cable-sizing", label: "케이블 굵기 검토", text: "운전 전류로 Iz·ΔV 후보를 좁힐 때 씁니다." },
+      { href: "/tools/electrical/breaker-current", label: "차단기 참고", text: "In·Icu는 사용자 입력 비교만 합니다." },
     ],
   },
   {

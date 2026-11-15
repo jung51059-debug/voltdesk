@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ResultPanel } from "@/components/calculators/result-panel";
 import { ResultHandoff } from "@/components/calculators/result-handoff";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { analyzeTrend, parseTrendText, type TrendPoint } from "@/lib/calculations/field-verify";
@@ -209,7 +210,8 @@ export function TrendClient() {
           월간 전력사용량 비교
         </Link>
       </div>
-      {formula ? <TechnicalDisclosure formula={formula} /> : null}
+      {formula ? <CalculatorExplain slug="trend-analysis" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
     </div>
   );
 }

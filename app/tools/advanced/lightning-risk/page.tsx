@@ -6,18 +6,23 @@ import { EngineeringDisclaimer } from "@/components/calculators/engineering-disc
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { TrackRecentTool } from "@/components/calculators/track-recent-tool";
-import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd } from "@/lib/seo";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
+import { breadcrumbJsonLd, calculatorJsonLd, faqJsonLd, toolMetadata } from "@/lib/seo";
 import { getFormulaById } from "@/lib/data/formulas";
 import { getToolBySlug } from "@/lib/data/tools";
 
-export const metadata: Metadata = {
-  title: "낙뢰보호 점검 목록",
-  description: "낙뢰보호 검토 전에 확인할 항목 목록입니다. 위험점수와 LPS 등급은 계산하지 않습니다.",
-  alternates: { canonical: "/tools/advanced/lightning-risk" },
-};
+const pageTool = getToolBySlug("lightning-risk");
+
+export const metadata: Metadata = pageTool
+  ? toolMetadata(pageTool)
+  : {
+      title: "낙뢰보호 점검 목록",
+      description: "낙뢰보호 검토 전에 확인할 항목 목록입니다. 위험점수와 LPS 등급은 계산하지 않습니다.",
+      alternates: { canonical: "/tools/advanced/lightning-risk" },
+    };
 
 export default function LightningPage() {
-  const tool = getToolBySlug("lightning-risk");
+  const tool = pageTool;
   const formula = getFormulaById("formula-lightning");
   return (
     <div className="max-w-3xl">
@@ -58,7 +63,8 @@ export default function LightningPage() {
       <p className="mt-6 rounded-2xl border border-warning-ink/30 bg-warning-bg px-4 py-3 text-sm text-warning-ink">
         이 페이지는 점검 목록입니다. LPS 등급, 수뢰부 배치, 이격거리는 계산하지 않습니다.
       </p>
-      {formula ? <TechnicalDisclosure formula={formula} /> : <EngineeringDisclaimer />}
+      {formula ? <CalculatorExplain slug="lightning-risk" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : <EngineeringDisclaimer />}
     </div>
   );
 }

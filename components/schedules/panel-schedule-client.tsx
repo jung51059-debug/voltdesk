@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { CalculatorExplain } from "@/components/calculators/calculator-explain";
 import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import { buildHandoffHref } from "@/lib/calculations/handoff";
@@ -206,7 +207,8 @@ export function PanelScheduleClient() {
           <strong className="block text-xl tabular-nums">{bal.imbalancePct.toFixed(1)} %</strong>
         </p>
       </section>
-      {formula ? <TechnicalDisclosure formula={formula} /> : null}
+      {formula ? <CalculatorExplain slug="panel-schedule" formula={formula} /> : null}
+      {formula ? <TechnicalDisclosure formula={formula} variant="compact" /> : null}
     </div>
   );
 }

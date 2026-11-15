@@ -58,6 +58,18 @@ export default function AboutPage() {
               — UPS, 발전기, 사용량, 현장 확인
             </li>
             <li>
+              <Link href="/tools/categories/schedule" className="font-medium text-primary hover:underline">
+                설계 Schedule
+              </Link>
+              — 부하·케이블·반 스케줄과 SLD 데이터 초안
+            </li>
+            <li>
+              <Link href="/tools/categories/advanced" className="font-medium text-primary hover:underline">
+                고급 검토
+              </Link>
+              — 아크·낙뢰 점검 목록(입사에너지·LPS 등급 계산 아님)
+            </li>
+            <li>
               <Link href="/references" className="font-medium text-primary hover:underline">
                 실무 참고
               </Link>
