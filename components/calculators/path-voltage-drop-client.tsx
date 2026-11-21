@@ -1,21 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ResultPanel } from "@/components/calculators/result-panel";
 import { ResultHandoff } from "@/components/calculators/result-handoff";
-import { TechnicalDisclosure } from "@/components/calculators/technical-disclosure";
-import { CalculatorExplain } from "@/components/calculators/calculator-explain";
-import { RelatedResources } from "@/components/calculators/related-resources";
-import { StandardStatusBadge, StandardStatusNote } from "@/components/calculators/standard-badge";
 import { TrackCalculatorView } from "@/components/analytics/track-calculator-view";
-import { FavoriteButton } from "@/components/ui/favorite-button";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { getCategoryById } from "@/lib/data/categories";
 import { parseHandoff } from "@/lib/calculations/handoff";
-import { getCalculatorGuide } from "@/lib/data/calculator-guides";
-import { getRelatedTools, getToolBySlug } from "@/lib/data/tools";
+import { getToolBySlug } from "@/lib/data/tools";
 import { SITE } from "@/lib/types";
 import {
   KEC_VOLTAGE_DROP_MIXED,
@@ -36,8 +28,6 @@ import {
   type PathVoltageDropInput,
   type PathVoltageDropSegmentInput,
 } from "@/lib/calculations/path-voltage-drop";
-import { getFormulaById } from "@/lib/data/formulas";
-import { getStandardBasisBySlug } from "@/lib/data/standard-basis";
 import { usePreferences } from "@/components/providers/preferences-provider";
 import { pushRecentTool } from "@/lib/storage/local";
 import { persist } from "@/lib/storage/persist";
@@ -112,11 +102,8 @@ const inputClass = "h-11 w-full rounded-lg border border-border bg-surface px-3 
 export function PathVoltageDropClient() {
   const searchParams = useSearchParams();
   const { prefs } = usePreferences();
-  const formula = getFormulaById("formula-path-voltage-drop");
-  const basis = getStandardBasisBySlug("path-voltage-drop");
   const tool = getToolBySlug("path-voltage-drop");
   const category = tool ? getCategoryById(tool.categoryId) : undefined;
-  const related = tool ? getRelatedTools(tool) : [];
   const [draft, setDraft] = useState<Draft>(() => store.load());
   const [hydrated, setHydrated] = useState(false);
 
@@ -155,42 +142,8 @@ export function PathVoltageDropClient() {
       : KEC_VOLTAGE_DROP_START.lv;
 
   return (
-    <div className="mx-auto w-full max-w-5xl">
+    <>
       <TrackCalculatorView toolSlug="path-voltage-drop" category={category?.slug} />
-      <Breadcrumb
-        items={[
-          { href: "/", label: "홈" },
-          { href: "/tools/electrical", label: "전기" },
-          { href: "/tools/categories/cable", label: "케이블 / 배선" },
-          { label: "경로 전압강하 계산기" },
-        ]}
-        compact
-      />
-      <header className="mb-6 flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium text-muted">케이블 / 배선</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">경로 전압강하 계산기</h1>
-          {basis ? (
-            <div className="mt-2 space-y-1.5">
-              <StandardStatusBadge status={basis.standardStatus} />
-              <StandardStatusNote status={basis.standardStatus} />
-            </div>
-          ) : null}
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            인입구부터 최종 부하까지 여러 배선 구간의 누적 전압강하를 검토합니다. 한 케이블만 계산하려면{" "}
-            <Link href="/tools/electrical/voltage-drop" className="text-primary hover:underline">
-              전압강하 계산기
-            </Link>
-            를 쓰세요.
-          </p>
-          <p className="mt-2 max-w-2xl text-sm leading-6">
-            구간마다 전류나 전선이 다를 때 한 구간 계산기보다 이 도구가 맞습니다. 허용값 비교는 사용자가 넣은 기준이 있을
-            때만 하며, 자동 합격이 아닙니다.
-          </p>
-        </div>
-        <FavoriteButton toolId="tool-path-voltage-drop" toolName="경로 전압강하 계산기" />
-      </header>
-
       <div className="rounded-[16px] border border-border bg-card p-5 sm:p-6 lg:grid lg:grid-cols-2 lg:gap-10">
         <div className="space-y-4">
           <Field label="KEC 232.3.9 기준 검토">
@@ -393,20 +346,6 @@ export function PathVoltageDropClient() {
           )}
         </div>
       </div>
-
-      {formula ? (
-        <>
-          <CalculatorExplain slug="path-voltage-drop" formula={formula} />
-          <TechnicalDisclosure formula={formula} slug="path-voltage-drop" variant={getCalculatorGuide("path-voltage-drop") ? "compact" : "full"} />
-        </>
-      ) : null}
-
-      <RelatedResources
-        related={related}
-        articles={[]}
-        sourceToolSlug="path-voltage-drop"
-        category={category?.slug}
-      />
-    </div>
+    </>
   );
 }
