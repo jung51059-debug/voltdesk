@@ -189,6 +189,10 @@ export function CalculatorWorkspace({
 
   function setField(id: string, value: string) {
     setDirty(true);
+    if (tool.slug === "transformer-impedance") {
+      setOutcome(engines[tool.slug]({ ...values, [id]: value }, prefs.precision));
+      setDirty(false);
+    }
     setValues((current) => {
       const next = { ...current, [id]: value };
       if ((tool.slug === "contract-power-current" || tool.slug === "amp-to-kw") && id === "phase") {
@@ -287,6 +291,7 @@ export function CalculatorWorkspace({
   const resultBlock =
     outcome?.ok ? (
       <ResultPanel
+        keepNumbersTogether={tool.slug === "transformer-impedance"}
         result={outcome}
         split={complex}
         actions={

@@ -1,3 +1,4 @@
+import { transformerImpedanceFormula } from "@/lib/data/transformer-impedance";
 import type { FormulaDefinition } from "@/lib/types";
 
 function f(
@@ -24,6 +25,7 @@ function f(
 }
 
 export const extraFormulas: FormulaDefinition[] = [
+  transformerImpedanceFormula,
   f("formula-motor-current", "모터 정격전류", "3상 I = P / (√3 V PF η),  단상 I = P / (V PF η)", [
     { symbol: "P", name: "축출력", unit: "W", description: "모터 기계 출력" },
     { symbol: "V", name: "전압", unit: "V", description: "3상은 선간전압" },

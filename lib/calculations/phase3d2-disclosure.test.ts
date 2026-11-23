@@ -83,11 +83,11 @@ describe("Phase 3D-2 — 유형별 공식 표시", () => {
   });
 });
 
-describe("Phase 3D-2 — published 68종 메타", () => {
+describe("Phase 3D-2 — published 69종 메타", () => {
   const published = getPublishedTools();
 
-  it("68종", () => {
-    expect(published).toHaveLength(68);
+  it("69종", () => {
+    expect(published).toHaveLength(69);
   });
 
   it("무관 fallback 없음 (3D-1 P1 22종)", () => {

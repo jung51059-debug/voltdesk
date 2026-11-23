@@ -1,3 +1,4 @@
+import { transformerImpedanceTool } from "./transformer-impedance";
 import type { CalculatorTool } from "@/lib/types";
 
 function tool(partial: CalculatorTool): CalculatorTool {
@@ -7,6 +8,7 @@ function tool(partial: CalculatorTool): CalculatorTool {
 const faq = (question: string, answer: string) => [{ question, answer }];
 
 export const extraTools: CalculatorTool[] = [
+  transformerImpedanceTool,
   tool({
     id: "tool-motor-current",
     slug: "motor-current",
@@ -523,7 +525,7 @@ export const extraTools: CalculatorTool[] = [
     formulaId: "formula-transformer-sizing",
     tags: ["변압기", "kVA", "용량"],
     synonyms: ["transformer sizing", "변압기 용량", "TR 용량", "필요 kVA"],
-    relatedToolIds: ["tool-transformer-load", "tool-transformer-current", "tool-short-circuit"],
+    relatedToolIds: ["tool-transformer-impedance", "tool-transformer-load", "tool-transformer-current", "tool-short-circuit"],
     relatedArticleIds: ["art-transformer-sizing", "art-transformer-load", "art-demand-vs-load-factor"],
     complexity: "intermediate",
     featured: true,

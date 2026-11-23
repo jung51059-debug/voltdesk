@@ -1,3 +1,4 @@
+import { calculateTransformerImpedance } from "./transformer-impedance";
 import type { CalculationOutcome, CalculationResult } from "@/lib/types";
 import { fail, metric, warning } from "@/lib/calculations/helpers";
 import { SQRT_3, WATTS_PER_HP, conductorOhmPerKm, conductorResistanceOhm, resistivityOf, toMeters, toOhmPerKm, toVolts, toWattHours, toWatts } from "@/lib/math/units";
@@ -1253,6 +1254,7 @@ export const engines: Record<string, (input: CalcInput, precision: number) => Ca
   "cable-parallel": calculateCableParallel,
   "cable-ampacity": calculateCableAmpacityReview,
   "busbar": calculateBusbar,
+  "transformer-impedance": calculateTransformerImpedance,
   "transformer-sizing": calculateTransformerSizing,
   "transformer-current": calculateTransformerCurrents,
   "transformer-parallel": calculateTransformerParallel,

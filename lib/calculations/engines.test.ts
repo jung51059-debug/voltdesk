@@ -1006,7 +1006,7 @@ describe("전동기 슬립·동기속도", () => {
   it("사이트맵·SEO·상호 링크가 Phase 1 범위를 만족한다", () => {
     const paths = sitemapEntries();
     expect(paths).toContain("/tools/electrical/motor-slip");
-    expect(paths).toHaveLength(129);
+    expect(paths).toHaveLength(130);
 
     const slip = getToolBySlug("motor-slip");
     expect(slip?.metaTitle).toContain("슬립");

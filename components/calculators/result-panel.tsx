@@ -8,10 +8,12 @@ export function ResultPanel({
   result,
   split = false,
   actions,
+  keepNumbersTogether = false,
 }: {
   result: CalculationResult;
   split?: boolean;
   actions?: ReactNode;
+  keepNumbersTogether?: boolean;
 }) {
   const primary = result.metrics.find((metric) => metric.primary) ?? result.metrics[0];
   const rest = result.metrics.filter((metric) => metric !== primary);
@@ -27,7 +29,7 @@ export function ResultPanel({
           <ReviewStatusBadge status={result.reviewStatus} />
         </div>
       ) : null}
-      <p className="mt-3 text-4xl font-semibold tracking-tight text-primary tabular-nums sm:text-5xl">
+      <p className={`mt-3 font-semibold tracking-tight text-primary tabular-nums ${keepNumbersTogether ? "max-w-full overflow-x-auto whitespace-nowrap" : ""} ${keepNumbersTogether && String(primary.value).length > 14 ? "text-2xl sm:text-4xl" : "text-4xl sm:text-5xl"}`}>
         {primary.value}
         {primary.unit ? <span className="ml-2 text-xl font-medium sm:text-2xl">{primary.unit}</span> : null}
       </p>
@@ -37,12 +39,12 @@ export function ResultPanel({
       {rest.length > 0 ? (
         <dl className="mt-5 space-y-2 border-t border-border pt-4">
           {rest.map((metric) => (
-            <div key={metric.id} className="flex items-baseline justify-between gap-3 text-sm">
+            <div key={metric.id} className={`flex items-baseline justify-between gap-3 text-sm ${keepNumbersTogether ? "flex-wrap" : ""}`}>
               <dt className="text-muted">
                 {metric.label}
                 {metric.hint ? <span className="mt-0.5 block text-[11px] font-normal">{metric.hint}</span> : null}
               </dt>
-              <dd className={`font-semibold text-ink ${metric.unit ? "shrink-0 tabular-nums" : "min-w-0 text-right leading-6"}`}>
+              <dd className={`font-semibold text-ink ${keepNumbersTogether ? "max-w-full overflow-x-auto whitespace-nowrap" : ""} ${metric.unit ? "shrink-0 tabular-nums" : "min-w-0 text-right leading-6"}`}>
                 {metric.value}
                 {metric.unit ? <span className="ml-1 font-medium text-muted">{metric.unit}</span> : null}
               </dd>

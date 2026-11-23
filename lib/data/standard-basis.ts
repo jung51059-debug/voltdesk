@@ -280,6 +280,7 @@ export const standardBases: StandardBasis[] = [
     },
   ),
   row("busbar", "formula-busbar", "general-engineering", ["engineering"], "engineering", "단면적·전류밀도·I²t 참고.", "부스바 기하·밀도", ["IEC/KEC 부스바 허용전류표가 아닙니다."]),
+  row("transformer-impedance", "formula-transformer-impedance", "general-engineering", ["engineering"], "engineering", "Zbase=V²/S, %Z=100|Z|/Zbase, In=S/(√3 V).", "%Z·Ω 변환과 변압기 단자 단락 근사", ["동일한 기준 측의 3상 용량과 선간전압을 사용합니다.", "단락 근사는 c=1이며 전원·케이블·회전기 기여를 생략합니다."]),
   row("transformer-sizing", "formula-transformer-sizing", "general-engineering", ["engineering"], "engineering", "수요 kW를 여유·역률로 kVA화.", "필요 kVA 참고", ["냉각 방식 보정·탭·병렬은 포함하지 않습니다."]),
   row("transformer-current", "formula-transformer-current", "general-engineering", ["engineering"], "engineering", "I = S/(√3 V).", "1·2차 정격전류", ["단락·보호 정격이 아닙니다."]),
   row("transformer-parallel", "formula-transformer-parallel", "general-engineering", ["engineering"], "engineering", "S/z 비례 분담.", "병렬 분담 kVA", ["탭·위상·순환전류 상세는 없습니다."]),

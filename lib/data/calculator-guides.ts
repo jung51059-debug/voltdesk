@@ -1,3 +1,4 @@
+import { transformerImpedanceGuide } from "./transformer-impedance";
 import { phase3b2aGuides } from "@/lib/data/calculator-guides-phase3b2a";
 import { phase3b2b1Guides } from "@/lib/data/calculator-guides-phase3b2b1";
 import { phase3b2b2Guides } from "@/lib/data/calculator-guides-phase3b2b2";
@@ -33,6 +34,7 @@ export type CalculatorGuide = {
 
 /** 핵심 계산기만. 공식·예제 숫자는 FormulaDefinition을 화면에 재사용한다. */
 export const calculatorGuides: CalculatorGuide[] = [
+  transformerImpedanceGuide,
   ...phase3b2aGuides,
   ...phase3b2b1Guides,
   ...phase3b2b2Guides,
