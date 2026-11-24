@@ -50,6 +50,18 @@ const store = persist<Draft>("voltdesk:path-voltage-drop", {
   ],
 });
 
+function normalizeDraft(draft: Draft): Draft {
+  return {
+    ...draft,
+    segments: draft.segments.map((seg) => ({
+      ...emptyPathSegment(0),
+      ...seg,
+      mode: seg.mode === "detailed" ? "detailed" : "basic",
+      direction: seg.direction === "leading" ? "leading" : "lagging",
+    })),
+  };
+}
+
 function numOr(raw: string | undefined, fallback: number): number {
   if (!raw) return fallback;
   const n = Number(raw);
@@ -69,6 +81,7 @@ function draftFromHandoff(params: Record<string, string>): Draft | null {
     resistanceOhmKm: numOr(params.resistance, 0.727),
     material: params.material === "al" ? "al" : "cu",
     areaMm2: numOr(params.area, 35),
+    mode:params.mode === "detailed" ? "detailed" : "basic",reactanceOhmKm:numOr(params.reactance,0.08),direction:params.direction === "leading" ? "leading" : "lagging",temperature:numOr(params.temperature,20),
   };
   return {
     startKind: (params.startKind as KecPathStartKind) || "meter-2nd",
@@ -104,14 +117,14 @@ export function PathVoltageDropClient() {
   const { prefs } = usePreferences();
   const tool = getToolBySlug("path-voltage-drop");
   const category = tool ? getCategoryById(tool.categoryId) : undefined;
-  const [draft, setDraft] = useState<Draft>(() => store.load());
+  const [draft, setDraft] = useState<Draft>(() => normalizeDraft(store.load()));
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     pushRecentTool("tool-path-voltage-drop");
     const handed = draftFromHandoff(parseHandoff(searchParams));
     queueMicrotask(() => {
-      if (handed) setDraft(handed);
+      if (handed) setDraft(normalizeDraft(handed));
       setHydrated(true);
     });
   }, [searchParams]);
@@ -253,8 +266,23 @@ export function PathVoltageDropClient() {
                     <Field label="부하전류 A">
                       <input className={inputClass} inputMode="decimal" value={String(seg.currentA)} onChange={(e) => patchSeg(index, { currentA: Number(e.target.value) })} />
                     </Field>
-                    <Field label="역률 (기록용 — 현재 전압강하 계산에는 사용되지 않음)">
-                      <input className={inputClass} inputMode="decimal" value={String(seg.pf ?? "")} onChange={(e) => patchSeg(index, { pf: Number(e.target.value) })} />
+                    <Field label="구간 계산">
+                      <select
+                        className={inputClass}
+                        value={seg.mode === "detailed" ? "detailed" : "basic"}
+                        onChange={(e) => patchSeg(index, { mode: e.target.value as "basic" | "detailed" })}
+                      >
+                        <option value="basic">기본 (저항 ΔV만)</option>
+                        <option value="detailed">상세 (R·X·역률)</option>
+                      </select>
+                    </Field>
+                    <Field label={seg.mode === "detailed" ? "역률 PF" : "역률 (기록용)"}>
+                      <input
+                        className={inputClass}
+                        inputMode="decimal"
+                        value={String(seg.pf ?? "")}
+                        onChange={(e) => patchSeg(index, { pf: Number(e.target.value) })}
+                      />
                     </Field>
                     <Field label="편도 길이 m">
                       <input className={inputClass} inputMode="decimal" value={String(seg.lengthM)} onChange={(e) => patchSeg(index, { lengthM: Number(e.target.value) })} />
@@ -280,8 +308,40 @@ export function PathVoltageDropClient() {
                         <Field label="단면적 mm²">
                           <input className={inputClass} inputMode="decimal" value={String(seg.areaMm2 ?? "")} onChange={(e) => patchSeg(index, { areaMm2: Number(e.target.value) })} />
                         </Field>
+                        {seg.mode === "detailed" ? (
+                          <Field label="도체 온도 (℃)">
+                            <input
+                              className={inputClass}
+                              inputMode="decimal"
+                              value={String(seg.temperature ?? 20)}
+                              onChange={(e) => patchSeg(index, { temperature: Number(e.target.value) })}
+                            />
+                          </Field>
+                        ) : null}
                       </>
                     )}
+                    {seg.mode === "detailed" ? (
+                      <>
+                        <Field label="리액턴스 x (Ω/km)">
+                          <input
+                            className={inputClass}
+                            inputMode="decimal"
+                            value={String(seg.reactanceOhmKm ?? "")}
+                            onChange={(e) => patchSeg(index, { reactanceOhmKm: Number(e.target.value) })}
+                          />
+                        </Field>
+                        <Field label="역률 방향">
+                          <select
+                            className={inputClass}
+                            value={seg.direction === "leading" ? "leading" : "lagging"}
+                            onChange={(e) => patchSeg(index, { direction: e.target.value as "lagging" | "leading" })}
+                          >
+                            <option value="lagging">지상</option>
+                            <option value="leading">진상</option>
+                          </select>
+                        </Field>
+                      </>
+                    ) : null}
                   </div>
                   {errors[`${prefix}.current`] || errors[`${prefix}.length`] || errors[`${prefix}.voltage`] || errors[`${prefix}.resistance`] || errors[`${prefix}.name`] ? (
                     <p className="mt-2 text-xs text-danger-ink">
@@ -292,6 +352,13 @@ export function PathVoltageDropClient() {
                     <p className="mt-3 text-sm tabular-nums">
                       구간 ΔV {roundTo(row.dropV, prefs.precision)} V ({roundTo(row.dropPct, prefs.precision)}%) · 누적{" "}
                       {roundTo(row.cumulativePct, prefs.precision)}%
+                      {row.mode === "detailed" ? (
+                        <>
+                          {" "}
+                          · R {roundTo(row.resistiveV, prefs.precision)} V · X {roundTo(row.reactiveV, prefs.precision)} V · 손실{" "}
+                          {roundTo(row.lossW, prefs.precision)} W
+                        </>
+                      ) : null}
                     </p>
                   ) : null}
                 </article>

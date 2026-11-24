@@ -1,3 +1,4 @@
+import { impedanceTools } from "./impedance-tools";
 import { transformerImpedanceTool } from "./transformer-impedance";
 import type { CalculatorTool } from "@/lib/types";
 
@@ -8,6 +9,7 @@ function tool(partial: CalculatorTool): CalculatorTool {
 const faq = (question: string, answer: string) => [{ question, answer }];
 
 export const extraTools: CalculatorTool[] = [
+  ...impedanceTools,
   transformerImpedanceTool,
   tool({
     id: "tool-motor-current",

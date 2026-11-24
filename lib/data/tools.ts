@@ -506,7 +506,7 @@ export const baseTools: CalculatorTool[] = [
       "한 케이블 구간의 전류·거리·도체 저항으로 단상·3상 전압강하를 계산합니다. 80A·80m·0.727Ω/km·380V면 8.06V(2.12%)입니다. 여러 구간 합산은 경로 전압강하를 쓰세요.",
     description: "전류, 편도 길이, 도체 저항으로 단상·3상 한 구간 전압강하를 계산합니다.",
     longDescription:
-      "3상은 √3 × I × L × r / 1000, 단상은 2 × I × L × r / 1000입니다. 80A·80m·0.727Ω/km·380V 3상은 8.06V(2.12%)입니다. 리액턴스는 포함하지 않습니다. 인입~부하 여러 구간은 경로 전압강하 계산기입니다.",
+      "기본 모드는 3상 √3·I·L·r/1000, 단상 2·I·L·r/1000 저항 근사입니다. 상세 모드는 R·X·역률·온도(이론 저항) 또는 제조사 Ω/km로 정현파 정상상태 ΔV·손실을 근사합니다. 인입~부하 여러 구간은 경로 전압강하 계산기입니다.",
     formulaId: "formula-voltage-drop",
     tags: ["전압강하", "케이블", "VD", "전선"],
     synonyms: ["voltage drop", "전압 강하", "선로전압강하", "케이블 전압강하", "VD%"],
@@ -526,11 +526,12 @@ export const baseTools: CalculatorTool[] = [
       {
         question: "이 계산기는 어떤 식을 쓰나요?",
         answer:
-          "단상은 ΔV = 2 × I × L × r / 1000, 3상은 ΔV = √3 × I × L × r / 1000입니다. L은 편도 길이(m), r은 Ω/km입니다. 리액턴스와 역률 보정은 넣지 않습니다.",
+          "기본 모드는 ΔV = k·I·L·r/1000(k=2 단상, √3 3상)입니다. 상세 모드는 리액턴스·역률·온도(이론 저항) 또는 제조사 R·X로 정현파 정상상태 ΔV·손실을 근사합니다. 최종 설계 적합 판정이 아닙니다.",
       },
       {
         question: "80A, 80m, 0.727Ω/km, 380V 3상은 얼마인가요?",
-        answer: "전압강하는 8.06V, 강하율은 2.12%입니다. 말단 예상전압은 371.94V입니다.",
+        answer:
+          "기본 모드(저항만)는 8.06V·2.12%입니다. 상세 모드(r=0.727, x=0.08, PF0.8 지상, 100m)는 약 8.724V·2.296%·손실 1396W 근사입니다.",
       },
       {
         question: "한 구간 결과로 인입부터 기기까지 판단해도 되나요?",
@@ -567,7 +568,7 @@ export const baseTools: CalculatorTool[] = [
       "전체 경로 전압강하",
       "인입 전압강하",
     ],
-    relatedToolIds: ["tool-voltage-drop", "tool-cable-sizing", "tool-cable-resistance"],
+    relatedToolIds: ["tool-voltage-drop", "tool-cable-sizing", "tool-cable-resistance", "tool-cable-impedance"],
     relatedArticleIds: ["art-voltage-drop-guide", "art-motor-start-dip", "art-voltage-drop", "art-cable-sizing"],
     complexity: "advanced",
     featured: true,
@@ -578,7 +579,7 @@ export const baseTools: CalculatorTool[] = [
       {
         question: "기존 전압강하 계산기와 무엇이 다른가요?",
         answer:
-          "기존 도구는 케이블 한 구간을 빠르게 계산합니다. 이 도구는 기준점부터 최종 기기까지 여러 구간을 더해 KEC 232.3.9 관련 참고값과 비교합니다.",
+          "기존 도구는 케이블 한 구간을 빠르게 계산합니다. 이 도구는 구간별 기본(저항) 또는 상세(R·X·역률)를 더해 누적합니다. KEC 232.3.9 관련 참고값 비교는 선택입니다.",
       },
       {
         question: "변압기를 꼭 넣어야 하나요?",
@@ -876,7 +877,12 @@ export const baseTools: CalculatorTool[] = [
   },
 ];
 
-export const tools: CalculatorTool[] = [...baseTools, ...extraTools];
+export const tools: CalculatorTool[] = [...baseTools, ...extraTools].map(tool => {
+  const cableRelated = ["voltage-drop", "path-voltage-drop", "cable-resistance", "cable-sizing", "cable-ampacity", "cable-parallel", "short-circuit", "transformer-impedance"];
+  const rlcRelated = ["power-factor", "power-triangle", "power-factor-correction"];
+  const extra = cableRelated.includes(tool.slug) ? ["tool-cable-impedance"] : rlcRelated.includes(tool.slug) ? ["tool-rlc-impedance"] : [];
+  return extra.length ? { ...tool, relatedToolIds: [...new Set([...tool.relatedToolIds, ...extra])] } : tool;
+});
 
 export function isElectricalWorkspaceTool(tool: { href: string; slug: string; domain: string }): boolean {
   return tool.domain === "electrical" && tool.href === `/tools/electrical/${tool.slug}` && Boolean(formSchemas[tool.slug]);

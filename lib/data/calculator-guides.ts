@@ -1,3 +1,4 @@
+import { impedanceGuides } from "./impedance-tools";
 import { transformerImpedanceGuide } from "./transformer-impedance";
 import { phase3b2aGuides } from "@/lib/data/calculator-guides-phase3b2a";
 import { phase3b2b1Guides } from "@/lib/data/calculator-guides-phase3b2b1";
@@ -34,6 +35,7 @@ export type CalculatorGuide = {
 
 /** 핵심 계산기만. 공식·예제 숫자는 FormulaDefinition을 화면에 재사용한다. */
 export const calculatorGuides: CalculatorGuide[] = [
+  ...impedanceGuides,
   transformerImpedanceGuide,
   ...phase3b2aGuides,
   ...phase3b2b1Guides,
@@ -547,8 +549,8 @@ export const calculatorGuides: CalculatorGuide[] = [
     ],
     cautions: [
       "혼합 부하에 3%·5%를 자동 적용하지 않습니다.",
-      "리액턴스·변압기 %Z를 넣지 않으면 낙폭이 작게 나올 수 있습니다.",
-      "KEC 표 숫자는 공개 Q&A 근거 참고이며 현재 시행본을 확인하세요.",
+      "구간 «기본»은 저항 ΔV만, «상세»는 R·X·역률 근사입니다. 기본만 쓰면 리액턴스를 반영하지 않아 낙폭이 작게 나올 수 있습니다.",
+      "변압기 %Z·전원 임피던스는 자동 포함하지 않습니다. KEC 표 숫자는 공개 Q&A 근거 참고이며 현재 시행본을 확인하세요.",
     ],
     links: [
       { href: "/tools/electrical/voltage-drop", label: "전압강하 계산기", text: "한 구간만 빠르게 볼 때 사용합니다. 경로 합산은 이 화면입니다." },

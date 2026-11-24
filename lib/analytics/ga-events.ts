@@ -8,6 +8,7 @@ import { SITE } from "@/lib/types";
 export const GA_MEASUREMENT_ID = "G-JZD2J26DV2";
 
 export const GA_EVENT = {
+  calculatorInteraction: "calculator_interaction",
   calculatorView: "calculator_view",
   calculationRun: "calculation_run",
   resultCopy: "result_copy",

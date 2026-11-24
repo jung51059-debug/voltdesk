@@ -90,13 +90,14 @@ describe("GA4 이벤트 헬퍼", () => {
     expect(gtag).not.toHaveBeenCalled();
   });
 
-  it("이벤트 이름 5종이 서로 다르고 page_view와 겹치지 않는다", () => {
+  it("이벤트 이름 6종이 서로 다르고 page_view와 겹치지 않는다", () => {
     const names = Object.values(GA_EVENT);
-    expect(new Set(names).size).toBe(5);
+    expect(new Set(names).size).toBe(6);
     expect(names).not.toContain("page_view");
     expect(names).toEqual(
       expect.arrayContaining([
         "calculator_view",
+        "calculator_interaction",
         "calculation_run",
         "result_copy",
         "related_tool_click",

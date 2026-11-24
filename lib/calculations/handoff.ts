@@ -1,5 +1,6 @@
 /** 계산기 간 전달·공유에 넣을 수 있는 입력 키. 부하명·프로젝트명은 넣지 않습니다. */
 export const HANDOFF_KEYS = new Set([
+  "reactance", "direction", "temperature", "resistanceBasis",
   "phase",
   "power",
   "powerUnit",

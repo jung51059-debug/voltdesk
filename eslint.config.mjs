@@ -9,8 +9,10 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    "artifacts/**", // Local browser evidence, not application source.
     "out/**",
     "build/**",
+    ".vercel/**",
     "next-env.d.ts",
   ]),
 ]);

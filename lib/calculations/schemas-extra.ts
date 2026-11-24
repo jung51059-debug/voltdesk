@@ -1,3 +1,4 @@
+import { impedanceSchemas } from "./impedance-schemas";
 import { transformerImpedanceSchema } from "@/lib/data/transformer-impedance";
 import type { FormSchema } from "@/lib/calculations/schemas";
 
@@ -24,6 +25,7 @@ const cuAl = [
 ];
 
 export const extraFormSchemas: Record<string, FormSchema> = {
+  ...impedanceSchemas,
   "transformer-impedance": transformerImpedanceSchema,
   "motor-current": {
     slug: "motor-current",

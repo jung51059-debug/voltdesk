@@ -239,6 +239,7 @@ export const baseFormSchemas: Record<string, FormSchema> = {
     slug: "voltage-drop",
     layout: "complex",
     defaults: {
+      mode: "basic", pf: "0.8", direction: "lagging", reactance: "0.08", temperature: "20",
       phase: "3",
       current: "80",
       length: "80",
@@ -258,6 +259,52 @@ export const baseFormSchemas: Record<string, FormSchema> = {
       kecPathLength: "",
     },
     fields: [
+      {
+        id: "mode",
+        label: "계산 모드",
+        kind: "select",
+        options: [
+          { value: "basic", label: "기본 (저항만)" },
+          { value: "detailed", label: "상세 R·X·역률" },
+        ],
+      },
+      {
+        id: "reactance",
+        label: "리액턴스 x (Ω/km)",
+        kind: "number",
+        step: "any",
+        min: 0,
+        visibleWhen: { field: "mode", values: ["detailed"] },
+      },
+      {
+        id: "pf",
+        label: "역률 PF (0~1)",
+        kind: "number",
+        step: "any",
+        min: 0,
+        max: 1,
+        visibleWhen: { field: "mode", values: ["detailed"] },
+      },
+      {
+        id: "direction",
+        label: "역률 방향",
+        kind: "select",
+        options: [
+          { value: "lagging", label: "지상" },
+          { value: "leading", label: "진상" },
+        ],
+        visibleWhen: { field: "mode", values: ["detailed"] },
+      },
+      {
+        id: "temperature",
+        label: "도체 운전 온도 (℃)",
+        hint: "재질·단면적 모드의 이론 저항 온도 보정에만 씁니다. Ω/km 직접 입력(제조사 교류)에는 자동 보정하지 않습니다.",
+        kind: "number",
+        step: "any",
+        min: -50,
+        max: 250,
+        visibleWhen: { field: "mode", values: ["detailed"] },
+      },
       {
         id: "phase",
         label: "회로",

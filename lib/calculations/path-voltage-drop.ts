@@ -1,3 +1,4 @@
+import { acVoltageDrop, theoreticalResistance } from "./impedance";
 import { fail, metric, warning } from "@/lib/calculations/helpers";
 import {
   KEC_VOLTAGE_DROP_MIXED,
@@ -22,17 +23,24 @@ import {
 import { roundTo } from "@/lib/math/round";
 import type { CalculationOutcome, CalculationResult, EngineeringWarning } from "@/lib/types";
 
+export type PathSegmentCalcMode = "basic" | "detailed";
+
 export type PathVoltageDropSegmentInput = {
   id: string;
   name: string;
   phase: VoltageDropPhase;
   voltageV: number;
   currentA: number;
-  /** 기록용. 저항 근사 ΔV에는 쓰지 않음. */
+  /** basic: 계산 미사용(기록 가능). detailed: R·X 전압강하에 사용. */
   pf?: number;
   lengthM: number;
+  mode?: PathSegmentCalcMode;
   rMode: "ohm" | "size";
   resistanceOhmKm?: number;
+  reactanceOhmKm?: number;
+  direction?: "lagging" | "leading";
+  /** detailed + 재질·단면적: 이론 저항 온도 보정(℃). Ω/km 직접 입력(제조사 교류)에는 적용하지 않음. */
+  temperature?: number;
   material?: "cu" | "al";
   areaMm2?: number;
 };
@@ -55,7 +63,11 @@ export type PathSegmentComputed = {
   voltageV: number;
   currentA: number;
   lengthM: number;
+  mode: PathSegmentCalcMode;
   rOhmKm: number;
+  resistiveV: number;
+  reactiveV: number;
+  lossW: number;
   dropV: number;
   dropPct: number;
   cumulativeV: number;
@@ -94,8 +106,12 @@ export function emptyPathSegment(index: number): PathVoltageDropSegmentInput {
     currentA: 80,
     pf: 0.85,
     lengthM: 40,
+    mode: "basic",
     rMode: "ohm",
     resistanceOhmKm: 0.727,
+    reactanceOhmKm: 0.08,
+    direction: "lagging",
+    temperature: 20,
     material: "cu",
     areaMm2: 35,
   };
@@ -124,10 +140,16 @@ function segmentResistance(seg: PathVoltageDropSegmentInput): { rOhmKm: number; 
   if (seg.rMode === "size") {
     const area = seg.areaMm2 ?? 0;
     if (!(area > 0)) return { rOhmKm: NaN, error: "단면적은 0보다 커야 합니다." };
+    if ((seg.mode ?? "basic") === "detailed") {
+      try { return {rOhmKm: theoreticalResistance(seg.material ?? "cu",area,seg.temperature ?? 20).r}; }
+      catch (error) {
+        return { rOhmKm: NaN, error: error instanceof Error ? error.message : "도체 온도 보정을 적용할 수 없습니다." };
+      }
+    }
     return { rOhmKm: conductorROhmKmFromSize(seg.material ?? "cu", area) };
   }
   const r = seg.resistanceOhmKm ?? 0;
-  if (!(r > 0)) return { rOhmKm: NaN, error: "저항은 0보다 커야 합니다." };
+  if (!(r >= 0) || !Number.isFinite(r)) return { rOhmKm: NaN, error: "저항은 0보다 커야 합니다." };
   return { rOhmKm: r };
 }
 
@@ -137,6 +159,12 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
     return fail({}, "구간을 하나 이상 넣으세요.");
   }
 
+  if (new Set(input.segments.map((seg) => `${seg.phase}:${seg.voltageV}`)).size > 1) {
+    return fail(
+      {},
+      "상(회로) 또는 기준전압이 구간마다 다릅니다. 누적 전압강하·% 합산은 같은 상·같은 기준전압일 때만 의미가 있습니다.",
+    );
+  }
   const computed: PathSegmentComputed[] = [];
   let cumulativeV = 0;
   let cumulativePct = 0;
@@ -145,15 +173,28 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
   input.segments.forEach((seg, index) => {
     const prefix = `seg${index}`;
     if (!seg.name.trim()) fieldErrors[`${prefix}.name`] = "구간명을 넣으세요.";
-    if (!(seg.currentA > 0)) fieldErrors[`${prefix}.current`] = "전류는 0보다 커야 합니다.";
-    if (!(seg.lengthM > 0)) fieldErrors[`${prefix}.length`] = "길이는 0보다 커야 합니다.";
-    if (!(seg.voltageV > 0)) fieldErrors[`${prefix}.voltage`] = "전압은 0보다 커야 합니다.";
+    if (!(seg.currentA > 0) || !Number.isFinite(seg.currentA)) fieldErrors[`${prefix}.current`] = "전류는 0보다 커야 합니다.";
+    if (!(seg.lengthM > 0) || !Number.isFinite(seg.lengthM)) fieldErrors[`${prefix}.length`] = "길이는 0보다 커야 합니다.";
+    if (!(seg.voltageV > 0) || !Number.isFinite(seg.voltageV)) fieldErrors[`${prefix}.voltage`] = "전압은 0보다 커야 합니다.";
     const res = segmentResistance(seg);
     if (res.error) fieldErrors[`${prefix}.resistance`] = res.error;
     if (fieldErrors[`${prefix}.current`] || fieldErrors[`${prefix}.length`] || fieldErrors[`${prefix}.voltage`] || res.error) {
       return;
     }
-    const dropV = resistiveVoltageDropVolts(seg.phase, seg.currentA, seg.lengthM, res.rOhmKm);
+    let detail: ReturnType<typeof acVoltageDrop>;
+    try {
+      detail = acVoltageDrop({phase:seg.phase,voltage:seg.voltageV,current:seg.currentA,length:seg.lengthM,r:res.rOhmKm,
+        x: (seg.mode ?? "basic") === "detailed" ? seg.reactanceOhmKm ?? NaN : 0,
+        pf: (seg.mode ?? "basic") === "detailed" ? seg.pf ?? NaN : 1,
+        direction: (seg.mode ?? "basic") === "detailed" ? seg.direction ?? "lagging" : "lagging",
+      });
+    } catch (error) {
+      fieldErrors[`${prefix}.resistance`] = error instanceof Error ? error.message : "R·X 입력을 확인하세요.";
+      return;
+    }
+    const mode: PathSegmentCalcMode = seg.mode === "detailed" ? "detailed" : "basic";
+    const dropV =
+      mode === "detailed" ? detail.drop : resistiveVoltageDropVolts(seg.phase, seg.currentA, seg.lengthM, res.rOhmKm);
     const dropPct = voltageDropPercent(dropV, seg.voltageV);
     cumulativeV += dropV;
     cumulativePct += dropPct;
@@ -165,7 +206,11 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
       voltageV: seg.voltageV,
       currentA: seg.currentA,
       lengthM: seg.lengthM,
+      mode,
       rOhmKm: res.rOhmKm,
+      resistiveV: mode === "detailed" ? detail.resistive : detail.resistive,
+      reactiveV: mode === "detailed" ? detail.reactive : 0,
+      lossW: mode === "detailed" ? detail.lossW : 0,
       dropV,
       dropPct,
       cumulativeV,
@@ -178,6 +223,10 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
 
   const voltages = new Set(computed.map((row) => row.voltageV));
   const mixedVoltage = voltages.size > 1;
+  const detailed = input.segments.some((seg) => seg.mode === "detailed");
+  const mixedModes =
+    input.segments.some((seg) => (seg.mode ?? "basic") === "basic") &&
+    input.segments.some((seg) => seg.mode === "detailed");
   const startLabel = startLabelForKind(input.startKind, input.startLabel);
   const supply = input.kecSupply;
   const load = input.kecLoad;
@@ -211,9 +260,30 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
   const compare =
     kecMode === "review" ? (cumulativePct <= kecLimit + 1e-9 ? "below" : "above") : undefined;
 
-  const warnings: EngineeringWarning[] = [
-    warning("info", "저항 근사", "기존 단일구간과 같은 저항 근사입니다. 역률은 기록만 하며 리액턴스는 포함하지 않습니다."),
-  ];
+  const warnings: EngineeringWarning[] = detailed
+    ? [
+        warning(
+          "info",
+          "R·X 상세 구간",
+          "상세 모드 구간은 ΔV ≈ I·L·(r·PF + x·sinφ) 근사와 도체 I²R 손실을 표시합니다. 진상 역률이면 리액턴스 성분이 전압상승으로 나타날 수 있습니다.",
+        ),
+      ]
+    : [
+        warning(
+          "info",
+          "저항 근사",
+          "모든 구간이 기본 모드입니다. ΔV는 I·L·r만 반영하며 역률·리액턴스는 계산에 쓰지 않습니다.",
+        ),
+      ];
+  if (mixedModes) {
+    warnings.push(
+      warning(
+        "warning",
+        "기본·상세 혼합",
+        "기본 구간은 역률·리액턴스 없이 저항만, 상세 구간은 R·X·역률을 반영합니다. 누적 ΔV는 구간별 방식이 다르므로 해석에 주의하세요.",
+      ),
+    );
+  }
   if (mixedVoltage) {
     warnings.push(
       warning(
@@ -298,7 +368,18 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
 
   return {
     ok: true,
-    metrics,
+    metrics: detailed
+      ? [
+          ...metrics,
+          metric(
+            "loss",
+            "상세 구간 도체 손실 합",
+            computed.reduce((sum, row) => sum + row.lossW, 0),
+            "W",
+            precision,
+          ),
+        ]
+      : metrics,
     inputSummary: [
       { label: "기준점", value: startLabel },
       { label: "구간 수", value: String(computed.length) },
@@ -308,11 +389,14 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
     ],
     interpretation: `${startLabel} → ${pathLine}. 누적 ${roundTo(cumulativePct, precision)}%. ${kecNote}`,
     warnings,
-    formulaUsed: `${voltageDropFormula("1")} 또는 ${voltageDropFormula("3")}. 누적 % = Σ(ΔV/V×100)`,
+    formulaUsed: detailed
+      ? "ΔV ≈ k·I·Lkm·(r·PF + x·sinφ); Ploss = n·I²·r·Lkm (n=2 단상·3상 평형). k는 회로 방식 계수."
+      : `${voltageDropFormula("1")} 또는 ${voltageDropFormula("3")}. 누적 % = Σ(ΔV/V×100)`,
     steps: [
-      ...computed.map(
-        (row) =>
-          `${row.name}: ${voltageDropFormula(row.phase)} → ${roundTo(row.dropV, precision)} V (${roundTo(row.dropPct, precision)}%), 누적 ${roundTo(row.cumulativePct, precision)}%`,
+      ...computed.map((row) =>
+        row.mode === "detailed"
+          ? `${row.name}: R성분 ${roundTo(row.resistiveV, precision)} V + X성분 ${roundTo(row.reactiveV, precision)} V → ΔV ${roundTo(row.dropV, precision)} V (${roundTo(row.dropPct, precision)}%), 손실 ${roundTo(row.lossW, precision)} W · 누적 ${roundTo(row.cumulativePct, precision)}%`
+          : `${row.name}: ${voltageDropFormula(row.phase)} → ${roundTo(row.dropV, precision)} V (${roundTo(row.dropPct, precision)}%), 누적 ${roundTo(row.cumulativePct, precision)}%`,
       ),
       `전체 경로 길이 = ${roundTo(totalLengthM, 1)} m`,
       kecMode === "review"
@@ -336,8 +420,11 @@ export function calculatePathVoltageDrop(input: PathVoltageDropInput, precision:
           ? review("check", "KEC 232.3.9 적용 대상이 아닙니다.")
         : review("check", "허용 전압강하율은 프로젝트 기준을 확인하세요."),
     assumptionsUsed: [
-      "각 구간은 기존 전압강하 계산기와 같은 저항 근사입니다.",
-      "누적 ΔV%는 구간 %의 합입니다.",
+      detailed
+        ? "상세 구간은 단일 전압강하 계산기 상세 모드와 같은 R·X·역률 근사를 씁니다."
+        : "각 구간은 기본 전압강하 계산기와 같은 저항만 근사합니다.",
+      "누적 ΔV·ΔV%는 같은 상·같은 기준전압인 구간만 합산합니다.",
+      "누적 ΔV%는 구간별 (ΔV/V×100)의 합입니다.",
       "표 232.3-1 거리 가산은 전체 검토 경로 길이에 적용합니다.",
       "변압기는 필수 구간이 아닙니다. 사용자는 기준점과 구간을 자유롭게 구성합니다.",
     ],

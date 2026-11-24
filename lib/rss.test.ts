@@ -13,7 +13,7 @@ describe("사이트맵", () => {
     expect(paths).toContain("/about");
     expect(paths).toContain("/references");
     expect(new Set(paths).size).toBe(paths.length);
-    expect(paths).toHaveLength(130);
+    expect(paths).toHaveLength(132);
     expect(paths).toContain("/tools/electrical/motor-slip");
     expect(paths).toContain("/tools/electrical/contract-power-current");
     expect(paths).not.toContain("/tools/electrical/motor-start-vd");
@@ -33,7 +33,7 @@ describe("사이트맵", () => {
 
   it("MetadataRoute.sitemap 항목이 절대 URL·유효 lastmod·고유하다", () => {
     const entries = sitemap();
-    expect(entries).toHaveLength(130);
+    expect(entries).toHaveLength(132);
     const urls = entries.map((entry) => entry.url);
     expect(new Set(urls).size).toBe(urls.length);
     for (const entry of entries) {

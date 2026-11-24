@@ -158,8 +158,8 @@ export const standardBases: StandardBasis[] = [
     "kec-related",
     ["kec", "engineering"],
     "approximation",
-    "기본은 저항 근사 ΔV. KEC 표 비교는 사용자가 검토를 켠 뒤에만 합니다.",
-    "계산 전압강하 %. KEC 표 232.3-1 비교는 선택 검토",
+    "기본 모드는 I·L·r 저항 근사 ΔV. 상세 모드는 정현파 정상상태 R·X·역률 근사. KEC 표 비교는 사용자가 검토를 켠 뒤에만 합니다.",
+    "전압강하 %(기본·상세 모드). KEC 표 232.3-1 비교는 선택 검토",
     [
       "기본 계산은 3%·5%를 자동 한도로 쓰지 않습니다.",
       "KEC 232.3.9는 전력공급자로부터 수전하는 수용가설비 기준이며 독립 자가발전기에는 해당하지 않습니다.",
@@ -168,8 +168,12 @@ export const standardBases: StandardBasis[] = [
     {
       domesticReview: "KEC 232.3.9",
       relatedStandards: ["KS C IEC 60364-5-52 부속서 G (KEC 인용 관계, 계산 미사용)"],
-      usedInCalculation: "ΔV는 계산 구간 편도 L. 표 232.3-1 가산은 인입구→기기 경로 길이. 구간=경로일 때만 ΔV%와 허용 참고값을 비교. 혼합부하는 표 숫자를 고르지 않음. % 분모는 전압강하율 기준전압(저압=계량기 2차, 고압 이상=변압기 2차, 계산 종류와 일치)",
-      referenceOnly: ["독립 자가발전기, 혼합부하, 수전방식 미입력, 구간≠경로 시 표와 수치 비교 없음", "R/X·역률 보정 ΔV는 미구현"],
+      usedInCalculation:
+        "기본: ΔV=I·L·r(회로 계수 포함). 상세: ΔV≈k·I·Lkm(r·PF±x·sinφ), 도체 손실 I²r. 편도 L. 표 232.3-1 가산은 인입구→기기 경로. 구간=경로일 때만 ΔV%와 허용 참고값 비교. % 분모=전압강하율 기준전압.",
+      referenceOnly: [
+        "독립 자가발전기, 혼합부하, 수전방식 미입력, 구간≠경로 시 표와 수치 비교 없음",
+        "상세 모드는 정상상태 근사이며 조류·기동·불평형·변압기 %Z 자동 반영이 아닙니다. 최종 설계 적합·인증 판정이 아닙니다.",
+      ],
     },
   ),
   row(
@@ -178,8 +182,8 @@ export const standardBases: StandardBasis[] = [
     "kec-related",
     ["kec", "engineering"],
     "approximation",
-    "구간마다 기존 저항 근사 ΔV를 쓰고 누적 %. 표 비교는 누적값과 전체 경로 길이.",
-    "누적 ΔV% · 전체 경로 길이 · 선택적 표 232.3-1 수치관계",
+    "구간별 기본(저항 ΔV) 또는 상세(R·X·역률)를 선택해 누적 %. 표 비교는 누적값과 전체 경로 길이.",
+    "누적 ΔV% · 전체 경로 길이 · 구간별 모드 · 선택적 표 232.3-1 수치관계",
     [
       "자동 적합 판정을 하지 않습니다.",
       "혼합부하는 표 숫자를 고르지 않습니다.",
@@ -189,8 +193,12 @@ export const standardBases: StandardBasis[] = [
     {
       domesticReview: "KEC 232.3.9",
       relatedStandards: ["KS C IEC 60364-5-52 부속서 G (KEC 인용 관계, 계산 미사용)"],
-      usedInCalculation: "Σ(구간 ΔV%). 가산은 Σ길이. 정상운전·단일 부하종류일 때만 누적%와 허용 참고값 비교. % = ΔV/전압강하율 기준전압. 역률은 기록만. 혼합은 자동 3%/5% 없음",
-      referenceOnly: ["독립 자가발전기, 혼합부하, 기동·돌입, 수전방식 미입력 시 표와 수치 비교 없음", "R/X 모델·역률 보정 ΔV는 미구현"],
+      usedInCalculation:
+        "Σ(구간 ΔV%). 구간 기본=저항만, 상세=R·X·역률·손실. 같은 상·기준전압만 합산. 가산=Σ길이. 정상운전·단일 부하종류일 때만 누적%와 허용 참고값 비교.",
+      referenceOnly: [
+        "독립 자가발전기, 혼합부하, 기동·돌입, 수전방식 미입력 시 표와 수치 비교 없음",
+        "상·기준전압이 다르면 누적 합산 차단. 기본·상세 혼합 경로는 해석에 주의. 최종 설계 적합 판정이 아닙니다.",
+      ],
     },
   ),
   row("cable-resistance", "formula-cable-resistance", "general-engineering", ["engineering"], "approximation", "R = ρL/A (20°C DC 근사).", "편도 저항·Ω/km", ["IEC 60228 도체 저항표는 사용하지 않습니다.", "허용전류 선정이 아닙니다."]),
@@ -280,6 +288,30 @@ export const standardBases: StandardBasis[] = [
     },
   ),
   row("busbar", "formula-busbar", "general-engineering", ["engineering"], "engineering", "단면적·전류밀도·I²t 참고.", "부스바 기하·밀도", ["IEC/KEC 부스바 허용전류표가 아닙니다."]),
+  row(
+    "cable-impedance",
+    "formula-cable-impedance",
+    "general-engineering",
+    ["engineering"],
+    "approximation",
+    "R20=ρℓ/A, Rt=R20[1+α(T−20)], X=2πfL.",
+    "케이블 직렬 R·X·|Z| 근사",
+    [
+      "이론 모드는 직류저항·온도계수 근사입니다.",
+      "제조사 Ω/km 입력에는 온도·주파수 자동 보정을 하지 않습니다.",
+      "표피·근접·배열·누설은 포함하지 않습니다.",
+    ],
+  ),
+  row(
+    "rlc-impedance",
+    "formula-rlc-impedance",
+    "general-engineering",
+    ["engineering"],
+    "engineering",
+    "XL=2πfL, XC=1/(2πfC), Z=R+j(XL−XC).",
+    "직렬 RLC 정현파 임피던스·공진",
+    ["병렬·과도·비선형 소자는 해석하지 않습니다.", "무손실 공진(Z→0)에서는 정상상태 전류를 미정으로 둡니다."],
+  ),
   row("transformer-impedance", "formula-transformer-impedance", "general-engineering", ["engineering"], "engineering", "Zbase=V²/S, %Z=100|Z|/Zbase, In=S/(√3 V).", "%Z·Ω 변환과 변압기 단자 단락 근사", ["동일한 기준 측의 3상 용량과 선간전압을 사용합니다.", "단락 근사는 c=1이며 전원·케이블·회전기 기여를 생략합니다."]),
   row("transformer-sizing", "formula-transformer-sizing", "general-engineering", ["engineering"], "engineering", "수요 kW를 여유·역률로 kVA화.", "필요 kVA 참고", ["냉각 방식 보정·탭·병렬은 포함하지 않습니다."]),
   row("transformer-current", "formula-transformer-current", "general-engineering", ["engineering"], "engineering", "I = S/(√3 V).", "1·2차 정격전류", ["단락·보호 정격이 아닙니다."]),

@@ -188,9 +188,9 @@ describe("Phase 3B-1 실무 예제 ↔ 엔진", () => {
 });
 
 describe("Phase 3B-1 메타·콘텐츠 무결성", () => {
-  it("published 도구는 69개이며 formula.example이 있다", () => {
+  it("published 도구는 71개이며 formula.example이 있다", () => {
     const tools = getPublishedTools();
-    expect(tools).toHaveLength(69);
+    expect(tools).toHaveLength(71);
     for (const tool of tools) {
       const formula = getFormulaById(tool.formulaId);
       expect(formula, tool.slug).toBeTruthy();

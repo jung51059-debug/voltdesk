@@ -1,3 +1,5 @@
+import { calculateImpedance } from "./impedance-engine";
+import { calculateAcVoltageDrop } from "./impedance-adapters";
 import { calculateTransformerImpedance } from "./transformer-impedance";
 import type { CalculationOutcome, CalculationResult } from "@/lib/types";
 import { fail, metric, warning } from "@/lib/calculations/helpers";
@@ -582,6 +584,7 @@ export function calculateTransformerLoad(input: CalcInput, precision: number): C
 }
 
 export function calculateVoltageDrop(input: CalcInput, precision: number): CalculationOutcome {
+  if (input.mode === "detailed") return calculateAcVoltageDrop(input, precision);
   const fieldErrors: Record<string, string> = {};
   const phase = input.phase ?? "3";
   let I = 0;
@@ -1254,6 +1257,8 @@ export const engines: Record<string, (input: CalcInput, precision: number) => Ca
   "cable-parallel": calculateCableParallel,
   "cable-ampacity": calculateCableAmpacityReview,
   "busbar": calculateBusbar,
+  "cable-impedance": (input, precision) => calculateImpedance(input, precision),
+  "rlc-impedance": (input, precision) => calculateImpedance(input, precision, true),
   "transformer-impedance": calculateTransformerImpedance,
   "transformer-sizing": calculateTransformerSizing,
   "transformer-current": calculateTransformerCurrents,
