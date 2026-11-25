@@ -1,0 +1,4 @@
+/* US-only light text contrast. KR tokens and dark-mode colors remain independent. */
+html[lang="en-US"]:not(.dark) {
+  --muted: #52687d;
+}

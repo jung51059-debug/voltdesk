@@ -1,0 +1,86 @@
+import type { JurisdictionRecord, SourceRecord } from "./types";
+
+/**
+ * Curated source registry for US-4. NEC full text is not embedded; NFPA NEC
+ * distribution remains license-gated (BLOCKED_LICENSE) until explicit rights.
+ */
+export const US_REGULATION_SOURCES: SourceRecord[] = [
+  {
+    sourceId: "nist-sp811-2024",
+    documentTitle: "NIST Guide to the SI — Appendix B conversion factors",
+    issuingOrganization: "NIST",
+    edition: "SP 811",
+    publicationDate: "",
+    sourceUrl: "https://www.nist.gov/pml/special-publication-811",
+    accessedDate: "2026-11-24",
+    verifiedSection: "Appendix B.8 electrical units",
+    verifiedClaim: "Unit conversion factors for V, A, W, and SI prefixes",
+    applicability: "All US calculators using unit conversion",
+    verificationStatus: "PARTIAL",
+    reusePermissionStatus: "ALLOWED_PUBLIC",
+    limitation: "Conversion factors only; not design criteria",
+    relatedCalculators: "us-*",
+  },
+  {
+    sourceId: "openstax-up2-power",
+    documentTitle: "University Physics Vol. 2 — Electrical energy and power",
+    issuingOrganization: "OpenStax",
+    edition: "",
+    publicationDate: "",
+    sourceUrl: "https://openstax.org/books/university-physics-volume-2/pages/9-introduction",
+    accessedDate: "2026-11-24",
+    verifiedSection: "Ch. 9 Electrical energy and power (book section; deep page URL may redirect)",
+    verifiedClaim: "P=IV; Ohm's law relationships for resistive DC",
+    applicability: "ohms-law, power calculators",
+    verificationStatus: "PARTIAL",
+    reusePermissionStatus: "ALLOWED_CITATION_ONLY",
+    limitation: "DC/resistive; not NEC equipment rules",
+    relatedCalculators: "ohms-law,single-phase-current",
+  },
+  {
+    sourceId: "iec-60909-0-kappa",
+    documentTitle: "IEC 60909-0 — Short-circuit currents (peak factor κ)",
+    issuingOrganization: "IEC",
+    edition: "",
+    publicationDate: "",
+    sourceUrl: "https://webstore.iec.ch/",
+    accessedDate: "2026-11-24",
+    verifiedSection: "Peak factor approximation cited in engine comments",
+    verifiedClaim: "κ = 1.02 + 0.98 e^(−3R/X) used in short-circuit engine",
+    applicability: "short-circuit (symmetrical/asymmetrical review)",
+    verificationStatus: "PARTIAL",
+    reusePermissionStatus: "BLOCKED_LICENSE",
+    limitation: "Full IEC text not reproduced; user-supplied impedances only",
+    relatedCalculators: "short-circuit",
+  },
+  {
+    sourceId: "nfpa-nec-2023",
+    documentTitle: "NFPA 70 National Electrical Code",
+    issuingOrganization: "NFPA",
+    edition: "2023",
+    publicationDate: "",
+    sourceUrl: "https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70",
+    accessedDate: "2026-11-24",
+    verifiedSection: "Not body-verified in US-4",
+    verifiedClaim: "Product landing page only — ampacity/fill tables not copied",
+    applicability: "Group C NEC-dependent tools",
+    verificationStatus: "BLOCKED_LICENSE",
+    reusePermissionStatus: "BLOCKED_LICENSE",
+    limitation: "No table embed without NFPA license; jurisdiction-specific adoption",
+    relatedCalculators: "cable-sizing,cable-ampacity,breaker-current,conduit-fill",
+  },
+];
+
+export const US_JURISDICTIONS: JurisdictionRecord[] = [
+  {
+    jurisdictionId: "us-default-unknown",
+    region: "United States (unspecified)",
+    adoptedEdition: "UNKNOWN",
+    adoptionStatus: "UNKNOWN",
+    effectiveDate: "",
+    localAmendments: "Not inventoried in US-4",
+    sourceUrl: "",
+    accessedDate: "2026-11-24",
+    notes: "Do not claim statewide NEC edition without AHJ confirmation",
+  },
+];

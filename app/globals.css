@@ -41,6 +41,11 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
+/* US primary action backgrounds become light blue in dark mode. Keep readable dark text. */
+html.dark[lang="en-US"] .bg-primary {
+  color: var(--surface);
+}
+
 @theme inline {
   --color-surface: var(--surface);
   --color-card: var(--card);

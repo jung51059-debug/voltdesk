@@ -1,0 +1,158 @@
+[
+  {
+    "usPath": "/us",
+    "krPath": "/"
+  },
+  {
+    "usPath": "/us/tools",
+    "krPath": "/tools"
+  },
+  {
+    "usPath": "/us/tools/electrical",
+    "krPath": "/tools/electrical"
+  },
+  {
+    "usPath": "/us/tools/facility",
+    "krPath": "/tools/facility"
+  },
+  {
+    "usPath": "/us/references",
+    "krPath": "/references"
+  },
+  {
+    "usPath": "/us/tools/electrical/single-phase-current",
+    "krPath": "/tools/electrical/single-phase-current"
+  },
+  {
+    "usPath": "/us/tools/electrical/three-phase-current",
+    "krPath": "/tools/electrical/three-phase-current"
+  },
+  {
+    "usPath": "/us/tools/electrical/amp-to-kw",
+    "krPath": "/tools/electrical/amp-to-kw"
+  },
+  {
+    "usPath": "/us/tools/electrical/kw-kva-hp",
+    "krPath": "/tools/electrical/kw-kva-hp"
+  },
+  {
+    "usPath": "/us/tools/electrical/power-factor",
+    "krPath": "/tools/electrical/power-factor"
+  },
+  {
+    "usPath": "/us/tools/electrical/power-triangle",
+    "krPath": "/tools/electrical/power-triangle"
+  },
+  {
+    "usPath": "/us/tools/electrical/power-factor-correction",
+    "krPath": "/tools/electrical/power-factor-correction"
+  },
+  {
+    "usPath": "/us/tools/electrical/motor-slip",
+    "krPath": "/tools/electrical/motor-slip"
+  },
+  {
+    "usPath": "/us/tools/electrical/motor-acceleration",
+    "krPath": "/tools/electrical/motor-acceleration"
+  },
+  {
+    "usPath": "/us/tools/electrical/transformer-load",
+    "krPath": "/tools/electrical/transformer-load"
+  },
+  {
+    "usPath": "/us/tools/electrical/transformer-current",
+    "krPath": "/tools/electrical/transformer-current"
+  },
+  {
+    "usPath": "/us/tools/electrical/transformer-loss",
+    "krPath": "/tools/electrical/transformer-loss"
+  },
+  {
+    "usPath": "/us/tools/electrical/rlc-impedance",
+    "krPath": "/tools/electrical/rlc-impedance"
+  },
+  {
+    "usPath": "/us/tools/electrical/ct-ratio",
+    "krPath": "/tools/electrical/ct-ratio"
+  },
+  {
+    "usPath": "/us/tools/electrical/pt-ratio",
+    "krPath": "/tools/electrical/pt-ratio"
+  },
+  {
+    "usPath": "/us/tools/electrical/busbar",
+    "krPath": "/tools/electrical/busbar"
+  },
+  {
+    "usPath": "/us/tools/electrical/lighting-density",
+    "krPath": "/tools/electrical/lighting-density"
+  },
+  {
+    "usPath": "/us/tools/facility/field-compare",
+    "krPath": "/tools/facility/field-compare"
+  },
+  {
+    "usPath": "/us/tools/facility/duty-cycle",
+    "krPath": "/tools/facility/duty-cycle"
+  },
+  {
+    "usPath": "/us/tools/facility/trend-analysis",
+    "krPath": "/tools/facility/trend-analysis"
+  },
+  {
+    "usPath": "/us/tools/facility/retrofit-compare",
+    "krPath": "/tools/facility/retrofit-compare"
+  },
+  {
+    "usPath": "/us/tools/facility/equipment-load",
+    "krPath": "/tools/facility/equipment-load"
+  },
+  {
+    "usPath": "/us/tools/facility/energy-intensity",
+    "krPath": "/tools/facility/energy-intensity"
+  },
+  {
+    "usPath": "/us/tools/electrical/motor-current",
+    "krPath": "/tools/electrical/motor-current"
+  },
+  {
+    "usPath": "/us/tools/facility/generator-load",
+    "krPath": "/tools/facility/generator-load"
+  },
+  {
+    "usPath": "/us/tools/facility/generator-fuel",
+    "krPath": "/tools/facility/generator-fuel"
+  },
+  {
+    "usPath": "/us/tools/facility/monthly-energy",
+    "krPath": "/tools/facility/monthly-energy"
+  },
+  {
+    "usPath": "/us/tools/facility/yoy-energy",
+    "krPath": "/tools/facility/yoy-energy"
+  },
+  {
+    "usPath": "/us/tools/facility/energy-cost",
+    "krPath": "/tools/facility/energy-cost"
+  },
+  {
+    "usPath": "/us/tools/facility/pm-interval",
+    "krPath": "/tools/facility/pm-interval"
+  },
+  {
+    "usPath": "/us/tools/electrical/contract-power-current",
+    "krPath": "/tools/electrical/contract-power-current"
+  },
+  {
+    "usPath": "/us/tools/electrical/cable-ampacity",
+    "krPath": "/tools/electrical/cable-ampacity"
+  },
+  {
+    "usPath": "/us/references/kw-vs-kva",
+    "krPath": "/references/kw-vs-kva"
+  },
+  {
+    "usPath": "/us/references/motor-horsepower-and-current",
+    "krPath": "/references/motor-current"
+  }
+]

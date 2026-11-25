@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getArticleBySlug } from "@/lib/data/articles";
 import { getToolBySlug } from "@/lib/data/tools";
 import { articleJsonLd, calculatorBreadcrumbItems, calculatorJsonLd, toolMetadata, websiteJsonLd } from "@/lib/seo";
-import { metadata as aboutMetadata } from "@/app/about/page";
+import { metadata as aboutMetadata } from "@/app/(kr)/about/page";
 
 const homeDescription =
   "현장에서 바로 쓰는 전기 계산과 실무 참고. 케이블, 변압기, 모터, 역률, UPS, 발전기, 부하 스케줄을 로그인 없이 계산합니다.";

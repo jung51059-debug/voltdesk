@@ -1,0 +1,20 @@
+import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';import {createRequire} from 'node:module';import {chromium} from 'playwright';import {target} from './us9b-auth.mjs';
+const t=await target(),lhRoot='C:/Users/ksal3/AppData/Local/npm-cache/_npx/0f94ee7615faf582/node_modules/lighthouse',require=createRequire(path.join(lhRoot,'package.json'));
+const {default:lighthouse}=await import(pathToFileURL(path.join(lhRoot,'core/index.js')).href),launcher=await import(pathToFileURL(require.resolve('chrome-launcher')).href);
+const inventory=JSON.parse(fs.readFileSync('artifacts/us9b/review-data.json')),route=slug=>inventory.routes.find(r=>r.slug===slug).path;
+const paths=['/us',route('three-phase-current'),'/us/privacy','/us/contact',route('kw-vs-kva')];
+fs.mkdirSync('artifacts/us9b/lighthouse',{recursive:true});const results=[];
+const cookieResponse=await fetch(t.base+'/us?x-vercel-set-bypass-cookie=true',{headers:t.headers,redirect:'manual'});
+const cookies=cookieResponse.headers.getSetCookie().map(raw=>{const first=raw.split(';')[0],cut=first.indexOf('=');return {name:first.slice(0,cut),value:first.slice(cut+1),domain:new URL(t.base).hostname,path:'/',secure:true,httpOnly:true,sameSite:'None'};});
+if(!cookies.length)throw new Error('No origin-bound approved auth cookie; do not use global secret headers');
+const chrome=await launcher.launch({chromePath:chromium.executablePath(),chromeFlags:['--headless=new','--no-sandbox','--disable-dev-shm-usage']});
+const browser=await chromium.connectOverCDP(`http://127.0.0.1:${chrome.port}`),context=browser.contexts()[0];await context.addCookies(cookies);
+const page=await context.newPage();await page.goto(t.base+'/us',{waitUntil:'networkidle'});if(await page.locator('html').getAttribute('lang')!=='en-US')throw new Error('Lighthouse cookie did not authorize app document');const cdp=await context.newCDPSession(page);
+try{for(const formFactor of ['mobile','desktop'])for(const pathname of paths)for(let repeat=1;repeat<=3;repeat++){
+ if(process.env.US9B_LH_SMOKE&&(formFactor!=='mobile'||pathname!=='/us'||repeat!==1))continue;
+ await cdp.send('Network.clearBrowserCache');await cdp.send('Storage.clearDataForOrigin',{origin:t.base,storageTypes:'local_storage,indexeddb,cache_storage,service_workers'});
+ const desktop=formFactor==='desktop';const options={port:chrome.port,output:'json',logLevel:'error',onlyCategories:['performance','accessibility','best-practices','seo'],disableStorageReset:true,formFactor,screenEmulation:{mobile:!desktop,width:desktop?1440:390,height:900,deviceScaleFactor:1,disabled:false},throttlingMethod:'simulate',throttling:desktop?{rttMs:40,throughputKbps:10240,cpuSlowdownMultiplier:1,requestLatencyMs:0,downloadThroughputKbps:0,uploadThroughputKbps:0}:{rttMs:150,throughputKbps:1638.4,cpuSlowdownMultiplier:4,requestLatencyMs:0,downloadThroughputKbps:0,uploadThroughputKbps:0}};
+ const result=await lighthouse(t.base+pathname,options),lhr=result.lhr;const file=`${formFactor}-${pathname.replaceAll('/','_')}-${repeat}.json`;fs.writeFileSync(`artifacts/us9b/lighthouse/${file}`,result.report);
+ results.push({path:pathname,formFactor,repeat,file,buildId:t.buildId,version:lhr.lighthouseVersion,runtimeError:lhr.runtimeError??null,performance:lhr.categories.performance.score,accessibility:lhr.categories.accessibility.score,bestPractices:lhr.categories['best-practices'].score,seo:lhr.categories.seo.score,lcp:lhr.audits['largest-contentful-paint'].numericValue,fcp:lhr.audits['first-contentful-paint'].numericValue,cls:lhr.audits['cumulative-layout-shift'].numericValue,tbt:lhr.audits['total-blocking-time'].numericValue,settings:lhr.configSettings});
+ fs.writeFileSync(`artifacts/us9b/lighthouse${process.env.US9B_LH_SMOKE?'-smoke':''}.json`,JSON.stringify({buildId:t.buildId,environment:t.environment,checkedAt:new Date().toISOString(),rows:results},null,2));console.log(`${results.length}: ${formFactor} ${pathname} ${repeat} P=${lhr.categories.performance.score}`);
+ }}finally{await browser.close();await chrome.kill();}

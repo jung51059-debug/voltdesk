@@ -3,6 +3,9 @@ import { articles } from "@/lib/data/articles";
 import { getCategoryById, getCategoryBySlug, getHubCategories } from "@/lib/data/categories";
 import { getFeaturedTools, getPublishedTools, getRecentlyAddedTools, getToolsByCategory, getToolsByDomain } from "@/lib/data/tools";
 import { SITE, type CalculatorTool, type ReferenceArticle } from "@/lib/types";
+import { mergeKrAlternates, usSitemapIndexablePaths } from "@/lib/us/release-seo";
+
+export { mergeKrAlternates };
 
 export function absoluteUrl(path: string): string {
   if (path === "/" || path === "") return SITE.url;
@@ -16,7 +19,7 @@ export function toolMetadata(tool: CalculatorTool): Metadata {
   return {
     title,
     description,
-    alternates: { canonical: tool.href },
+    alternates: mergeKrAlternates(tool.href),
     openGraph: { title, description },
     robots: tool.status === "published" ? undefined : { index: false, follow: true },
   };
@@ -136,7 +139,9 @@ export function sitemapEntries() {
   const categoryPaths = getHubCategories().map((category) => `/tools/categories/${category.slug}`);
   const toolPaths = getPublishedTools().map((tool) => tool.href);
   const articlePaths = articles.map((article) => article.href);
-  return [...staticPaths, ...categoryPaths, ...toolPaths, ...articlePaths];
+  const krPaths = [...staticPaths, ...categoryPaths, ...toolPaths, ...articlePaths];
+  const usPaths = usSitemapIndexablePaths();
+  return usPaths.length > 0 ? [...krPaths, ...usPaths] : krPaths;
 }
 
 /** 페이지에 적힌 날짜만 씁니다. 출처가 없으면 기존 사이트맵 기준일인 2026-08-20을 유지합니다. */

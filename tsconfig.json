@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,7 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -28,7 +34,38 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "artifacts/us3/next-static/types/**/*.ts",
+    "artifacts/us3/next-static/dev/types/**/*.ts",
+    "artifacts/us7/next/types/**/*.ts",
+    "artifacts/us7/next/dev/types/**/*.ts",
+    "artifacts/us7/next-final/types/**/*.ts",
+    "artifacts/us7/next-final/dev/types/**/*.ts",
+    "artifacts/us7/next-release-review/types/**/*.ts",
+    "artifacts/us7/next-release-review/dev/types/**/*.ts",
+    "artifacts/us7/next-closure/types/**/*.ts",
+    "artifacts/us7/next-closure/dev/types/**/*.ts",
+    "artifacts/us7/next-final-verified-2/types/**/*.ts",
+    "artifacts/us7/next-final-verified-2/dev/types/**/*.ts",
+    "artifacts/us7/next-final-export/types/**/*.ts",
+    "artifacts/us7/next-final-export/dev/types/**/*.ts",
+    "artifacts/us7/next-audited-references/types/**/*.ts",
+    "artifacts/us7/next-audited-references/dev/types/**/*.ts",
+    "artifacts/us8/next-public/types/**/*.ts",
+    "artifacts/us8/next-public/dev/types/**/*.ts",
+    "artifacts/us8/next-public-final/types/**/*.ts",
+    "artifacts/us8/next-public-final/dev/types/**/*.ts",
+    "artifacts/us9b/next-protected-v1/types/**/*.ts",
+    "artifacts/us9b/next-protected-v1/dev/types/**/*.ts",
+    "artifacts/us9b/next-public-v2/types/**/*.ts",
+    "artifacts/us9b/next-public-v2/dev/types/**/*.ts",
+    "artifacts/us9b/next-public-v3/types/**/*.ts",
+    "artifacts/us9b/next-public-v3/dev/types/**/*.ts",
+    "artifacts/us9/next-public-v1/types/**/*.ts",
+    "artifacts/us9/next-public-v1/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "artifacts"
+  ]
 }

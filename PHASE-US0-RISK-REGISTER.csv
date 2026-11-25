@@ -1,0 +1,57 @@
+risk_id,severity,likelihood,area,description,impact_scope,mitigation,resolve_before_phase,status
+R-P0-01,P0,medium,regression,KR calculator numeric output changes when shared engines gain US unit layers,KR production,Keep SI internal; US-only adapters; Vitest baselines on KR routes,US-7,open
+R-P0-02,P0,medium,regulation,NEC ampacity/breaker/EGC tables embedded without license or wrong edition,US legal/SEO,User-input tables only until NFPA rights verified; no pass/fail on NEC; isNecTableEmbedAllowed=false,US-4,mitigated
+R-P0-03,P0,low,seo,KR sitemap URLs removed or canonicals point to /us/,KR search,Freeze KR sitemap tests; separate US sitemap segment,US-7,open
+R-P1-01,P1,high,localization,AWG vs mm² double conversion or wrong direction,US calculators,Single conversion module; test vectors; never infer ampacity from AWG number alone,US-3,open
+R-P1-02,P1,medium,electrical,Line-to-line vs line-to-neutral voltage presets confused (208/240/120),US users,Explicit LL/LN fields and tooltips; examples per system type,US-3,open
+R-P1-03,P1,medium,content,Mechanical translation of KEC text into pseudo-NEC copy,US trust,Professional US English rewrite; separate regulation modules,US-5,open
+R-P1-04,P1,medium,privacy,GA4 events leak user input values,All locales,Continue production-only GA; no PII in events; locale dimension only,US-6,open
+R-P1-05,P1,low,ads,US visitors without CPRA/affiliate disclosure,US legal,Draft US Privacy/Terms/Affiliate before US traffic ads scale,US-6,open
+R-P2-01,P2,medium,engineering,voltage-drop KEC review enabled by mistake on US default,US UX,Default kecReview off for en-US; feature flag by region,US-3,open
+R-P2-02,P2,low,ops,origin/main diverges from 770b7dd baseline,Deployment,Tag US-1 start commit; CI on both locales,US-1,open
+R-P2-03,P2,medium,product,Workspace tools (schedules SLD load-flow) ship without US help text,US UX,Phase US-6 browser QA on workspaces; English strings,US-6,open
+R-P2-04,P2,low,hreflang,Partial hreflang on mismatched KR/US pages,SEO,Map table content_id; only reciprocal pairs,US-7,open
+R-P2-05,P2,high,safety,arc-flash/lightning checklists read as certified studies,US liability,Keep checklist-only; no energy scores; strong disclaimer,US-6,open
+R-US2FIX-01,P1,medium,localization,KR schema strings surfaced on US forms via shared FormSchema,US UX,schema-ko-en + localizeFormSchema on all Group A fields,US-2-fix,mitigated
+R-US2FIX-02,P2,medium,content,Worked examples in US content not numerically locked to engine defaults,US trust,Independent vitest for 8 slugs; manual spot-check guides vs UI,US-3,open
+R-US2FIX-03,P2,low,ops,CDN/Vary cache split KR vs US not proven on Vercel Preview,US/KR cache,Preview-only checklist; pathname-based region,US-3,open
+R-US2FIX-04,P2,medium,sources,IEEE/NFPA doc URLs marked pending without document-level verification,US content,PHASE-US2-FIX-SOURCES.csv; no invented citations,US-3,open
+R-US3-01,P1,medium,ops,Webpack WasmHash failure on corrupt .next after parallel build/start,US/KR deploy,Stop server before build; delete .next cache only; BUILD-FAILURE-NOTES.md,US-3,mitigated
+R-US3-02,P1,medium,content,VFD kW path labeled as kVA in US UI while KR engine stores heuristic scalar,US trust,US runGroupB labels sp=kW s/si=kVA; engine unchanged; vitest lock,US-3,mitigated
+R-US3-03,P2,high,product,Group B workspace tools not routable (load-flow sld schedules),US scope,Catalog blocked; US-4 confirms regulation dependency; US-6 implementation,US-4,open
+R-US3-04,P2,medium,qa,Full 56x5 Playwright interaction matrix not executed,US QA,280/280 PASS on latest build (PHASE-US3-BROWSER-QA.csv); in-page numeric spot-checks partial,US-3,mitigated
+R-US3-05,P2,medium,content,Source document body verification incomplete,US launch,US-4 SOURCE-CLOSURE Group A; NEC BLOCKED_LICENSE; release_ready=0,US-4,open
+R-US4-01,P1,medium,regulation,Type 3 NEC calculators shipped without document verification,US liability,Type 1/2 pilots only; 5 Group C blocked; guard blocks table embed,US-5,mitigated
+R-US4-02,P2,medium,qa,305-row browser matrix not run before US-4 close,US QA,305/305 PASS PHASE-US4-BROWSER-QA.csv; concurrency 2,US-4,mitigated
+R-US5-01,P2,medium,content,61 calculator guides uneven depth (Group A rich vs spec-built),US trust,spec-to-content builders + UsGuidePanel; US-5 QA CSV,US-5,open
+R-US5-02,P2,medium,content,24 KR articles not all published in English,US scope,10 guides routable; blocked in PHASE-US5-BLOCKED-CONTENT,US-6,open
+R-US5-03,P2,low,seo,US guides noindex but structured data present,US preview,review before indexable flip in US-7,US-7,open
+R-US5-04,P2,medium,qa,OpenStax deep page URLs may 404 in automated body fetch,US sources,Use book landing + PUBLIC pattern checks; PARTIAL ok,US-5,mitigated
+R-US5-05,P2,low,qa,independent_expected still N/A on some Group A viewports,browser QA,61/61 JSON expectations; 205/305 UI PASS rows,US-5,open
+R-US6-01,P2,medium,policy,US operator contact and legal review PENDING,privacy/terms,User confirmation before US-7 public,US-7,open
+R-US6-02,P2,low,product,SLD workspace PARTIAL (no canvas symbols),workspaces,Enhance or document limits,US-7,open
+R-US6-03,P2,low,qa,US-6 extended Playwright matrix NOT_RUN in closure session,browser QA,Re-run US6_BROWSER_QA after build,US-7,mitigated
+"R-US7-01","P0","low","regression","US7 verification of historical R-P0-01 and R-P0-03","KR production","132 baseline URL set metadata and static routes equal; shared engines unchanged; all tests pass","US-7","mitigated"
+"R-US7-02","P1","medium","search","Fault current aliases and three omitted calculators","US discovery","95 records with all 61 calculators and 14 required searches passing","US-7","mitigated"
+"R-US7-03","P1","high","sources","26 calculators 5 guides and radial load-flow lack full documentary scope","US excluded scope","BLOCKED_TECHNICAL per exact URL allowlist; source and manufacturer model review before inclusion","US-9","blocked"
+"R-US7-04","P1","high","license","NFPA NEC table rights unresolved; IEC full text not accessed","US regulation","BLOCKED_LICENSE and BLOCKED_ACCESS retained; Type3 NEC zero; no tables embedded","US-9","blocked"
+"R-US7-05","P1","medium","policy","Owner identity contact reuse provider retention and legal applicability pending","US site-wide release","Consolidated OPERATOR-CONFIRMATION and POLICY-REVIEW; no invented identity or US address requirement","US-9","open"
+"R-US7-06","P2","medium","content","Two repetitive cable instructional FAQ clusters","Five already excluded cable calculators","Tailor explanations during source closure; no forced public inclusion","US-9","open"
+"R-US7-07","P2","medium","performance","Lighthouse scores TBT and actual CDN performance not measured","US deployment QA","42 local timing runs documented; no dependency install; repeat in approved US8 environment","US-8","open"
+"R-US7-08","P2","medium","accessibility","Screen-reader and axe incomplete items require manual review","US accessibility","106 axe scans and 530 focus/overflow checks pass; no WCAG certification claimed","US-8","open"
+"R-US7-09","P2","low","workspace","SLD remains list and SVG PARTIAL feature","US SLD","Explicit limitations; READY_NOINDEX only; no canvas or compliance claim","US-9","open"
+"R-US7-10","P2","medium","build","Node25 local runtime and intermittent font or WasmHash build failure","Build reproducibility","Fresh isolated successful output; failure logs retained; verify linked Node24 runtime in US8","US-8","open"
+"R-US7-11","P1","medium","privacy","US event forwarding to inherited production gtag","US privacy","US helper blocks route events; mock is local only; zero US external requests; KR behavior retained","US-7","mitigated"
+"R-US7-12","P1","medium","workspace","Persisted draft hydration and US CSV category-language defects","US workspaces","Hydration-safe snapshots; malformed/quota checks; English distinct category export regression and actual download checks","US-7","mitigated"
+R-US8-01,P2,low,ops,US Preview validated but Production legal gate open,US launch,Operator confirmation before public,US-9,open
+R-US8-02,P2,low,qa,axe incomplete items remain; SR manual NOT_RUN,accessibility,Manual SR pass on release candidates,US-9,open
+R-US8-03,P1,medium,policy,Five US policy pages BLOCKED_POLICY,US trust,Owner + counsel before indexable,US-9,mitigated
+
+"R-US9B-01","P2","medium","privacy","Hobby DPA gap; non-runtime Vercel retention not fully confirmed in dashboard","US legal accuracy","Official-source Privacy READY_NOINDEX; release_blocker NO; Pro review before monetization","US-9B closure","mitigated"
+"R-US9B-02","P2","medium","accessibility","Screen reader NOT_RUN; workspace contrast manual limits remain","US accessibility","Manual procedure doc; release_blocker NO; not equated with blocking defect","US-9B closure","open"
+"R-US9B-03","P2","medium","performance","Lab LCP may exceed 2500ms on some mobile paths","US mobile","Prior US-9B thirty-run medians recorded; field CWV not claimed","US-9B","measured"
+"R-US9B-04","P1","high","hosting","Future monetization may violate Hobby or tax rules","US future ads","US-9 released on Hobby with no US GA/ads/revenue; reassess Pro before monetization","US-10","open"
+
+"R-US9B-05","P2","low","policy","US8-03 five-policy BLOCKED counts superseded","US policy","All five policy URLs READY_NOINDEX; index still off","US-9B closure","mitigated"
+"R-US9B-06","P2","low","qa","US7-07 historical missing CDN Lighthouse measurements superseded","US performance","Thirty fresh repeated final Preview Lighthouse runs; current raw medians and range; field CWV not established","US-9B","measured"
+"R-US9B-07","P2","low","accessibility","US light muted text contrast below normal-text threshold","US light mode","US-only CSS token corrected from708ca4 to52687d; full106 light and106 dark tested; brand exemption retained with raw nodes","US-9B","mitigated"

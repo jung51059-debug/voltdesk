@@ -25,6 +25,9 @@ export type GaEventParams = {
   article_slug?: string;
   target_tool_slug?: string;
   source?: string;
+  content_locale?: string;
+  content_region?: string;
+  unit_system?: string;
 };
 
 const ALLOWED_PARAM_KEYS = new Set([
@@ -33,6 +36,9 @@ const ALLOWED_PARAM_KEYS = new Set([
   "article_slug",
   "target_tool_slug",
   "source",
+  "content_locale",
+  "content_region",
+  "unit_system",
 ]);
 
 export function productionHostname(): string {
@@ -91,6 +97,7 @@ declare global {
 export function trackGaEvent(name: GaEventName, params: GaEventParams = {}): boolean {
   if (!isGaEnabled()) return false;
   if (typeof window === "undefined") return false;
+  if (window.location.pathname === '/us' || (window.location.pathname ?? '').startsWith('/us/')) return false;
   const safe = sanitizeGaParams(params);
   window.gtag?.("event", name, safe);
   return true;

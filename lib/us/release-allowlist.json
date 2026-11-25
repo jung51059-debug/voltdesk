@@ -1,0 +1,638 @@
+[
+  {
+    "path": "/us",
+    "kind": "home",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools",
+    "kind": "calculator_hub",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical",
+    "kind": "calculator_hub",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility",
+    "kind": "calculator_hub",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/references",
+    "kind": "guide_hub",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/workspaces",
+    "kind": "workspace_hub",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/single-phase-current",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/three-phase-current",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/amp-to-kw",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/kw-kva-hp",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/power-factor",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/power-triangle",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/power-factor-correction",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/thd",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/harmonic-filter",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/motor-slip",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/motor-acceleration",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/transformer-load",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/transformer-current",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/transformer-loss",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/transformer-parallel",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/transformer-impedance",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/rlc-impedance",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/ct-ratio",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/pt-ratio",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/busbar",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/lux",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/lighting-density",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/solar-pv",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/soil-resistivity",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/field-compare",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/duty-cycle",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/trend-analysis",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/retrofit-compare",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/equipment-load",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/energy-intensity",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/motor-current",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/motor-starting",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/transformer-sizing",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/soft-starter",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/ups-backup-time",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/ups-capacity",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/battery-capacity",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/generator-load",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/generator-fuel",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/monthly-energy",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/yoy-energy",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/energy-cost",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/pm-interval",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/facility/phase-unbalance",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/generator-load-test",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/vfd-sizing",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/generator-sizing",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/facility/generator-start-vd",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/grounding-rod",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/cable-impedance",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/cable-resistance",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/voltage-drop",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/path-voltage-drop",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/cable-parallel",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/ohms-law",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/wire-size-converter",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/contract-power-current",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/short-circuit",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/protection-relay",
+    "kind": "calculator",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/electrical/cable-ampacity",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/tools/electrical/conduit-fill-physical",
+    "kind": "calculator",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/references/kw-vs-kva",
+    "kind": "guide",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/references/single-phase-vs-three-phase",
+    "kind": "guide",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/references/voltage-drop-basics",
+    "kind": "guide",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/references/awg-and-kcmil-explained",
+    "kind": "guide",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/references/us-voltage-systems",
+    "kind": "guide",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/references/split-phase-120-240",
+    "kind": "guide",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/references/understanding-wire-ampacity-user-input",
+    "kind": "guide",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/references/conduit-fill-physical-explained",
+    "kind": "guide",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/references/grounding-vs-bonding-terms",
+    "kind": "guide",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/references/motor-horsepower-and-current",
+    "kind": "guide",
+    "status": "READY_FOR_RELEASE",
+    "proposedIndex": true
+  },
+  {
+    "path": "/us/workspaces/load-flow",
+    "kind": "workspace",
+    "status": "BLOCKED_TECHNICAL",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/workspaces/sld",
+    "kind": "workspace",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/workspaces/load-schedule",
+    "kind": "workspace",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/workspaces/cable-schedule",
+    "kind": "workspace",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/electrical-basics",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/cable",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/transformer",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/motor",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/protection",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/grounding",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/power-quality",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/lighting",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/solar",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/power-system",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/schedule",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/advanced",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/generator",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/ups",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/facility-ops",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/tools/categories/field-verify",
+    "kind": "category",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/search",
+    "kind": "search",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/favorites",
+    "kind": "favorites",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/settings",
+    "kind": "settings",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/about",
+    "kind": "about",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/contact",
+    "kind": "contact",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/privacy",
+    "kind": "privacy",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/terms",
+    "kind": "terms",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/disclaimer",
+    "kind": "disclaimer",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  },
+  {
+    "path": "/us/sources",
+    "kind": "sources",
+    "status": "READY_NOINDEX",
+    "proposedIndex": false
+  }
+]

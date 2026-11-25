@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Heart, Menu, Moon, Search, Settings, Sun, X } from "lucide-react";
+import { RegionSwitcher } from "@/components/layout/region-switcher";
 import { SearchOverlay } from "@/components/layout/search-overlay";
 import { AmporyMark, AmporyWordmark } from "@/components/brand/ampory-mark";
 import { usePreferences } from "@/components/providers/preferences-provider";
@@ -65,6 +66,7 @@ export function Header() {
           })}
         </nav>
         <div className="ml-auto flex items-center gap-1">
+          <RegionSwitcher />
           <button
             type="button"
             onClick={() => setOpenSearch(true)}

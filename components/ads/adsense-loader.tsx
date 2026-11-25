@@ -8,6 +8,7 @@ const SKIP_ADS = new Set(["/favorites", "/settings", "/search"]);
 
 export function AdSenseLoader() {
   const pathname = usePathname();
+  if (pathname.startsWith("/us")) return null;
   if (SKIP_ADS.has(pathname)) return null;
 
   return (

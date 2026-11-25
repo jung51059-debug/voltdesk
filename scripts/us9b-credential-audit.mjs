@@ -1,0 +1,6 @@
+import fs from 'node:fs';import path from 'node:path';import {project} from './us9b-auth.mjs';
+const p=await project(),auth=JSON.parse(fs.readFileSync(path.join(process.env.APPDATA,'com.vercel.cli/Data/auth.json'),'utf8')),secrets=[auth.token,...Object.keys(p.protectionBypass??{})].filter(v=>typeof v==='string'&&v.length>15),files=[];
+function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.isDirectory()){if(!/^(next-|stage-|pdf-tools|prior-)/.test(e.name))walk(path.join(dir,e.name));}else if(/\.(json|md|csv|txt|log|sha256)$/.test(e.name))files.push(path.join(dir,e.name));}}
+walk('artifacts/us9b');for(const file of fs.readdirSync('.'))if(file.startsWith('PHASE-US9B-'))files.push(file);
+const matches=[];for(const file of files){const b=fs.readFileSync(file);if(secrets.some(s=>b.includes(Buffer.from(s))))matches.push(file);}
+const result={checkedAt:new Date().toISOString(),filesScanned:files.length,credentialValuesWritten:false,matches,result:matches.length?'FAIL':'PASS',scope:'Exact current account auth and existing project bypass values compared only in memory; no values printed'};fs.writeFileSync('artifacts/us9b/credential-audit.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));if(matches.length)process.exitCode=1;

@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 import { loadFavorites, subscribeStorage, toggleFavorite as toggleStored } from "@/lib/storage/local";
+import type { StorageRegion } from "@/lib/storage/region-keys";
 
 type FavoriteContextValue = {
   favorites: string[];
@@ -11,22 +12,29 @@ type FavoriteContextValue = {
 
 const FavoriteContext = createContext<FavoriteContextValue | null>(null);
 
-function getSnapshot() {
-  return JSON.stringify(loadFavorites());
-}
 
 function getServerSnapshot() {
   return "[]";
 }
 
-export function FavoriteProvider({ children }: { children: React.ReactNode }) {
+export function FavoriteProvider({
+  children,
+  region = "KR",
+}: {
+  children: React.ReactNode;
+  region?: StorageRegion;
+}) {
+  const getSnapshot = useCallback(() => JSON.stringify(loadFavorites(region)), [region]);
   const raw = useSyncExternalStore(subscribeStorage, getSnapshot, getServerSnapshot);
   const favorites = useMemo(() => JSON.parse(raw) as string[], [raw]);
 
-  const toggle = useCallback((id: string) => {
-    const next = toggleStored(id);
-    return next.includes(id);
-  }, []);
+  const toggle = useCallback(
+    (id: string) => {
+      const next = toggleStored(id, region);
+      return next.includes(id);
+    },
+    [region],
+  );
 
   const value = useMemo(
     () => ({

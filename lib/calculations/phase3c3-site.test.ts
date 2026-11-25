@@ -37,7 +37,7 @@ const WORKFLOW_CATEGORIES = [
 ] as const;
 
 function readAppFile(relativePath: string) {
-  return readFileSync(join(process.cwd(), "app", relativePath), "utf8");
+  return readFileSync(join(process.cwd(), "app", "(kr)", relativePath), "utf8");
 }
 
 describe("Phase 3C-3 — 카테고리 허브", () => {

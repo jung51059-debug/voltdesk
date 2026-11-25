@@ -1,7 +1,8 @@
 import { DEFAULT_PREFERENCES, type UserPreference } from "@/lib/types";
+import { storageKeysFor, type StorageRegion } from "@/lib/storage/region-keys";
+const PREF_KEY = storageKeysFor("KR").preferences;
 
-const PREF_KEY = "voltdesk:preferences";
-const FAV_KEY = "voltdesk:favorites";
+const FAV_KEY = storageKeysFor("KR").favorites;
 const RECENT_TOOLS_KEY = "voltdesk:recent-tools";
 const RECENT_ARTICLES_KEY = "voltdesk:recent-articles";
 const RECENT_SEARCH_KEY = "voltdesk:recent-searches";
@@ -42,22 +43,32 @@ export function writeJson(key: string, value: unknown) {
   emitStorage();
 }
 
-export function loadPreferences(): UserPreference {
-  return { ...DEFAULT_PREFERENCES, ...readJson(PREF_KEY, {}) };
+const US_PREFERENCE_DEFAULTS: UserPreference = {
+  ...DEFAULT_PREFERENCES,
+  defaultVoltage: 480,
+  defaultFrequency: 60,
+  unitSystem: "mixed",
+  language: "en",
+};
+
+export function loadPreferences(region: StorageRegion = "KR"): UserPreference {
+  const base = region === "US" ? US_PREFERENCE_DEFAULTS : DEFAULT_PREFERENCES;
+  return { ...base, ...readJson(storageKeysFor(region).preferences, {}) };
 }
 
-export function savePreferences(prefs: UserPreference) {
-  writeJson(PREF_KEY, prefs);
+export function savePreferences(prefs: UserPreference, region: StorageRegion = "KR") {
+  writeJson(storageKeysFor(region).preferences, prefs);
 }
 
-export function loadFavorites(): string[] {
-  return readJson<string[]>(FAV_KEY, []);
+export function loadFavorites(region: StorageRegion = "KR"): string[] {
+  return readJson<string[]>(storageKeysFor(region).favorites, []);
 }
 
-export function toggleFavorite(toolId: string): string[] {
-  const current = loadFavorites();
+export function toggleFavorite(toolId: string, region: StorageRegion = "KR"): string[] {
+  const key = storageKeysFor(region).favorites;
+  const current = loadFavorites(region);
   const next = current.includes(toolId) ? current.filter((id) => id !== toolId) : [toolId, ...current];
-  writeJson(FAV_KEY, next);
+  writeJson(key, next);
   return next;
 }
 
@@ -79,15 +90,17 @@ export function pushRecentArticle(articleId: string) {
   writeJson(RECENT_ARTICLES_KEY, next);
 }
 
-export function loadRecentSearches(): string[] {
-  return readJson<string[]>(RECENT_SEARCH_KEY, []);
+export function loadRecentSearches(region: StorageRegion = "KR"): string[] {
+  return readJson<string[]>(storageKeysFor(region).recentSearches, []);
 }
 
-export function pushRecentSearch(query: string) {
+export function pushRecentSearch(query: string, region: StorageRegion = "KR") {
   const q = query.trim();
   if (!q) return;
-  const next = [q, ...loadRecentSearches().filter((item) => item !== q)].slice(0, 8);
-  writeJson(RECENT_SEARCH_KEY, next);
+  const key = storageKeysFor(region).recentSearches;
+  const current = readJson<string[]>(key, []);
+  const next = [q, ...current.filter((item) => item !== q)].slice(0, 8);
+  writeJson(key, next);
 }
 
 export function clearRecent() {

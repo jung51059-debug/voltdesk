@@ -1,0 +1,2 @@
+check,result,notes
+production_sample,PASS,See artifacts/us9/deployment.json and US-9B baselines for full matrix

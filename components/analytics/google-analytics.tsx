@@ -23,7 +23,7 @@ declare global {
 export function GoogleAnalytics() {
   const pathname = usePathname();
   const isFirstView = useRef(true);
-  const enabled = isGaEnabled();
+  const enabled = isGaEnabled() && !pathname.startsWith("/us");
 
   useEffect(() => {
     if (!enabled) return;
